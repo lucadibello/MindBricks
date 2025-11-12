@@ -1,0 +1,434 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+  --accent: #f97316;
+  --accent-2: #f43f5e;
+  --dark: #020617;
+  --muted: #94a3b8;
+}
+
+body {
+  background: radial-gradient(circle at 10% 20%, #1e1b4b 0%, #020617 55%, #000 100%);
+  color: #e2e8f0;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.reveal {
+  font-family: inherit;
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  text-transform: none;
+  letter-spacing: -0.02em;
+}
+
+.reveal section {
+  padding: 1.5rem 1.5rem 2rem;
+}
+
+.tagline {
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.title-meta {
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 0.35rem 1rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.highlight {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.lead {
+  font-size: 1.2rem;
+  color: #cbd5f5;
+  max-width: 760px;
+}
+
+.accent-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.accent-list li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.4rem;
+}
+
+.accent-list li::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.mini-note {
+  margin-top: 1.2rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+
+.fragment.blur-in {
+  filter: blur(8px);
+  opacity: 0.15;
+  transform: translateY(10px);
+  transition: filter 280ms ease, opacity 280ms ease, transform 280ms ease;
+}
+
+.fragment.blur-in.visible {
+  filter: blur(0);
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.twocol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.twocol.align-top {
+  align-items: flex-start;
+}
+
+.device-mock {
+  width: min(320px, 90%);
+  margin: 0 auto;
+  padding: 1rem;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(15,23,42,0.85), rgba(2,6,23,0.9));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 25px 50px rgba(2,6,23,0.65);
+}
+
+.device-screen {
+  border-radius: 20px;
+  background: radial-gradient(circle at 20% 20%, rgba(249,115,22,0.45), rgba(15,23,42,0.85));
+  padding: 1.2rem;
+  min-height: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.device-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  pointer-events: none;
+}
+
+.signal {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.signal span {
+  display: block;
+  width: 14px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 8px;
+}
+
+.signal span:nth-child(1) { height: 28px; }
+.signal span:nth-child(2) { height: 48px; background: var(--accent); }
+.signal span:nth-child(3) { height: 36px; }
+.signal span:nth-child(4) { height: 60px; background: var(--accent-2); }
+
+.device-note {
+  font-size: 0.85rem;
+  color: #c4d1f6;
+}
+
+.icon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  margin-right: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.icon-pill svg {
+  width: 16px;
+  height: 16px;
+}
+
+.media-frame {
+  border-radius: 18px;
+  background: rgba(2, 6, 23, 0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 1rem;
+  box-shadow: 0 20px 40px rgba(2,6,23,0.55);
+}
+
+.media-frame img {
+  border-radius: 12px;
+  width: 100%;
+  height: auto;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+  margin: 0;
+  list-style: none;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 2px;
+  background: linear-gradient(var(--accent), var(--accent-2));
+  opacity: 0.6;
+}
+
+.timeline li {
+  margin-bottom: 0.8rem;
+  position: relative;
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: -1.05rem;
+  top: 0.2rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(249,115,22,0.8);
+}
+
+.pulse-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 16px rgba(244,63,94,0.7);
+  display: inline-block;
+}
+
+.auto-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.auto-card {
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(15,23,42,0.6);
+  min-height: 150px;
+}
+
+.badge a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.photo-credit {
+  font-size: 0.7rem;
+  color: rgba(226, 232, 240, 0.65);
+  margin-top: 0.4rem;
+  text-align: right;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.2rem;
+  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.5);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.card ul {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card ul li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.card ul li::before {
+  content: '▸';
+  color: var(--accent);
+  position: absolute;
+  left: 0;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.step {
+  border-left: 4px solid var(--accent-2);
+  background: rgba(15, 23, 42, 0.6);
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+.step strong {
+  display: block;
+  color: white;
+  margin-bottom: 0.3rem;
+}
+
+.storyboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  counter-reset: panel;
+  margin-top: 1rem;
+  padding: 0;
+}
+
+.storyboard li {
+  list-style: none;
+  background: rgba(15, 23, 42, 0.65);
+  border-radius: 16px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 160px;
+}
+
+.storyboard li::before {
+  counter-increment: panel;
+  content: counter(panel);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.storyboard li span {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.thanks {
+  text-align: center;
+}
+
+.thanks .grid {
+  text-align: left;
+}
+
+/* Density + sizing utilities */
+.lead.small { font-size: 1.05rem; max-width: 680px; }
+
+.grid.smallgap { gap: 0.9rem; }
+
+.card.compact { padding: 0.9rem; }
+.card.compact h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+.card.compact ul li { margin-bottom: 0.18rem; font-size: 0.92rem; }
+
+.compact-list { margin: 0.2rem 0 0; padding: 0; list-style: none; }
+.compact-list li { padding-left: 1rem; }
+.compact-list li::before { left: 0; }
+
+.badge.small { padding: 0.25rem 0.7rem; font-size: 0.78rem; }
+
+/* Slightly reduce default section padding on dense slides (optional) */
+section[data-dense] { padding: 1rem 1rem 1.2rem; }
+
+/* Better readability on small screens */
+@media (max-width: 900px) {
+  .lead.small { font-size: 1rem; max-width: 560px; }
+  .card.compact { padding: 0.8rem; }
+  .card.compact ul li { font-size: 0.9rem; }
+}
+
+/* Consistent phone screenshot sizing */
+.phone-shot {
+  width: 260px;               /* fixed width for all screenshots */
+  max-height: 520px;          /* keeps tall ones reasonable */
+  object-fit: contain;        /* NEVER distort aspect ratio */
+  border-radius: 16px;        /* cleaner look */
+}
+
+/* Optional: center them nicely with spacing */
+.showcase-stack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 520px;              /* same as max-height → perfect centering */
+}
