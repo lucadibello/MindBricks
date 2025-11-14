@@ -77,7 +77,7 @@
 
           <!-- Overview slide (split in 3 for better animations) -->
           <section data-transition="slide" data-auto-animate>
-            <h2>MindBricks · <span class="highlight">Focus Coach</span> Overview</h2>
+            <h2>MindBricks · <span class="highlight">Overview</span></h2>
 
             <div class="grid" style="max-width: 90%;">
               <div class="card fragment blur-in">
@@ -136,8 +136,6 @@
                 <ul class="compact-list fragment blur-in" data-fragment-index="0">
                   <li>Timers only</li>
                   <li>Generic rewards</li>
-                  <li>No environment sensing</li>
-                  <li>No guidance</li>
                 </ul>
               </div>
 
@@ -147,8 +145,7 @@
                 <ul class="compact-list">
                   <li class="fragment blur-in">Context-aware</li>
                   <li class="fragment blur-in">Adaptive</li>
-                  <li class="fragment blur-in">On-device sensing</li>
-                  <li class="fragment blur-in">Next-day focus timeline</li>
+                  <li class="fragment blur-in">On-device</li>
                 </ul>
               </div>
             </div>
@@ -162,9 +159,6 @@
               <span class="badge small fragment blur-in" style="white-space:nowrap;" data-auto-next="100">
                 Privacy: fully on-device
               </span>
-              <span class="badge small fragment blur-in" style="white-space:nowrap;" data-auto-next="100" >
-                Generative: next-day plan
-              </span>
               <span class="badge small fragment blur-in" style="white-space:nowrap;">
                 Personalized: learns your habits
               </span>
@@ -174,7 +168,7 @@
 
         <!-- 3) plan -->
         <section>
-          <section data-transition="slide" data-auto-animate>
+          <section data-transition="slide" data-auto-animate data-visibility="hidden">
             <h2>MindBricks · <span class="highlight">Flow Summary</span></h2>
 
             <!-- Scoped density tweaks -->
@@ -187,7 +181,7 @@
 
             <div class="steps compact" style="display:grid; grid-template-columns:repeat(3, minmax(200px, 1fr)); gap:1rem; margin-top:1rem; justify-content:center; width:fit-content; max-width:90%;">
               <div class="step fragment blur-in" data-fragment-index="1">
-                <strong>1) Start a focus block</strong>
+                <strong>1) Start a focus session</strong>
                 <p>Pomodoro runs and records <span class="highlight">light</span>, <span class="highlight">noise</span>, <span class="highlight">phone pickups</span>.</p>
               </div>
 
@@ -197,19 +191,19 @@
               </div>
 
               <div class="step fragment blur-in" data-fragment-index="3">
-                <strong>3) Learn on-device</strong>
-                <p>Update the <span class="highlight">user's focus profile</span> (habits + environment) privately on the phone.</p>
+                <strong>3) Motivate</strong>
+                <p><span class="highlight">Earn coins</span> to build your house; ending early removes progress — gentle pressure.</p>
               </div>
 
               <div class="step fragment blur-in" data-fragment-index="4">
-                <strong>4) Plan tomorrow</strong>
+                <strong>4) Learn on-device</strong>
+                <p>Update the <span class="highlight">user's focus profile</span> (habits + environment) privately on the phone.</p>
+              </div>
+
+              <div class="step fragment blur-in" data-fragment-index="5"> <strong>5) Plan tomorrow</strong>
                 <p>Generate a <span class="highlight">color-coded timeline</span>: best hours + suggested environments.</p>
               </div>
 
-              <div class="step fragment blur-in" data-fragment-index="5">
-                <strong>5) Motivate</strong>
-                <p><span class="highlight">Earn coins</span> to build your house; ending early removes progress — gentle pressure.</p>
-              </div>
 
               <div class="step fragment blur-in" data-fragment-index="6" style="border-color: #34d399;">
                 <strong>6) Repeat daily</strong>
