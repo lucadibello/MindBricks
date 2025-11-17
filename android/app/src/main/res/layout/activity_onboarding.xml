@@ -21,26 +21,29 @@
         android:padding="16dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonSkip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Skip" />
+            style="?attr/materialButtonOutlinedStyle"
+            android:text="@string/onboarding_skip" />
 
         <Space
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonNext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Next" />
+            android:text="@string/onboarding_next" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
