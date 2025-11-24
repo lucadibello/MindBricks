@@ -96,6 +96,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
         // generate a new avatar on "refresh" click
         reloadAvatarButton.setOnClickListener(v -> {
             String seed = generateUniqueSeed();
+            prefs.setUserAvatarSeed(seed);
             loadRandomizedProfilePicture(seed);
         });
 
@@ -114,9 +115,10 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String seed = prefs.getUserName();
+        String seed = prefs.getUserAvatarSeed();
         if (seed == null || seed.isEmpty()) {
             seed = generateUniqueSeed();
+            prefs.setUserAvatarSeed(seed);
         }
         loadRandomizedProfilePicture(seed);
     }

@@ -16,7 +16,8 @@ public class PreferencesManager {
         USER_EMAIL("user_email"),
         USER_FOCUS_GOAL("user_focus_goal"),
         USER_SPRINT_LENGTH_MINUTES("user_sprint_length_minutes"),
-        USER_TAGS_JSON("user_tags_json");
+        USER_TAGS_JSON("user_tags_json"),
+        USER_AVATAR_SEED("user_avatar_seed");
 
 
 
@@ -106,5 +107,13 @@ public class PreferencesManager {
     }
     public String getUserTagsJson() {
         return preferences.getString(PreferencesKey.USER_TAGS_JSON.getName(), "[]");
+    }
+
+    // -- User avatar seed --
+    public void setUserAvatarSeed(String seed) {
+        preferences.edit().putString(PreferencesKey.USER_AVATAR_SEED.getName(), seed).apply();
+    }
+    public String getUserAvatarSeed() {
+        return preferences.getString(PreferencesKey.USER_AVATAR_SEED.getName(), "");
     }
 }
