@@ -79,22 +79,13 @@ public final class PermissionManager {
             this.onRationale = onRationale;
         }
 
+        // FIXME: maybe this class is useless. We may remove it in the future!
+
         /**
-         * Request permission when activity is created
+         * Launch the permission dialog without any checks.
          */
-        public void checkAndRequest(Activity activity) {
-            if (PermissionManager.hasPermission(activity, permission)) {
-                if (onGranted != null) onGranted.run();
-            } else if (PermissionManager.shouldShowRationale(activity, permission)) {
-                if (onRationale != null) {
-                    onRationale.run();
-                } else {
-                    // if no rationale provided = request anyway
-                    launcher.launch(permission);
-                }
-            } else {
-                launcher.launch(permission);
-            }
+        public void launch() {
+            launcher.launch(permission);
         }
     }
 }
