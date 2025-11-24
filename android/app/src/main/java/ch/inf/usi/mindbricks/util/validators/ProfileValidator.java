@@ -2,12 +2,10 @@ package ch.inf.usi.mindbricks.util.validators;
 
 import android.text.TextUtils;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.util.ValidationResult;
 
 /**
