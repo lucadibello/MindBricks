@@ -4,12 +4,16 @@
 
     <!-- Notifications: needed to inform the user when timer ends -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Audio: needed to record background noise during focus sessions -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- Internet: needed to download the generated avatar from the APIs -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"

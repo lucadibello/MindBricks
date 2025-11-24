@@ -25,15 +25,49 @@
     <string name="onboarding_profile_goal_label">What project or habits do you want to focus on?</string>
     <string name="onboarding_profile_session_label">Preferred sprint length (minutes)</string>
     <string name="onboarding_profile_session_helper">Start with 25 minutes to follow the classic Pomodoro technique.</string>
+    <string name="onboarding_tags_empty_state">Add tags to label each study session (e.g. Algorithms, UX Research, Physics).</string>
+    <string name="onboarding_tags_add_button">Add a tag</string>
+    <string name="onboarding_error_goal_required">Tell us what you want to focus on.</string>
+    <string name="validation_error_sprint_required">Enter your preferred sprint length.</string>
+    <string name="validation_error_sprint_invalid">Use a positive number of minutes.</string>
+    <string name="validation_error_tags_required">Create at least one tag to track your sessions.</string>
+    <string name="onboarding_error_profile_required">Complete your profile to continue.</string>
+    <string name="onboarding_tags_dialog_title">Create a tag</string>
+    <string name="onboarding_tags_dialog_add">Add tag</string>
+    <string name="onboarding_tags_dialog_name_label">Tag name</string>
+    <string name="onboarding_tags_dialog_color_label">Pick a color</string>
+    <string name="onboarding_error_tag_name_required">Give your tag a name.</string>
+    <string name="onboarding_error_tag_color_required">You need to pick a color to create a tag.</string>
 
     <string name="onboarding_sensors_title">Sense your environment</string>
     <string name="onboarding_sensors_description">MindBricks learns based on ambient noise and light environment during study sessions.</string>
     <string name="onboarding_sensors_microphone_title">Microphone check-ins</string>
     <string name="onboarding_sensors_microphone_body">We only listen for noise levels during your sessions to understand in what environment you are.</string>
+    <string name="onboarding_sensors_microphone_rationale_title">Allow microphone in background</string>
+    <string name="onboarding_sensors_microphone_background_button">Why background access?</string>
+    <string name="onboarding_sensors_microphone_rationale">Allow microphone access so we can track noise during sessions, even when the screen is off. If you selected “Allow only while using”, switch to “Allow” in system settings.</string>
+    <string name="onboarding_sensors_microphone_allow_button">Allow microphone</string>
     <string name="onboarding_sensors_light_title">Luminance insights</string>
     <string name="onboarding_sensors_light_body">Ambient light data helps us understand if you are more productive in the dark, or in the bright.</string>
     <string name="onboarding_enable_microphone">Allow microphone</string>
-    <string name="onboarding_enable_light">Allow luminance sensor</string>
+    <string name="onboarding_enable_light_info">Why luminance matters</string>
+    <string name="onboarding_error_microphone_required">Enable microphone access to continue.</string>
+    <string name="onboarding_sensors_light_unavailable">Light sensor unavailable on this device</string>
+    <string name="onboarding_sensors_light_enabled">Light sensor enabled. We’ll read ambient light during sessions.</string>
+    <string name="onboarding_sensors_microphone_settings_title">Enable microphone in Settings</string>
+    <string name="onboarding_sensors_microphone_settings_body">You chose “Don’t allow”. To keep reading noise during sessions (even with the screen off), enable microphone for MindBricks in system Settings.</string>
+    <string name="onboarding_sensors_microphone_open_settings">Open settings</string>
+    <string name="onboarding_sensors_pickup_title">Phone pick-up detection</string>
+    <string name="onboarding_sensors_pickup_body">We use the significant motion sensor to detect when you lift or move the phone during focus sessions.</string>
+    <string name="onboarding_enable_pickup">Enable pick-up detection</string>
+    <string name="onboarding_sensors_pickup_unavailable">Pick-up detection unavailable on this device</string>
+    <string name="onboarding_sensors_pickup_enabled">Pick-up detection enabled.</string>
+    <string name="onboarding_notifications_rationale_title">Allow notifications</string>
+    <string name="onboarding_notifications_rationale_body">Enable notifications so we can remind you to start, pause, and celebrate focus sessions.</string>
+    <string name="onboarding_notifications_allow_button">Allow notifications</string>
+    <string name="onboarding_notifications_settings_title">Turn on notifications in Settings</string>
+    <string name="onboarding_notifications_settings_body">Notifications are off. Enable them in system Settings to get reminders.</string>
+    <string name="onboarding_notifications_open_settings">Open settings</string>
 
     <string name="onboarding_notifications_title">Stay on track</string>
     <string name="onboarding_notifications_body">Enable reminders so MindBricks can nudge you to start, pause, and celebrate after each focus session.</string>
@@ -42,6 +76,10 @@
 
     <string name="onboarding_done_title">Ready to focus</string>
     <string name="onboarding_done_body">You have everything set. When you tap Start we\'ll open your focus dashboard.</string>
+
+    <string name="validation_error_name_required">Add your name so we can personalize your coaching.</string>
+    <string name="validation_error_name_format">Use a real name (letters, accents, spaces, &amp; allowed).</string>
+    <string name="validation_error_tag_name_format">Use letters/numbers with simple punctuation for tag names.</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

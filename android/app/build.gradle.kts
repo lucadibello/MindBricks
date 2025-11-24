@@ -61,4 +61,7 @@ dependencies {
     annotationProcessor(libs.room.compiler)
     // charts
     implementation(libs.mpandroidchart)
+    // http image component + caching
+    implementation(libs.glide.runtime)
+    annotationProcessor(libs.glide.compiler)
 }

@@ -12,6 +12,7 @@ navigationFragment = "2.9.6"
 navigationUi = "2.9.6"
 room = "2.8.3"
 mpandroidchart = "v3.1.0"
+glide = "5.0.5"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -29,6 +30,10 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 # plotting
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
+
+# http image component + caching
+glide-runtime = { module = "com.github.bumptech.glide:glide", version.ref = "glide"}
+glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
