@@ -1,16 +1,19 @@
 package ch.inf.usi.mindbricks.ui.onboarding.page;
 
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -39,6 +42,7 @@ import java.util.Objects;
 
 public class OnboardingUserFragment extends Fragment implements OnboardingStepValidator {
 
+    private ImageView profilePicture;
     private TextInputLayout nameLayout;
     private TextInputLayout sprintLengthLayout;
 
@@ -50,6 +54,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     private final List<Tag> tags = new ArrayList<>();
     private PreferencesManager prefs;
+    private static final String DICEBEAR_BASE_URL = "https://api.dicebear.com/9.x/pixel-art/png";
 
     @Nullable
     @Override
@@ -61,6 +66,9 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
         prefs = new PreferencesManager(requireContext());
 
         // NOTE: get fields
+
+        // profile picture image view
+        profilePicture = view.findViewById(R.id.imageProfile);
 
         // name + container
         nameLayout = view.findViewById(R.id.layoutName);
@@ -95,6 +103,12 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        loadProfilePicture();
+    }
+
+    @Override
     public void onPause() {
         // on pause: store field values
         super.onPause();
@@ -125,6 +139,41 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
         prefs.setUserName(name);
         prefs.setUserSprintLengthMinutes(sprintLength);
         prefs.setUserTagsJson(serializeTags());
+    }
+
+    private String generateUniqueSeed() {
+        // randomize a part of the seed if no name is provided
+        // NOTE: this is needed otherwise all new users would have the same
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            // generate random char in range [a-z]
+            sb.append((char) ('a' + (int) (Math.random() * 26)));
+        }
+        return "mindbricks-" + sb;
+    }
+
+    /**
+     * Loads the default user avatar from DiceBear.
+     */
+    private void loadProfilePicture() {
+        String seed = prefs.getUserName();
+        if (seed == null || seed.isEmpty()) {
+            seed = generateUniqueSeed();
+        }
+
+        // build URL with unique seed
+        Uri avatarUri = Uri.parse(DICEBEAR_BASE_URL)
+                .buildUpon()
+                .appendQueryParameter("seed", seed)
+                .build();
+
+        // load image using Glide
+        Glide.with(this)
+                .load(avatarUri)
+                .placeholder(R.drawable.ic_avatar_placeholder)
+                .error(R.drawable.ic_avatar_placeholder)
+                .centerCrop()
+                .into(profilePicture);
     }
 
     private void launchPhotoPicker() {

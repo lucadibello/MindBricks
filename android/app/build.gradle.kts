@@ -62,5 +62,6 @@ dependencies {
     // charts
     implementation(libs.mpandroidchart)
     // http image component + caching
-    implementation(libs.glide)
+    implementation(libs.glide.runtime)
+    annotationProcessor(libs.glide.compiler)
 }
