@@ -8,30 +8,24 @@ import androidx.lifecycle.MutableLiveData;
 
 public class OnboardingSensorsViewModel extends AndroidViewModel {
 
-    private MutableLiveData<Boolean> hasMicrophone = new MutableLiveData<>(false);
-
     private MutableLiveData<Boolean> hasLuminanceSensor = new MutableLiveData<>(false);
-    private MutableLiveData<Boolean> hasPickUpGestureSensor = new MutableLiveData<>(false);
-    private MutableLiveData<Boolean> hasProximitySensor = new MutableLiveData<>(false);;
+    private MutableLiveData<Boolean> hasSignificantMotionSensor = new MutableLiveData<>(false);
 
-    // permissions
-    private MutableLiveData<Boolean> hasRecordingPermission = new MutableLiveData<>(false);;
+    // permissions / acknowledgements
+    private MutableLiveData<Boolean> hasRecordingPermission = new MutableLiveData<>(false);
+    private MutableLiveData<Boolean> hasAcknowledgedPickup = new MutableLiveData<>(false);
 
 
     public OnboardingSensorsViewModel(@NonNull Application application) {
         super(application);
     }
 
-    public MutableLiveData<Boolean> getHasMicrophone() {
-        return hasMicrophone;
-    }
-
     public MutableLiveData<Boolean> getHasLuminanceSensor() {
         return hasLuminanceSensor;
     }
 
-    public MutableLiveData<Boolean> getHasPickUpGestureSensor() {
-        return hasPickUpGestureSensor;
+    public MutableLiveData<Boolean> getHasSignificantMotionSensor() {
+        return hasSignificantMotionSensor;
     }
 
     public MutableLiveData<Boolean> getHasRecordingPermission() {
@@ -40,5 +34,13 @@ public class OnboardingSensorsViewModel extends AndroidViewModel {
 
     public void setHasRecordingPermission(boolean b) {
         hasRecordingPermission.setValue(b);
+    }
+
+    public MutableLiveData<Boolean> getHasAcknowledgedPickup() {
+        return hasAcknowledgedPickup;
+    }
+
+    public void setHasAcknowledgedPickup(boolean value) {
+        hasAcknowledgedPickup.setValue(value);
     }
 }
