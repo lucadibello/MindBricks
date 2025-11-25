@@ -28,25 +28,27 @@ public class ShopFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 1. Get a reference to the RecyclerView from the binding
-        RecyclerView shopRecyclerView = binding.shopItemsRecyclerView;
+        RecyclerView shopRecyclerView1 = binding.itemsRecyclerView1;
+        RecyclerView shopRecyclerView2 = binding.itemsRecyclerView2;
 
-        // 2. Create sample data for the shop
+        // Sample data for the shop
         List<ShopItem> items = new ArrayList<>();
-        items.add(new ShopItem("Cool Brick", 100, R.drawable.ic_home_black_24dp)); // Use your own drawables
+        items.add(new ShopItem("Cool Brick", 100, R.drawable.ic_home_black_24dp));
         items.add(new ShopItem("Fancy Brick", 250, R.drawable.ic_dashboard_black_24dp));
         items.add(new ShopItem("Golden Brick", 500, R.drawable.ic_notifications_black_24dp));
         items.add(new ShopItem("Basic Brick", 50, R.drawable.ic_coin_icon));
         items.add(new ShopItem("Another Brick", 120, R.drawable.ic_home_black_24dp));
 
 
-        // 3. Create an instance of your adapter and pass the data to it
-        ShopItemAdapter adapter = new ShopItemAdapter(items);
+        // Create an instance of adapter
+        ShopItemAdapter adapter1 = new ShopItemAdapter(items);
+        ShopItemAdapter adapter2 = new ShopItemAdapter(items);
 
-        // 4. Attach the adapter to the RecyclerView
-        shopRecyclerView.setAdapter(adapter);
 
-        // The layout manager is already set in the XML, so you don't need to set it here.
+        // Attach the adapter to the RecyclerView
+        shopRecyclerView1.setAdapter(adapter1);
+        shopRecyclerView2.setAdapter(adapter2);
+
     }
 
     @Override
