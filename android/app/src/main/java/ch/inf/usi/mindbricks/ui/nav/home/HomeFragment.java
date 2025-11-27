@@ -1,10 +1,9 @@
 package ch.inf.usi.mindbricks.ui.nav.home;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.view.LayoutInflater;
+import android.os.Looper;import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,7 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider; // Required for ViewModel
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.slider.Slider;
 
@@ -26,7 +25,6 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
-// Make sure this import path matches where you placed your ProfileViewModel
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
 public class HomeFragment extends Fragment {
@@ -36,15 +34,8 @@ public class HomeFragment extends Fragment {
     private ImageView menuIcon;
     private TextView coinBalanceTextView;
 
-    // Timer variables
-    private int seconds = 0;
-    private boolean isRunning = false;
-    private final Handler timerHandler = new Handler(Looper.getMainLooper());
-    private Runnable timerRunnable;
-
-    // Declare the shared ViewModel
+    // Shared ViewModel for coin management
     private ProfileViewModel profileViewModel;
-    private CoinManager coinManager;
 
     // Timer variables
     private CountDownTimer countDownTimer;
@@ -55,10 +46,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Initialize the ViewModel by scoping it to the Activity.
-        // This is the key to sharing it with other fragments.
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
-
-        // We no longer need to inflate the view here since onViewCreated will handle it with binding
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -66,27 +54,23 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Find all the views
-        coinManager = new CoinManager(requireActivity().getApplicationContext());
         timerTextView = view.findViewById(R.id.timer_text_view);
         startSessionButton = view.findViewById(R.id.start_stop_button);
         menuIcon = view.findViewById(R.id.drawer_menu);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
 
-        // CORRECTED: Observe the public 'coins' LiveData field.
-        // This block will now automatically update the UI whenever the coin balance changes.
+        // Observe the coin balance from the ViewModel.
+        // This automatically updates the coin text view whenever the value changes.
         profileViewModel.coins.observe(getViewLifecycleOwner(), balance -> {
             if (balance != null) {
                 coinBalanceTextView.setText(String.valueOf(balance));
             }
         });
 
-        // Set up the button click listeners
-        startStopButton.setOnClickListener(v -> handleStartStop());
-        updateCoinDisplay();
-        updateTimerUI(0); // Set initial timer text to 00:00
+        // Set initial timer text
+        updateTimerUI(0);
 
-        // --- Button Listeners ---
+        // Button Listeners
         startSessionButton.setOnClickListener(v -> {
             if (isTimerRunning) {
                 confirmEndSessionDialog();
@@ -104,19 +88,15 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Shows the new dialog with a slider for picking the session duration.
+     * Shows the dialog with a slider for picking the session duration.
      */
     private void showDurationPickerDialog() {
-        // Inflate the custom layout
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_timer_session, null);
 
         final Slider durationSlider = dialogView.findViewById(R.id.duration_slider);
         final TextView durationText = dialogView.findViewById(R.id.duration_text);
 
-        builder.setPositiveButton("Confirm", (dialog, which) -> {
-            stopTimer();
-        });
         // Set an initial value for the duration text
         durationText.setText(String.format(Locale.getDefault(), "%d minutes", (int) durationSlider.getValue()));
 
@@ -125,12 +105,17 @@ public class HomeFragment extends Fragment {
             durationText.setText(String.format(Locale.getDefault(), "%d minutes", (int) value));
         });
 
-        // Build the AlertDialog
+        // Build and show the AlertDialog
         new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
+                .setTitle("Set Session Duration")
                 .setPositiveButton("Start", (dialog, which) -> {
                     int durationInMinutes = (int) durationSlider.getValue();
-                    startTimer(durationInMinutes);
+                    if (durationInMinutes > 0) {
+                        startTimer(durationInMinutes);
+                    } else {
+                        Toast.makeText(getContext(), "Please select a duration greater than 0.", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .setNegativeButton("Cancel", null)
                 .create()
@@ -144,26 +129,25 @@ public class HomeFragment extends Fragment {
     private void startTimer(int minutes) {
         isTimerRunning = true;
         startSessionButton.setText(R.string.stop_session);
-        startSessionButton.setEnabled(false);
+        startSessionButton.setEnabled(false); // Disable to prevent conflicts
 
-        long durationInMillis = (long) minutes * 60 * 1000;
-        lastMinuteMark = minutes; // Initialize the last minute mark
+        long durationInMillis = TimeUnit.MINUTES.toMillis(minutes);
+        lastMinuteMark = minutes; // Initialize with the starting number of minutes
 
         countDownTimer = new CountDownTimer(durationInMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 updateTimerUI(millisUntilFinished);
 
-                // Calculate the current minute å
+                // Calculate the current full minute remaining
                 long currentMinute = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
 
-                // If we've crossed into a new minute that's less than the last one we recorded...
-                if (currentMinute < lastMinuteMark) { // <<< THE PROBLEM IS HERE
-                    lastMinuteMark = currentMinute; // Update the mark
-                    earnCoin(); // Award a coin
+                // If the current minute is less than the last one we recorded, a full minute has passed.
+                if (currentMinute < lastMinuteMark) {
+                    lastMinuteMark = currentMinute;
+                    earnCoin();
                 }
             }
-
 
             @Override
             public void onFinish() {
@@ -174,22 +158,21 @@ public class HomeFragment extends Fragment {
             }
         }.start();
 
-        // Re-enable the button after a short delay to prevent accidental double-clicks
-        new Handler(requireActivity().getMainLooper()).postDelayed(() -> {
-            if (isTimerRunning) { // Check if timer wasn't cancelled in the meantime
+        // Re-enable the button after a short delay
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (isTimerRunning) {
                 startSessionButton.setEnabled(true);
             }
         }, 1500);
     }
 
     /**
-     * Stops the timer, calculates coins, resets the UI, and updates the ViewModel.
      * Shows a confirmation dialog before stopping the timer.
      */
     private void confirmEndSessionDialog() {
         new AlertDialog.Builder(requireContext())
                 .setTitle("End Session?")
-                .setMessage("Are you sure you want to end the current session?")
+                .setMessage("Are you sure you want to end the current session early? You will not get a coin for the current minute.")
                 .setPositiveButton("Confirm", (dialog, which) -> {
                     stopTimerAndReset();
                     Toast.makeText(getContext(), "Session ended.", Toast.LENGTH_SHORT).show();
@@ -198,14 +181,8 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
-        if (coinsEarned > 0) {
-            // Use the ViewModel to add coins.
-            profileViewModel.addCoins(coinsEarned);
-            Toast.makeText(getContext(), "You earned " + coinsEarned + " coins!", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getContext(), "Session ended. Study for at least a minute to earn coins.", Toast.LENGTH_LONG).show();
     /**
-     * Stops the timer completely without awarding coins.
+     * Stops the timer completely without awarding coins for the unfinished minute.
      */
     private void stopTimerAndReset() {
         if (countDownTimer != null) {
@@ -214,11 +191,6 @@ public class HomeFragment extends Fragment {
         resetTimerState();
     }
 
-        timerHandler.removeCallbacks(timerRunnable);
-        seconds = 0;
-        isRunning = false;
-        startStopButton.setText(R.string.start_session);
-        updateTimerUI();
     /**
      * Resets all timer-related UI and state variables.
      */
@@ -239,29 +211,13 @@ public class HomeFragment extends Fragment {
         timerTextView.setText(timeString);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Always clean up handlers to prevent memory leaks
-        if (timerRunnable != null) {
-            timerHandler.removeCallbacks(timerRunnable);
     /**
-     * Adds one coin and shows a brief toast message.
+     * Adds one coin using the ViewModel and shows a brief toast message.
      */
     private void earnCoin() {
-        coinManager.addCoins(1);
-        updateCoinDisplay();
+        profileViewModel.addCoins(1);
+        // The LiveData observer will automatically update the coin balance text.
         Toast.makeText(getContext(), "+1 Coin!", Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * Gets the current balance from CoinManager and sets the text.
-     */
-    private void updateCoinDisplay() {
-        if (coinBalanceTextView != null) {
-            int balance = coinManager.getCoinBalance();
-            coinBalanceTextView.setText(String.valueOf(balance));
-        }
     }
 
     @Override
