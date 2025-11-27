@@ -3,6 +3,7 @@ package ch.inf.usi.mindbricks.ui.nav.shop;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+// import android.widget.Button; // No longer needed
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -13,14 +14,18 @@ import ch.inf.usi.mindbricks.R;
 
 public class ShopItemAdapter extends RecyclerView.Adapter<ShopItemAdapter.ShopItemViewHolder> {
 
-    private final List<ShopItem> items;
-
-    // Constructor to pass in the data
-    public ShopItemAdapter(List<ShopItem> items) {
-        this.items = items;
+    public interface OnItemBuyClickListener {
+        void onItemBuyClick(ShopItem item);
     }
 
-    // This method creates a new ViewHolder by inflating the shop_item.xml layout
+    private final List<ShopItem> items;
+    private final OnItemBuyClickListener buyClickListener;
+
+    public ShopItemAdapter(List<ShopItem> items, OnItemBuyClickListener listener) {
+        this.items = items;
+        this.buyClickListener = listener;
+    }
+
     @NonNull
     @Override
     public ShopItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -29,26 +34,33 @@ public class ShopItemAdapter extends RecyclerView.Adapter<ShopItemAdapter.ShopIt
         return new ShopItemViewHolder(view);
     }
 
-    // This method binds the data from a ShopItem object to the views in the ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ShopItemViewHolder holder, int position) {
         ShopItem currentItem = items.get(position);
         holder.itemName.setText(currentItem.getName());
         holder.itemPrice.setText(String.valueOf(currentItem.getPrice()));
         holder.itemImage.setImageResource(currentItem.getImageResourceId());
+
+        // --- CHANGE IS HERE ---
+        // Set the listener on the entire item view, not just a button.
+        holder.itemView.setOnClickListener(v -> {
+            if (buyClickListener != null) {
+                buyClickListener.onItemBuyClick(currentItem);
+            }
+        });
+        // --- END OF CHANGE ---
     }
 
-    // Returns the total number of items in the list
     @Override
     public int getItemCount() {
         return items.size();
     }
 
-    // The ViewHolder class holds the references to the views in shop_item.xml
     public static class ShopItemViewHolder extends RecyclerView.ViewHolder {
         public ImageView itemImage;
         public TextView itemName;
         public TextView itemPrice;
+        // public Button buyButton; // No longer needed
 
         public ShopItemViewHolder(@NonNull View itemView) {
             super(itemView);
