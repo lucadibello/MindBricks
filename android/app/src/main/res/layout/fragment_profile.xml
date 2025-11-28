@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            tools:text="@string/initial_balance" />
+            tools:text="@string/default_balance" />
     </LinearLayout>
 
     <!-- Divider -->

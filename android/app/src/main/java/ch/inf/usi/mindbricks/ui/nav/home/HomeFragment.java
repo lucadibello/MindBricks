@@ -49,8 +49,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        // This ensures the host Activity implements the interface.
-        // The app will crash with a clear message if it doesn't, which is good for debugging.
         if (context instanceof NavigationLocker) {
             navigationLocker = (NavigationLocker) context;
         } else {
@@ -120,7 +118,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void startTimer(int minutes) {
-        // ADDED: Disable navigation when the timer starts
+        // Disable navigation when the timer starts
         if (navigationLocker != null) {
             navigationLocker.setNavigationEnabled(false);
         }
@@ -180,7 +178,7 @@ public class HomeFragment extends Fragment {
                 .setMessage("Great focus! You've earned 3 bonus coins for completing the session.")
                 .setPositiveButton("Awesome!", (dialog, which) -> {
                     earnCoin(3);
-                    // This method now also handles re-enabling the navigation
+                    // This method also handles re-enabling the navigation
                     resetTimerState();
                 })
                 .setCancelable(false)
@@ -198,7 +196,7 @@ public class HomeFragment extends Fragment {
      * UPDATED: Resets all timer-related UI and state variables, and re-enables navigation.
      */
     private void resetTimerState() {
-        // ADDED: Re-enable navigation whenever the timer is reset
+        //  Re-enable navigation when the timer is reset
         if (navigationLocker != null) {
             navigationLocker.setNavigationEnabled(true);
         }

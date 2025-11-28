@@ -11,16 +11,10 @@ import java.util.concurrent.TimeUnit;
 public class HomeViewModel extends ViewModel {
 
     private CountDownTimer countDownTimer;
-
-    // To hold the formatted time string
     private final MutableLiveData<String> _timeString = new MutableLiveData<>("00:00");
     public LiveData<String> timeString = _timeString;
-
-    // To hold the coin count
     private final MutableLiveData<Integer> _coinCount = new MutableLiveData<>(0);
     public LiveData<Integer> coinCount = _coinCount;
-
-    // To know if the timer is running
     private final MutableLiveData<Boolean> _isTimerRunning = new MutableLiveData<>(false);
     public LiveData<Boolean> isTimerRunning = _isTimerRunning;
 

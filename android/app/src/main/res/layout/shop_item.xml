@@ -67,7 +67,6 @@
                 tools:text="250" />
         </LinearLayout>
 
-        <!-- The <Button> that was here has been removed -->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -10,7 +10,7 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="0dp">  <!-- removed ?attr/actionBarSize since no ActionBar -->
+        android:paddingTop="0dp">
 
         <!-- NAVIGATION HOST -->
         <fragment

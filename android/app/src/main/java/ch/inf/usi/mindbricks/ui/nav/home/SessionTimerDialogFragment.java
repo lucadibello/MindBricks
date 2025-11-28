@@ -33,20 +33,15 @@ public class SessionTimerDialogFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize ViewModel
         homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
 
-        // Find views
         durationSlider = view.findViewById(R.id.duration_slider);
         durationText = view.findViewById(R.id.duration_text);
 
-        // Listener for the slider
         durationSlider.addOnChangeListener((slider, value, fromUser) -> {
-            // Update the text view as the slider moves
             durationText.setText((int) value + " minutes");
         });
 
-        // Listener for the start button
         startTimerButton.setOnClickListener(v -> {
             int durationInMinutes = (int) durationSlider.getValue();
             homeViewModel.startTimer(durationInMinutes);
