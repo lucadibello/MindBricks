@@ -69,9 +69,7 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
                     } else {
                         showMicSettingsDialog();
                     }
-                },
-                // on rationale callback
-                this::showMicRationaleAndRequest
+                }
         );
 
         rootView = inflater.inflate(R.layout.fragment_onboarding_sensors, container, false);
