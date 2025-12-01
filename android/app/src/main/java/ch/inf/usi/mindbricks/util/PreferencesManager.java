@@ -1,7 +1,10 @@
 package ch.inf.usi.mindbricks.util;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Context;import android.content.SharedPreferences;
+
+// ADDED: Imports for Set and HashSet
+import java.util.HashSet;
+import java.util.Set;
 
 public class PreferencesManager {
 
@@ -17,13 +20,14 @@ public class PreferencesManager {
         USER_FOCUS_GOAL("user_focus_goal"),
         USER_SPRINT_LENGTH_MINUTES("user_sprint_length_minutes"),
         USER_TAGS_JSON("user_tags_json"),
-        USER_AVATAR_SEED("user_avatar_seed");
+        USER_AVATAR_SEED("user_avatar_seed"),
 
-
+        // ADDED: Key for storing the set of purchased item IDs
+        USER_PURCHASED_ITEMS("user_purchased_items");
 
         private final String name;
         PreferencesKey(String name) {
-           this.name = name;
+            this.name = name;
         }
 
         public String getName() {
@@ -116,4 +120,29 @@ public class PreferencesManager {
     public String getUserAvatarSeed() {
         return preferences.getString(PreferencesKey.USER_AVATAR_SEED.getName(), "");
     }
+
+    // ⭐️ --- START: ADDED METHODS FOR PURCHASED ITEMS --- ⭐️
+
+    /**
+     * Adds the ID of a newly purchased item to the set of owned items.
+     * @param itemId The unique ID of the item to add.
+     */
+    public void purchaseItem(String itemId) {
+        Set<String> purchasedIds = getPurchasedItemIds();
+        purchasedIds.add(itemId);
+        preferences.edit().putStringSet(PreferencesKey.USER_PURCHASED_ITEMS.getName(), purchasedIds).apply();
+    }
+
+    /**
+     * Retrieves the set of IDs for all items the user has purchased.
+     * @return A new Set of Strings containing the IDs of purchased items. Never null.
+     */
+    public Set<String> getPurchasedItemIds() {
+        // Retrieve the stored set. The second argument is the default value if the key is not found.
+        Set<String> storedSet = preferences.getStringSet(PreferencesKey.USER_PURCHASED_ITEMS.getName(), new HashSet<>());
+        // Return a new HashSet to prevent external modification of the set stored in SharedPreferences.
+        return new HashSet<>(storedSet);
+    }
+
+    // ⭐️ --- END: ADDED METHODS FOR PURCHASED ITEMS --- ⭐️
 }
