@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,11 +27,13 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.drivers.MicrophoneRecorder;
+import ch.inf.usi.mindbricks.database.AppDatabase;
+import ch.inf.usi.mindbricks.model.StudySession;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.PermissionManager;
 import ch.inf.usi.mindbricks.util.PermissionManager.PermissionRequest;
+import ch.inf.usi.mindbricks.util.SessionRecordingManager;
 
 public class HomeFragment extends Fragment {
 
@@ -43,16 +44,16 @@ public class HomeFragment extends Fragment {
     private ProfileViewModel profileViewModel;
 
     private CountDownTimer countDownTimer;
-    private MicrophoneRecorder microphoneRecorder;
     private boolean isTimerRunning = false;
     private PermissionRequest micPermissionRequest;
     private Integer pendingDurationMinutes = null;
-
-    // ADDED: A reference to the navigation locker interface
+    private SessionRecordingManager sessionRecordingManager;
+    private StudySession currentStudySession;
+    private AppDatabase db;
     private NavigationLocker navigationLocker;
 
     /**
-     * ADDED: Get a reference to the hosting Activity as a NavigationLocker.
+     * Get a reference to the hosting Activity as a NavigationLocker.
      * This is called before onCreateView.
      */
     @Override
@@ -69,6 +70,11 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+
+        // initialize db + session recorder
+        db = AppDatabase.getInstance(requireContext());
+        sessionRecordingManager = new SessionRecordingManager(requireContext());
+
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -167,8 +173,22 @@ public class HomeFragment extends Fragment {
 
         long durationInMillis = TimeUnit.MINUTES.toMillis(minutes);
         final int[] minutesCompleted = {0};
-        microphoneRecorder = new MicrophoneRecorder();
-        microphoneRecorder.startRecording();
+
+        // Create and insert current study session in DB + retrieve its ID for later
+        new Thread(() -> {
+            currentStudySession = new StudySession(
+                    System.currentTimeMillis(),
+                    minutes,
+                    "General", // FIXME: move default tag somewhere else. Hard-coded currently
+                    android.graphics.Color.GRAY // // FIXME: move also the default color somewhere else
+            );
+            long newId = db.studySessionDao().insert(currentStudySession);
+            currentStudySession.setId(newId); // store id in order to correctly append logs
+
+            // Start recording manage
+            new Handler(Looper.getMainLooper()).post(() -> sessionRecordingManager.startSession(newId));
+        }).start();
+
 
         countDownTimer = new CountDownTimer(durationInMillis, 1000) {
             @Override
@@ -181,12 +201,6 @@ public class HomeFragment extends Fragment {
                     minutesCompleted[0] = elapsedMinutes;
                     earnCoin(1);
                 }
-
-                // record amplitude from recording
-                if (microphoneRecorder != null) {
-                    double amplitude = microphoneRecorder.getCurrentAmplitude();
-                    Log.d("RMS Amplitude", String.valueOf(amplitude));
-                }
             }
 
             @Override
@@ -194,7 +208,7 @@ public class HomeFragment extends Fragment {
                 if (minutes > minutesCompleted[0]) {
                     earnCoin(1);
                 }
-                stopRecording();
+                stopTimerAndReset();
                 showSessionCompleteDialog();
             }
         }.start();
@@ -224,8 +238,6 @@ public class HomeFragment extends Fragment {
                 .setMessage("Great focus! You've earned 3 bonus coins for completing the session.")
                 .setPositiveButton("Awesome!", (dialog, which) -> {
                     earnCoin(3);
-                    // This method also handles re-enabling the navigation
-                    resetTimerState();
                 })
                 .setCancelable(false)
                 .show();
@@ -235,12 +247,19 @@ public class HomeFragment extends Fragment {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        stopRecording();
+
+        // Stop recording and store data in db
+        if (currentStudySession != null) {
+            sessionRecordingManager.stopSession(currentStudySession);
+            currentStudySession = null; // Clear current session
+        }
+
+        // reset timer to default state
         resetTimerState();
     }
 
     /**
-     * UPDATED: Resets all timer-related UI and state variables, and re-enables navigation.
+     * Resets all timer-related UI and state variables, and re-enables navigation.
      */
     private void resetTimerState() {
         //  Re-enable navigation when the timer is reset
@@ -273,22 +292,10 @@ public class HomeFragment extends Fragment {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        stopRecording();
-    }
 
-    /**
-     * ADDED: Clean up the reference to the activity to prevent memory leaks.
-     */
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        navigationLocker = null;
-    }
-
-    private void stopRecording() {
-        if (microphoneRecorder != null) {
-            microphoneRecorder.stopRecording();
-            microphoneRecorder = null;
+        // if destroying the fragment, stop recording and store data in db
+        if (currentStudySession != null) {
+            sessionRecordingManager.stopSession(currentStudySession);
         }
     }
 }
