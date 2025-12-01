@@ -22,4 +22,8 @@ public class BaseSensor {
     public boolean isAvailable() {
         return isSensorAvailable;
     }
+
+    public Sensor getSensor() {
+        return sensor;
+    }
 }
