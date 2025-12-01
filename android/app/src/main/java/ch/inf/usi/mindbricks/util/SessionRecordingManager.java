@@ -1,5 +1,6 @@
 package ch.inf.usi.mindbricks.util;
 
+import android.accessibilityservice.GestureDescription;
 import android.content.Context;
 import android.util.Log;
 
@@ -119,6 +120,38 @@ public class SessionRecordingManager {
         stopLightMonitoring();
         Log.d(TAG, "All sensors stopped.");
 
+        calculateAndUpdateSessionMetrics(session);
+        saveSessionToDatabase(session);
+
+        // Set empty id to signal that the session is stopped
+        currentSessionId = EMPTY_SESSION_ID;
+        Log.d(TAG, "Session recording stopped and data saved");
+    }
+
+    private void saveSessionToDatabase(StudySession session){
+        new Thread(() -> {
+            try {
+                // Update the study session with final metrics
+                db.studySessionDao().update(session);
+                Log.d(TAG, "Updated session in database");
+
+                // Insert all sensor logs
+                if (!logBuffer.isEmpty()) {
+                    db.sessionSensorLogDao().insertAll(logBuffer);
+                    Log.d(TAG, "Inserted " + logBuffer.size() + " sensor logs");
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving session data to database", e);
+            }
+        }).start();
+    }
+    private void calculateAndUpdateSessionMetrics(StudySession session){
+        if(logBuffer.isEmpty()){
+            Log.w(TAG, "No sensor logs collected from the session.");
+            return;
+        }
+
         // Calculate averages and update session
         float sumNoise = 0;
         float sumLight = 0;
@@ -129,6 +162,8 @@ public class SessionRecordingManager {
             sumNoise += log.getNoiseLevel();
             sumLight += log.getLightLevel();
         }
+
+
         if (count > 0) {
             session.setAvgNoiseLevel(sumNoise / count);
             session.setAvgLightLevel(sumLight / count);
@@ -137,14 +172,16 @@ public class SessionRecordingManager {
         // store # of phone pick ups
         session.setPhonePickupCount(totalPickups);
 
-        // Store study logs to db
-        new Thread(() -> {
-            db.sessionSensorLogDao().insertAll(logBuffer);
-            db.studySessionDao().update(session); // Update the main session with stats
-        }).start();
+        // Calculating focus score as follows:
+        // Start at 100, subtract penalties
+        // - Penalty for pickups: -5 points per pickup (max -50)
+        // Possibly? Not implemented -> Penalty for high noise: -0.3 points per noise unit above 30
+        float focusScore = 100.f;
+        int pickupPenalty = Math.min(totalPickups * 5, 50);
+        focusScore -= pickupPenalty;
 
-        // Set empty id to signal that the session is stopped
-        currentSessionId = EMPTY_SESSION_ID;
+        focusScore = Math.max(0, Math.min(100, focusScore));
+        session.setFocusScore(focusScore);
     }
 
     private void startLightMonitoring() {
