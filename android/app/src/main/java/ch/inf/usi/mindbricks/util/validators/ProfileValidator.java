@@ -27,6 +27,7 @@ public final class ProfileValidator {
 
     /**
      * Validates the name field, ensuring it is not empty.
+     *
      * @param name The name to validate
      * @return A ValidationResult indicating the validation result
      */
@@ -44,6 +45,7 @@ public final class ProfileValidator {
 
     /**
      * Validates the sprint length field, ensuring it is a valid integer greater than zero.
+     *
      * @param sprintLength The sprint length to validate
      * @return A ValidationResult indicating the validation result
      */

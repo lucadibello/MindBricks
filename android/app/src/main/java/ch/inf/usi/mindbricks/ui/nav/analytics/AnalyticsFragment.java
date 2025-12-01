@@ -47,7 +47,7 @@ public class AnalyticsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_analytics);
+        setContentView(R.layout.fragment_analytics);
 
         initViews();
         setupToolbar();
@@ -73,10 +73,8 @@ public class AnalyticsActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        sessionAdapter = new SessionHistoryAdapter(session -> {
-            // Handle session click - show detail view
-            showSessionDetails(session);
-        });
+        // Handle session click - show detail view
+        sessionAdapter = new SessionHistoryAdapter(this::showSessionDetails);
 
         sessionHistoryRecycler.setLayoutManager(new LinearLayoutManager(this));
         sessionHistoryRecycler.setAdapter(sessionAdapter);

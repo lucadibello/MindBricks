@@ -24,6 +24,14 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.ui.onboarding.OnboardingStepValidator;
@@ -33,30 +41,20 @@ import ch.inf.usi.mindbricks.util.ValidationResult;
 import ch.inf.usi.mindbricks.util.validators.ProfileValidator;
 import ch.inf.usi.mindbricks.util.validators.TagValidator;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 public class OnboardingUserFragment extends Fragment implements OnboardingStepValidator {
 
+    private static final String DICEBEAR_BASE_URL = "https://api.dicebear.com/9.x/pixel-art/png";
+    private final List<Tag> tags = new ArrayList<>();
     private ImageView profilePicture;
     private TextInputLayout nameLayout;
     private TextInputLayout sprintLengthLayout;
-
     private TextInputEditText editName;
     private TextInputEditText editSprintLength;
     private ChipGroup tagChipGroup;
     private MaterialButton addTagButton;
     private MaterialTextView tagEmptyState;
     private FloatingActionButton reloadAvatarButton;
-
-    private final List<Tag> tags = new ArrayList<>();
     private PreferencesManager prefs;
-    private static final String DICEBEAR_BASE_URL = "https://api.dicebear.com/9.x/pixel-art/png";
 
     @Nullable
     @Override
@@ -132,9 +130,8 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     @Override
     public boolean validateStep() {
-        boolean isValid = true;
+        boolean isValid = validateNameField();
 
-        if (!validateNameField()) isValid = false;
         if (!validateSprintLengthField()) isValid = false;
 
         // if all valid: store the result in app preferences
@@ -147,7 +144,8 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     /**
      * Stores the user data in preferences
-     * @param name User name to store
+     *
+     * @param name         User name to store
      * @param sprintLength Sprint length to store
      */
     private void persistUserData(String name, String sprintLength) {
@@ -192,6 +190,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     /**
      * Reads the text from a {@link TextInputEditText}
+     *
      * @param editText {@link TextInputEditText} to read from
      * @return Text read from the text input
      */
@@ -210,6 +209,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     /**
      * Validates the name field ensuring that user input is not empty
+     *
      * @return true if the name is valid, false otherwise
      */
     private boolean validateNameField() {
@@ -224,6 +224,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     /**
      * Validates the sprint length field ensuring that user input is not empty and is a valid number
+     *
      * @return true if the sprint length is valid, false otherwise
      */
     private boolean validateSprintLengthField() {
@@ -238,10 +239,10 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     /**
      * Shows a dialog to add a new tag to the list
-     *
+     * <p>
      * NOTE: this solution is inspired from this tutorial:
      * <a href="https://www.geeksforgeeks.org/android/how-to-create-a-custom-alertdialog-in-android/">
-     *     geeksforgeeks.org
+     * geeksforgeeks.org
      * </a>
      */
     private void showAddTagDialog() {
@@ -360,6 +361,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     /**
      * Serializes the list of tags into a JSON array
+     *
      * @return JSON array of tags as raw String
      */
     private String serializeTags() {

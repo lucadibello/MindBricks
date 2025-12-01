@@ -2,7 +2,6 @@ package ch.inf.usi.mindbricks.ui.nav.home;
 
 import android.os.CountDownTimer;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -10,16 +9,13 @@ import java.util.concurrent.TimeUnit;
 
 public class HomeViewModel extends ViewModel {
 
-    private CountDownTimer countDownTimer;
     private final MutableLiveData<String> _timeString = new MutableLiveData<>("00:00");
-    public LiveData<String> timeString = _timeString;
     private final MutableLiveData<Integer> _coinCount = new MutableLiveData<>(0);
-    public LiveData<Integer> coinCount = _coinCount;
     private final MutableLiveData<Boolean> _isTimerRunning = new MutableLiveData<>(false);
-    public LiveData<Boolean> isTimerRunning = _isTimerRunning;
+    private CountDownTimer countDownTimer;
 
     public void startTimer(int minutes) {
-        long durationInMillis = minutes * 60 * 1000;
+        long durationInMillis = minutes * 60L * 1000L;
         _isTimerRunning.setValue(true);
 
         countDownTimer = new CountDownTimer(durationInMillis, 1000) {

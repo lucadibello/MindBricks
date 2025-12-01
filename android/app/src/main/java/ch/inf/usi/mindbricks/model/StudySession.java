@@ -1,7 +1,6 @@
 package ch.inf.usi.mindbricks.model;
 
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 
@@ -14,26 +13,57 @@ public class StudySession {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-    private long timestamp; // When session started
-    private int durationMinutes; // How long the session lasted
-    private String tagTitle; // Which tag/subject was studied
-    private int tagColor; // Color of the tag
+    /**
+     * Timestamp of when the session started
+     */
+    private long timestamp;
+
+    /**
+     * Total duration of the session in minutes
+     */
+    private int durationMinutes;
+
+    /**
+     * Title of the tag/subject studied
+     */
+    private String tagTitle;
+
+    /**
+     * Color of the tag/subject studied
+     */
+    private int tagColor;
 
     // Environmental metrics
-    private float avgNoiseLevel; // Average noise during session (0-100)
-    private float avgLightLevel; // Average light level (0-100)
-    private int phonePickupCount; // How many times phone was picked up
+
+    /**
+     * Average noise level during the session (0-100)
+     */
+    private float avgNoiseLevel;
+
+    /**
+     * Average light level during the session (0-100)
+     */
+    private float avgLightLevel;
+
+    /**
+     * Number of times phone was picked up during the session
+     */
+    private int phonePickupCount;
 
     // Focus metrics
-    private float focusScore; // Calculated focus score (0-100)
-    private int coinsEarned; // Coins earned during session
+
+    /**
+     * Calculated focus score (0-100)
+     */
+    private float focusScore;
+
+    /**
+     * Number of coins earned during this study session
+     */
+    private int coinsEarned;
 
     // Optional notes
     private String notes;
-
-    @Ignore
-    public StudySession() {
-    }
 
     public StudySession(long timestamp, int durationMinutes, String tagTitle, int tagColor) {
         this.timestamp = timestamp;

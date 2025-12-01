@@ -30,6 +30,7 @@ public class MockDataGenerator {
 
     /**
      * Generate mock study sessions
+     *
      * @param count Number of sessions to generate
      * @return List of mock study sessions
      */
@@ -42,7 +43,7 @@ public class MockDataGenerator {
             // Random session within last 60 days
             long daysAgo = random.nextInt(60);
             cal.setTimeInMillis(System.currentTimeMillis());
-            cal.add(Calendar.DAY_OF_MONTH, -(int)daysAgo);
+            cal.add(Calendar.DAY_OF_MONTH, -(int) daysAgo);
 
             // Random hour between 6 AM and 11 PM
             int hour = 6 + random.nextInt(17);

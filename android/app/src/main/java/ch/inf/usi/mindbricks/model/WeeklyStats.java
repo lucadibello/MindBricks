@@ -5,12 +5,35 @@ package ch.inf.usi.mindbricks.model;
  */
 public class WeeklyStats {
 
-    private String dayLabel; // "Mon", "Tue", etc.
-    private int dayOfWeek; // 1-7 (Sunday = 1)
-    private int totalMinutes; // Total study time for this day
-    private float avgFocusScore; // Average focus score (0-100)
-    private int sessionCount; // Number of sessions
-    private long date; // Timestamp for this day (midnight)
+    /**
+     * The 3 letter abbreviation of the day of the week (e.g. "Mon", "Tue", etc.)
+     */
+    private String dayLabel;
+
+    /**
+     * Numeric value representing the day of the week (1 = Sunday, 2 = Monday, etc.)
+     */
+    private int dayOfWeek;
+
+    /**
+     * Total study time in minutes for the day
+     */
+    private int totalMinutes;
+
+    /**
+     * Average focus score for this day in range [0,100]
+     */
+    private float avgFocusScore;
+
+    /**
+     * Total number of sessions for this day
+     */
+    private int sessionCount;
+
+    /**
+     * Timestamp of the first session of this day
+     */
+    private long date;
 
     public WeeklyStats(String dayLabel, int dayOfWeek, long date) {
         this.dayLabel = dayLabel;

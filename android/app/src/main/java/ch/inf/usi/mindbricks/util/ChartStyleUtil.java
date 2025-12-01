@@ -10,8 +10,6 @@ import com.github.mikephil.charting.components.YAxis;
 
 import java.util.Locale;
 
-import ch.inf.usi.mindbricks.R;
-
 /**
  * Utility class for applying consistent styling to MPAndroidChart charts
  */
@@ -90,6 +88,7 @@ public class ChartStyleUtil {
 
     /**
      * Gets color for productivity level
+     *
      * @param productivity 0-100 scale
      */
     public static int getProductivityColor(int productivity) {
@@ -107,9 +106,10 @@ public class ChartStyleUtil {
 
     /**
      * Creates gradient colors for charts
+     *
      * @param startColor Starting color
-     * @param endColor Ending color
-     * @param steps Number of gradient steps
+     * @param endColor   Ending color
+     * @param steps      Number of gradient steps
      */
     public static int[] createGradient(int startColor, int endColor, int steps) {
         int[] gradient = new int[steps];

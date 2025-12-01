@@ -1,6 +1,5 @@
 package ch.inf.usi.mindbricks.ui.charts;
 
-import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.chip.Chip;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,11 +25,7 @@ import ch.inf.usi.mindbricks.model.StudySession;
 public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAdapter.SessionViewHolder> {
 
     private List<StudySession> sessions;
-    private OnSessionClickListener clickListener;
-
-    public interface OnSessionClickListener {
-        void onSessionClick(StudySession session);
-    }
+    private final OnSessionClickListener clickListener;
 
     public SessionHistoryAdapter(OnSessionClickListener listener) {
         this.sessions = new ArrayList<>();
@@ -60,6 +54,10 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
     @Override
     public int getItemCount() {
         return sessions.size();
+    }
+
+    public interface OnSessionClickListener {
+        void onSessionClick(StudySession session);
     }
 
     class SessionViewHolder extends RecyclerView.ViewHolder {

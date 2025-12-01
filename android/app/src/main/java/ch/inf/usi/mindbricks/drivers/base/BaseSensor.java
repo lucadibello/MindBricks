@@ -6,11 +6,12 @@ import android.hardware.SensorManager;
 
 public class BaseSensor {
 
-    private final Sensor sensor;
+    protected final SensorManager sensorManager;
+    protected final Sensor sensor;
     private final boolean isSensorAvailable;
 
     protected BaseSensor(Context ctx, int sensorType) {
-        SensorManager sensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager == null) {
             throw new IllegalStateException("SensorManager not available");
         }
@@ -18,11 +19,11 @@ public class BaseSensor {
         isSensorAvailable = (sensor != null);
     }
 
-    public Sensor getSensor() {
-        return sensor;
-    }
-
     public boolean isAvailable() {
         return isSensorAvailable;
+    }
+
+    public Sensor getSensor() {
+        return sensor;
     }
 }

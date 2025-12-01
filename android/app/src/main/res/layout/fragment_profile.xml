@@ -7,31 +7,29 @@
     android:layout_height="match_parent"
     tools:context=".ui.nav.profile.ProfileFragment">
 
-    <!-- Profile Avatar Image -->
-
+    <!-- Profile Title (Adjusted Constraints) -->
     <TextView
         android:id="@+id/page_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="@string/profile"
-        android:textColor="@android:color/black"
-        android:textSize="34sp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/profile_image_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Profile Avatar Image -->
     <ImageView
         android:id="@+id/profile_image_view"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="48dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
         android:contentDescription="profile_picture_desc"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/page_title"
         tools:src="@drawable/ic_avatar_placeholder" />
 
     <!-- Username -->
@@ -39,7 +37,7 @@
         android:id="@+id/profile_user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,13 +49,13 @@
         android:id="@+id/coin_balance_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_user_name">
-
+        <!-- ... (Coin balance content is unchanged) ... -->
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -79,86 +77,137 @@
         android:id="@+id/divider"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/coin_balance_layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- Sprint Length Section -->
-    <LinearLayout
-        android:id="@+id/sprint_length_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/coin_balance_layout" />
+
+    <!-- START REFACTOR: Added ScrollView for expanding content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_coin_icon"
-            app:tint="?attr/colorOnSurface"
-            android:contentDescription="sprint_length_icon_desc"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"
-            android:text="@string/sprint_length_label"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
-
-        <TextView
-            android:id="@+id/profile_sprint_length"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            android:textStyle="bold"
-            tools:text="@string/default_sprint_length" />
-    </LinearLayout>
-
-    <!-- Tags Section -->
-    <LinearLayout
-        android:id="@+id/tags_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:gravity="center_vertical"
-        android:orientation="vertical"
-        android:paddingHorizontal="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sprint_length_layout">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="tags_label"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/profile_tags_chip_group"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:chipSpacingVertical="4dp"/>
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
 
-        <TextView
-            android:id="@+id/profile_tags_empty_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/no_tags_defined"
-            android:visibility="gone"
-            tools:visibility="visible"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
+            <!-- Sprint Length Section -->
+            <LinearLayout
+                android:id="@+id/sprint_length_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="32dp">
+                <!-- ... (Sprint length content is unchanged) ... -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="sprint_length_icon_desc"
+                    android:src="@drawable/ic_coin_icon"
+                    app:tint="?attr/colorOnSurface" />
 
-    </LinearLayout>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="@string/sprint_length_label"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                <TextView
+                    android:id="@+id/profile_sprint_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textStyle="bold"
+                    tools:text="@string/default_sprint_length" />
+            </LinearLayout>
+
+            <!-- Tags Section -->
+            <LinearLayout
+                android:id="@+id/tags_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="32dp">
+                <!-- ... (Tags content is unchanged) ... -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tags_label"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/profile_tags_chip_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:chipSpacingVertical="4dp"/>
+
+                <TextView
+                    android:id="@+id/profile_tags_empty_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/no_tags_defined"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <!-- ⭐️ START: ADDED SECTION FOR PURCHASED ITEMS ⭐️ -->
+            <LinearLayout
+                android:id="@+id/purchased_items_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="32dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="my_items_label"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+
+                <!-- RecyclerView to display the list of purchased items -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/purchased_items_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/item_purchased_asset" />
+
+                <!-- Text to show when the user has not purchased any items -->
+                <TextView
+                    android:id="@+id/purchased_items_empty_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:text="no_items_purchased"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+            <!-- ⭐️ END: ADDED SECTION FOR PURCHASED ITEMS ⭐️ -->
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <!-- END REFACTOR: Added ScrollView -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

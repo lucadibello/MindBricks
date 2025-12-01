@@ -8,12 +8,12 @@ import androidx.lifecycle.MutableLiveData;
 
 public class OnboardingSensorsViewModel extends AndroidViewModel {
 
-    private MutableLiveData<Boolean> hasLightSensor = new MutableLiveData<>(false);
-    private MutableLiveData<Boolean> hasSignificantMotionSensor = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> hasLightSensor = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> hasSignificantMotionSensor = new MutableLiveData<>(false);
 
     // permissions / acknowledgements
-    private MutableLiveData<Boolean> hasRecordingPermission = new MutableLiveData<>(false);
-    private MutableLiveData<Boolean> hasAcknowledgedPickup = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> hasRecordingPermission = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> hasAcknowledgedPickup = new MutableLiveData<>(false);
 
 
     public OnboardingSensorsViewModel(@NonNull Application application) {

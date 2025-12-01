@@ -21,21 +21,14 @@ public class OnboardingPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        switch (position) {
-            case 0:
-                return new OnboardingIntroFragment();
-            case 1:
-                return new OnboardingUserFragment();
-            case 2:
-                return new OnboardingStudyPlanFragment();
-            case 3:
-                return new OnboardingSensorsFragment();
-            case 4:
-                return new OnboardingNotificationsFragment();
-            case 5:
-            default:
-                return new OnboardingDoneFragment();
-        }
+        return switch (position) {
+            case 0 -> new OnboardingIntroFragment();
+            case 1 -> new OnboardingUserFragment();
+            case 2 -> new OnboardingStudyPlanFragment();
+            case 4 -> new OnboardingSensorsFragment();
+            case 3 -> new OnboardingNotificationsFragment();
+            default -> new OnboardingDoneFragment();
+        };
     }
 
     @Override

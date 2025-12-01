@@ -228,7 +228,8 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
 
     /**
      * Applies the success tint to the button (show success when permission granted)
-     * @param button  The button to tint.
+     *
+     * @param button The button to tint.
      */
     private void tintAsEnabled(MaterialButton button) {
         int bg = resolveAttrColor(com.google.android.material.R.attr.colorPrimaryContainer);
@@ -240,7 +241,8 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
 
     /**
      * Applies the error tint to the button (show error when permission not granted)
-     * @param button  The button to tint.
+     *
+     * @param button The button to tint.
      */
     private void tintAsError(MaterialButton button) {
         int bg = resolveAttrColor(com.google.android.material.R.attr.colorErrorContainer);
@@ -252,7 +254,8 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
 
     /**
      * Applies the default tint to the button (to reset the state)
-     * @param button  The button to tint.
+     *
+     * @param button The button to tint.
      */
     private void tintAsDefault(MaterialButton button) {
         int bg = resolveAttrColor(com.google.android.material.R.attr.colorSurfaceVariant);
@@ -264,7 +267,8 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
 
     /**
      * Applies the light tint to the microphone "allow" button.
-     * @param hasPermission  Whether the user has granted the microphone permission.
+     *
+     * @param hasPermission Whether the user has granted the microphone permission.
      */
     private void applyMicTint(Boolean hasPermission) {
         if (hasPermission != null && hasPermission) {

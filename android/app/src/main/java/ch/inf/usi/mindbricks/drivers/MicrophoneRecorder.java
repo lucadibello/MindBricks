@@ -13,10 +13,10 @@ public class MicrophoneRecorder {
     private static final int SAMPLE_RATE = 44100;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-
-    private AudioRecord audioRecord;
     private final int bufferSize;
+    private AudioRecord audioRecord;
     private Thread recordingThread = null;
+    // NOTE: volatile as the following variables are accessed from multiple threads at the same time
     private volatile boolean isRecording = false;
     private volatile double currentAmplitude = 0;
 
@@ -79,12 +79,12 @@ public class MicrophoneRecorder {
      * <p>
      * SOURCES:
      * - <a href="https://en.wikipedia.org/wiki/DBFS">...</a>
-     *      - states that RMS is used for loudness measurement
+     * - states that RMS is used for loudness measurement
      *      FIXME: this reference is not used currently in the code, I should remove it later
      * - <a href="https://discourse.ardour.org/t/calculating-rms-in-digital-audio/109812">...</a>
      *      - details the RMS calculation
      *
-     * @param buffer audio samples
+     * @param buffer   audio samples
      * @param readSize number of valid samples in buffer
      */
     private void calculateRMS(short[] buffer, int readSize) {

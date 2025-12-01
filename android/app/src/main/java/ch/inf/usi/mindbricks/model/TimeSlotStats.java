@@ -5,11 +5,34 @@ package ch.inf.usi.mindbricks.model;
  */
 public class TimeSlotStats {
 
-    private int hourOfDay; // 0-23
-    private int totalMinutes; // Total minutes studied during this hour across all days
-    private float avgFocusScore; // Average focus score for this hour
-    private int sessionCount; // Number of sessions during this hour
-    private float avgNoiseLevel; // Average noise level
+    /**
+     * Hour of the day (0-23)
+     */
+    private int hourOfDay;
+
+    /**
+     * Total minutes studied during this hour across all days
+     */
+    private int totalMinutes;
+
+    /**
+     * Average focus score for this hour across all days
+     */
+    private float avgFocusScore;
+
+    /**
+     * Number of sessions during this hour
+     */
+    private int sessionCount;
+
+    /**
+     * Average noise level during this hour across all days
+     */
+    private float avgNoiseLevel;
+
+    /**
+     * Average light level during this hour across all days
+     */
     private float avgLightLevel; // Average light level
 
     public TimeSlotStats(int hourOfDay) {
@@ -75,23 +98,5 @@ public class TimeSlotStats {
 
     public void setAvgLightLevel(float avgLightLevel) {
         this.avgLightLevel = avgLightLevel;
-    }
-
-    /**
-     * Get hour label (e.g., "9 AM", "2 PM")
-     */
-    public String getHourLabel() {
-        if (hourOfDay == 0) return "12 AM";
-        if (hourOfDay == 12) return "12 PM";
-        if (hourOfDay < 12) return hourOfDay + " AM";
-        return (hourOfDay - 12) + " PM";
-    }
-
-    /**
-     * Get time range (e.g., "09:00-10:00")
-     */
-    public String getTimeRange() {
-        int endHour = (hourOfDay + 1) % 24;
-        return String.format("%02d:00-%02d:00", hourOfDay, endHour);
     }
 }

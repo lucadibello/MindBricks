@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -25,14 +26,17 @@ public interface StudySessionDao {
     List<StudySession> getAllSessions();
 
     @Insert
-    void insert(StudySession session);
+    long insert(StudySession session);
 
     @Insert
-    void insertAll(List<StudySession> sessions);
+    List<Long> insertAll(List<StudySession> sessions);
 
     @Delete
     void delete(StudySession session);
 
     @Query("DELETE FROM study_sessions")
     void deleteAll();
+
+    @Update
+    void update(StudySession session);
 }
