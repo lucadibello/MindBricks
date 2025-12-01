@@ -235,12 +235,11 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/buttonEnablePickup"
+                            style="@style/Widget.Material3.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
-                            android:text="@string/onboarding_enable_pickup"
-                            android:textColor="?attr/colorOnPrimaryContainer"
-                            app:backgroundTint="?attr/colorPrimaryContainer"
+                            android:text="@string/onboarding_info_pickup"
                             app:strokeWidth="0dp" />
 
                     </LinearLayout>

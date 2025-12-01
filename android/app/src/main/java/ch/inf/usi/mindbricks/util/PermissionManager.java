@@ -35,8 +35,7 @@ public final class PermissionManager {
             ActivityResultCaller caller,
             String permission,
             Runnable onGranted,
-            Runnable onDenied,
-            Runnable onRationale
+            Runnable onDenied
     ) {
         // create launcher to request permissions
         ActivityResultLauncher<String> launcher =
@@ -52,7 +51,7 @@ public final class PermissionManager {
                 );
 
         // create callback wrapper + return it
-        return new PermissionRequest(permission, launcher, onGranted, onDenied, onRationale);
+        return new PermissionRequest(permission, launcher);
     }
 
     /**
@@ -61,22 +60,13 @@ public final class PermissionManager {
     public static final class PermissionRequest {
         private final String permission;
         private final ActivityResultLauncher<String> launcher;
-        private final Runnable onGranted;
-        private final Runnable onDenied;
-        private final Runnable onRationale;
 
         private PermissionRequest(
                 String permission,
-                ActivityResultLauncher<String> launcher,
-                Runnable onGranted,
-                Runnable onDenied,
-                Runnable onRationale
+                ActivityResultLauncher<String> launcher
         ) {
             this.permission = permission;
             this.launcher = launcher;
-            this.onGranted = onGranted;
-            this.onDenied = onDenied;
-            this.onRationale = onRationale;
         }
 
         // FIXME: maybe this class is useless. We may remove it in the future!

@@ -57,9 +57,11 @@
     <string name="onboarding_sensors_microphone_settings_title">Enable microphone in Settings</string>
     <string name="onboarding_sensors_microphone_settings_body">You chose “Don’t allow”. To keep reading noise during sessions (even with the screen off), enable microphone for MindBricks in system Settings.</string>
     <string name="onboarding_sensors_microphone_open_settings">Open settings</string>
+    <string name="onboarding_sensors_pickup_info_title">Which sensors are used?</string>
+    <string name="onboarding_sensors_pickup_info_body">We use the significant motion sensor to detect when you lift or move the phone during focus sessions. If your phone doesn’t have this sensor, we’ll use the accelerometer as a fallback.</string>
     <string name="onboarding_sensors_pickup_title">Phone pick-up detection</string>
     <string name="onboarding_sensors_pickup_body">We use the significant motion sensor to detect when you lift or move the phone during focus sessions.</string>
-    <string name="onboarding_enable_pickup">Enable pick-up detection</string>
+    <string name="onboarding_info_pickup">Which sensors are used?</string>
     <string name="onboarding_sensors_pickup_unavailable">Pick-up detection unavailable on this device</string>
     <string name="onboarding_sensors_pickup_enabled">Pick-up detection enabled.</string>
     <string name="onboarding_notifications_rationale_title">Allow notifications</string>
@@ -231,4 +233,7 @@
     <string name="default_sprint_length">25 minute</string>
     <string name="tags_label">Tags label</string>
     <string name="no_tags_defined">No tags defined</string>
+    <string name="onboarding_sensors_pickup_fallback_in_use">
+        fallback in use
+    </string>
 </resources>

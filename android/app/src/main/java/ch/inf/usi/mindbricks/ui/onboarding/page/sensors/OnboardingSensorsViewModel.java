@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 public class OnboardingSensorsViewModel extends AndroidViewModel {
 
-    private MutableLiveData<Boolean> hasLuminanceSensor = new MutableLiveData<>(false);
+    private MutableLiveData<Boolean> hasLightSensor = new MutableLiveData<>(false);
     private MutableLiveData<Boolean> hasSignificantMotionSensor = new MutableLiveData<>(false);
 
     // permissions / acknowledgements
@@ -20,8 +20,8 @@ public class OnboardingSensorsViewModel extends AndroidViewModel {
         super(application);
     }
 
-    public MutableLiveData<Boolean> getHasLuminanceSensor() {
-        return hasLuminanceSensor;
+    public MutableLiveData<Boolean> getHasLightSensor() {
+        return hasLightSensor;
     }
 
     public MutableLiveData<Boolean> getHasSignificantMotionSensor() {

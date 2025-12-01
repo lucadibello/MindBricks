@@ -1,11 +1,8 @@
 package ch.inf.usi.mindbricks.ui.onboarding.page.sensors;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -23,6 +20,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.drivers.LightSensor;
+import ch.inf.usi.mindbricks.drivers.SignificantMotionSensor;
 import ch.inf.usi.mindbricks.ui.onboarding.OnboardingStepValidator;
 import ch.inf.usi.mindbricks.util.PermissionManager;
 
@@ -37,7 +36,6 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
     private MaterialButton micButton;
     private MaterialButton lightInfoButton;
     private MaterialButton pickupButton;
-    private MaterialButton micInfoButton;
 
 
     @Nullable
@@ -69,22 +67,24 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
                     } else {
                         showMicSettingsDialog();
                     }
-                },
-                // on rationale callback
-                this::showMicRationaleAndRequest
+                }
         );
+
+        // initialize sensors
+        LightSensor.initialize(requireContext());
+        SignificantMotionSensor.initialize(requireContext());
 
         rootView = inflater.inflate(R.layout.fragment_onboarding_sensors, container, false);
 
         micButton = rootView.findViewById(R.id.buttonEnableMicrophone);
         lightInfoButton = rootView.findViewById(R.id.buttonLightInfo);
         pickupButton = rootView.findViewById(R.id.buttonEnablePickup);
-        micInfoButton = rootView.findViewById(R.id.buttonMicBackgroundInfo);
+        MaterialButton micInfoButton = rootView.findViewById(R.id.buttonMicBackgroundInfo);
 
         // setup on click listeners
         micButton.setOnClickListener(v -> requestMicrophoneAccess());
         lightInfoButton.setOnClickListener(v -> showLightInfo());
-        pickupButton.setOnClickListener(v -> requestPickupAccess());
+        pickupButton.setOnClickListener(v -> showPickupInfo());
         micInfoButton.setOnClickListener(v -> showMicRationaleDialog());
 
         // prime state with current permission + sensors
@@ -92,7 +92,7 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
         viewModel.setHasRecordingPermission(hasMicPermission);
 
         boolean hasLightSensor = hasLightSensor();
-        viewModel.getHasLuminanceSensor().setValue(hasLightSensor);
+        viewModel.getHasLightSensor().setValue(hasLightSensor);
         if (!hasLightSensor) {
             lightInfoButton.setEnabled(false);
             lightInfoButton.setText(R.string.onboarding_sensors_light_unavailable);
@@ -103,6 +103,10 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
         if (!hasPickupSensor) {
             pickupButton.setEnabled(false);
             pickupButton.setText(R.string.onboarding_sensors_pickup_unavailable);
+        } else if (SignificantMotionSensor.getInstance().isFallback()) {
+            // show info if using accelerometer fallback
+            pickupButton.setEnabled(false);
+            pickupButton.setText(R.string.onboarding_sensors_pickup_fallback_in_use);
         }
 
         // setup listeners for sensor availability / permissions
@@ -150,7 +154,6 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
         Boolean hasMicPermission = viewModel.getHasRecordingPermission().getValue();
         if (hasMicPermission == null || !hasMicPermission) {
             Snackbar.make(rootView, R.string.onboarding_error_microphone_required, Snackbar.LENGTH_SHORT).show();
-            requestMicrophoneAccess();
             return false;
         }
 
@@ -186,19 +189,6 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
         micPermissionRequest.launch();
     }
 
-    private void showMicRationaleAndRequest() {
-        showMicRationaleDialog();
-    }
-
-    private void requestPickupAccess() {
-        if (!hasSignificantMotionSensor()) {
-            Snackbar.make(rootView, R.string.onboarding_sensors_pickup_unavailable, Snackbar.LENGTH_SHORT).show();
-            return;
-        }
-        viewModel.setHasAcknowledgedPickup(true);
-        Snackbar.make(rootView, R.string.onboarding_sensors_pickup_enabled, Snackbar.LENGTH_SHORT).show();
-    }
-
     /**
      * Refreshes the "allow" buttons colors based on the current state of the permissions.
      */
@@ -208,7 +198,7 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
         applyMicTint(hasMicPermission);
 
         boolean hasLightSensor = hasLightSensor();
-        viewModel.getHasLuminanceSensor().setValue(hasLightSensor);
+        viewModel.getHasLightSensor().setValue(hasLightSensor);
         if (!hasLightSensor) {
             lightInfoButton.setEnabled(false);
             lightInfoButton.setText(R.string.onboarding_sensors_light_unavailable);
@@ -222,30 +212,19 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
         if (!hasPickupSensor) {
             pickupButton.setEnabled(false);
             pickupButton.setText(R.string.onboarding_sensors_pickup_unavailable);
-        } else {
-            pickupButton.setEnabled(true);
-            pickupButton.setText(R.string.onboarding_enable_pickup);
+            applyPickupTint(false);
         }
-        applyPickupTint(viewModel.getHasAcknowledgedPickup().getValue());
+        applyPickupTint(true);
     }
 
-    /**
-     * Checks if the device has a light sensor.
-     * @return True if the light sensor is available, false otherwise.
-     */
     private boolean hasLightSensor() {
-        SensorManager sensorManager = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager == null) return false;
-        Sensor lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        return lightSensor != null;
+        return LightSensor.getInstance().isAvailable();
     }
 
     private boolean hasSignificantMotionSensor() {
-        SensorManager sensorManager = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager == null) return false;
-        Sensor motionSensor = sensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
-        return motionSensor != null;
+        return SignificantMotionSensor.getInstance().isAvailable();
     }
+
 
     /**
      * Applies the success tint to the button (show success when permission granted)
@@ -313,6 +292,14 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
                 .show();
     }
 
+    private void showPickupInfo() {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.onboarding_sensors_pickup_info_title)
+                .setMessage(R.string.onboarding_sensors_pickup_info_body)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
     /**
      * Shows a dialog that asks the user to grant the microphone permission.
      */
@@ -327,7 +314,7 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
 
     /**
      * Shows a dialog that asks the user to open the app settings to grant the microphone permission.
-     *
+     * <p>
      * NOTE: happens when the user denied access to mic (initial request + rationale)
      */
     private void showMicSettingsDialog() {

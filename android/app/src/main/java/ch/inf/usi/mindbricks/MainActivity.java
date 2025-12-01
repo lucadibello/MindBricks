@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import ch.inf.usi.mindbricks.databinding.ActivityMainBinding;
@@ -23,13 +22,7 @@ public class MainActivity extends AppCompatActivity implements NavigationLocker 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_shop, R.id.navigation_profile, R.id.navigation_analytics)
-                .build();
-
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-
-        // This line will still handle the fragment destinations
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         binding.navView.setOnItemSelectedListener(item -> {
@@ -37,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements NavigationLocker 
             if (item.getItemId() == R.id.navigation_analytics) {
                 Intent intent = new Intent(this, AnalyticsActivity.class);
                 startActivity(intent);
-
                 return false;
             }
             return NavigationUI.onNavDestinationSelected(item, navController);
@@ -46,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements NavigationLocker 
 
     @Override
     public void setNavigationEnabled(boolean enabled) {
-        if (binding != null && binding.navView != null) {
+        if (binding != null) {
             for (int i = 0; i < binding.navView.getMenu().size(); i++) {
                 binding.navView.getMenu().getItem(i).setEnabled(enabled);
             }
