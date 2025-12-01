@@ -12,9 +12,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import ch.inf.usi.mindbricks.MainActivity;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.PermissionManager;
@@ -191,16 +188,6 @@ public class OnboardingActivity extends AppCompatActivity {
     }
 
     private boolean hasValidStudyPlan() {
-        String planJson = prefs.getStudyPlanJson();
-        if (planJson == null || planJson.trim().isEmpty()) {
-            return false;
-        }
-
-        try {
-            JSONArray array = new JSONArray(planJson);
-            return array.length() > 0;
-        } catch (JSONException e) {
-            return false;
-        }
+        return !prefs.getStudyPlan().isEmpty();
     }
 }

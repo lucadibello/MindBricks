@@ -14,43 +14,17 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.model.plan.DayHours;
+import ch.inf.usi.mindbricks.model.plan.DayRow;
 import ch.inf.usi.mindbricks.ui.onboarding.OnboardingStepValidator;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 
 public class OnboardingStudyPlanFragment extends Fragment implements OnboardingStepValidator {
-
-    private static final class DayRow {
-        final String dayKey;
-        final MaterialCheckBox checkBox;
-        final Slider slider;
-        final MaterialTextView hoursLabel;
-
-        DayRow(String dayKey, MaterialCheckBox checkBox, Slider slider, MaterialTextView hoursLabel) {
-            this.dayKey = dayKey;
-            this.checkBox = checkBox;
-            this.slider = slider;
-            this.hoursLabel = hoursLabel;
-        }
-    }
-
-    private static final class DayHours {
-        final String dayKey;
-        final float hours;
-
-        DayHours(String dayKey, float hours) {
-            this.dayKey = dayKey;
-            this.hours = hours;
-        }
-    }
 
     private PreferencesManager prefs;
     private final List<DayRow> dayRows = new ArrayList<>();
@@ -62,11 +36,10 @@ public class OnboardingStudyPlanFragment extends Fragment implements OnboardingS
         View view = inflater.inflate(R.layout.fragment_onboarding_study_plan, container, false);
 
         prefs = new PreferencesManager(requireContext());
-
-        bindDayRows(view);
         weeklyTotal = view.findViewById(R.id.textWeeklyTotal);
 
-        restorePlanFromPrefs();
+        bindDayRows(view);
+        restorePlanFromPreferences();
         updateWeeklyTotal();
 
         return view;
@@ -83,16 +56,16 @@ public class OnboardingStudyPlanFragment extends Fragment implements OnboardingS
         List<DayHours> plan = new ArrayList<>();
         boolean hasErrors = false;
         for (DayRow row : dayRows) {
-            row.checkBox.setError(null);
-            if (!row.checkBox.isChecked()) continue;
+            row.checkBox().setError(null);
+            if (!row.checkBox().isChecked()) continue;
 
-            float hours = row.slider.getValue();
+            float hours = row.slider().getValue();
             if (hours <= 0f) {
-                row.checkBox.setError(getString(R.string.onboarding_study_plan_error_hours_required));
+                row.checkBox().setError(getString(R.string.onboarding_study_plan_error_hours_required));
                 hasErrors = true;
                 continue;
             }
-            plan.add(new DayHours(row.dayKey, hours));
+            plan.add(new DayHours(row.dayKey(), hours));
         }
 
         if (plan.isEmpty()) {
@@ -107,7 +80,7 @@ public class OnboardingStudyPlanFragment extends Fragment implements OnboardingS
             return false;
         }
 
-        prefs.setStudyPlanJson(serializePlan(plan));
+        prefs.setStudyPlan(plan);
         return true;
     }
 
@@ -154,37 +127,23 @@ public class OnboardingStudyPlanFragment extends Fragment implements OnboardingS
         return new DayRow(dayKey, checkBox, slider, hoursLabel);
     }
 
-    private void restorePlanFromPrefs() {
-        String planJson = prefs.getStudyPlanJson();
-        if (planJson == null || planJson.trim().isEmpty()) {
-            return;
-        }
-
-        try {
-            JSONArray array = new JSONArray(planJson);
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject entry = array.getJSONObject(i);
-                String day = entry.optString("day", "").toLowerCase(Locale.US);
-                float hours = (float) entry.optDouble("hours", 0);
-                if (hours <= 0f || day.isEmpty()) continue;
-
-                DayRow row = findRow(day);
-                if (row != null) {
-                    row.checkBox.setChecked(true);
-                    row.slider.setEnabled(true);
-                    row.slider.setValue(hours);
-                    updateHoursLabel(row.hoursLabel, hours);
-                }
+    private void restorePlanFromPreferences() {
+        List<DayHours> plan = prefs.getStudyPlan();
+        for (DayHours dayHours : plan) {
+            DayRow row = findRow(dayHours.dayKey());
+            if (row != null) {
+                row.checkBox().setChecked(true);
+                row.slider().setEnabled(true);
+                row.slider().setValue(dayHours.hours());
+                updateHoursLabel(row.hoursLabel(), dayHours.hours());
             }
-            updateWeeklyTotal();
-        } catch (JSONException ignored) {
-            // ignore malformed stored data
         }
+        updateWeeklyTotal();
     }
 
     private DayRow findRow(String dayKey) {
         for (DayRow row : dayRows) {
-            if (row.dayKey.equals(dayKey)) {
+            if (row.dayKey().equals(dayKey)) {
                 return row;
             }
         }
@@ -194,31 +153,16 @@ public class OnboardingStudyPlanFragment extends Fragment implements OnboardingS
     private void persistIfComplete() {
         List<DayHours> plan = new ArrayList<>();
         for (DayRow row : dayRows) {
-            if (!row.checkBox.isChecked()) continue;
-            float hours = row.slider.getValue();
+            if (!row.checkBox().isChecked()) continue;
+            float hours = row.slider().getValue();
             if (hours > 0f) {
-                plan.add(new DayHours(row.dayKey, hours));
+                plan.add(new DayHours(row.dayKey(), hours));
             }
         }
 
         if (!plan.isEmpty()) {
-            prefs.setStudyPlanJson(serializePlan(plan));
+            prefs.setStudyPlan(plan);
         }
-    }
-
-    private String serializePlan(List<DayHours> plan) {
-        JSONArray array = new JSONArray();
-        for (DayHours dayHours : plan) {
-            JSONObject obj = new JSONObject();
-            try {
-                obj.put("day", dayHours.dayKey);
-                obj.put("hours", dayHours.hours);
-                array.put(obj);
-            } catch (JSONException ignored) {
-                // should not happen with valid keys
-            }
-        }
-        return array.toString();
     }
 
     private void updateHoursLabel(MaterialTextView label, float hours) {
@@ -236,8 +180,8 @@ public class OnboardingStudyPlanFragment extends Fragment implements OnboardingS
         if (weeklyTotal == null) return;
         float total = 0f;
         for (DayRow row : dayRows) {
-            if (row.checkBox.isChecked()) {
-                total += row.slider.getValue();
+            if (row.checkBox().isChecked()) {
+                total += row.slider().getValue();
             }
         }
         weeklyTotal.setText(getString(R.string.onboarding_study_plan_total_placeholder, formatHours(total)));

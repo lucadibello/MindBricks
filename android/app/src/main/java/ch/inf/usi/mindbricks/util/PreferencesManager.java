@@ -3,6 +3,14 @@ package ch.inf.usi.mindbricks.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import ch.inf.usi.mindbricks.model.plan.DayHours;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class PreferencesManager {
 
     private static final String PREFS_NAME = "MindBricks-Preferences";
@@ -127,10 +135,39 @@ public class PreferencesManager {
         return preferences.getString(PreferencesKey.STUDY_OBJECTIVE.getName(), "");
     }
 
-    public void setStudyPlanJson(String studyPlanJson) {
-        preferences.edit().putString(PreferencesKey.STUDY_PLAN_JSON.getName(), studyPlanJson).apply();
+    public void setStudyPlan(List<DayHours> plan) {
+        JSONArray array = new JSONArray();
+        for (DayHours dayHours : plan) {
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("day", dayHours.dayKey());
+                obj.put("hours", dayHours.hours());
+                array.put(obj);
+            } catch (JSONException ignored) {
+                // should not happen with valid keys
+            }
+        }
+        preferences.edit().putString(PreferencesKey.STUDY_PLAN_JSON.getName(), array.toString()).apply();
     }
-    public String getStudyPlanJson() {
-        return preferences.getString(PreferencesKey.STUDY_PLAN_JSON.getName(), "[]");
+
+    public List<DayHours> getStudyPlan() {
+        List<DayHours> plan = new ArrayList<>();
+        String json = preferences.getString(PreferencesKey.STUDY_PLAN_JSON.getName(), "[]");
+        if (json.isEmpty()) return plan;
+
+        try {
+            JSONArray array = new JSONArray(json);
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject entry = array.getJSONObject(i);
+                String day = entry.optString("day", "");
+                float hours = (float) entry.optDouble("hours", 0);
+                if (!day.isEmpty() && hours > 0) {
+                    plan.add(new DayHours(day, hours));
+                }
+            }
+        } catch (JSONException ignored) {
+            // ignore malformed stored data
+        }
+        return plan;
     }
 }
