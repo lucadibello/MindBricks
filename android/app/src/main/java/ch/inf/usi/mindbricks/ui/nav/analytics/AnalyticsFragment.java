@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,19 +29,23 @@ import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.ui.charts.AIRecommendationCardView;
 import ch.inf.usi.mindbricks.ui.charts.DailyTimelineChartView;
+import ch.inf.usi.mindbricks.ui.charts.EnergyCurveChartView;
+import ch.inf.usi.mindbricks.ui.charts.GoalRingsView;
 import ch.inf.usi.mindbricks.ui.charts.HourlyDistributionChartView;
+import ch.inf.usi.mindbricks.ui.charts.QualityHeatmapChartView;
 import ch.inf.usi.mindbricks.ui.charts.SessionHistoryAdapter;
+import ch.inf.usi.mindbricks.ui.charts.StreakCalendarView;
 import ch.inf.usi.mindbricks.ui.charts.WeeklyFocusChartView;
 import ch.inf.usi.mindbricks.util.TestDataGenerator;
 
 /**
  * Fragment that displays analytics and visualizations of study sessions.
  *
- * Architecture:
- * Fragment -> ViewModel -> Repository -> Database
  */
 public class AnalyticsFragment extends Fragment {
+    private static final String TAG = "AnalyticsFragment";
 
     // ViewModel
     private AnalyticsViewModel viewModel;
@@ -49,16 +54,28 @@ public class AnalyticsFragment extends Fragment {
     private WeeklyFocusChartView weeklyFocusChart;
     private HourlyDistributionChartView hourlyDistributionChart;
     private DailyTimelineChartView dailyTimelineChart;
+    private EnergyCurveChartView energyCurveChart;
+    private QualityHeatmapChartView qualityHeatmapChart;
+    private StreakCalendarView streakCalendarView;
+    private GoalRingsView goalRingsView;
+    private AIRecommendationCardView aiRecommendationView;
 
     // Session history
     private RecyclerView sessionHistoryRecycler;
     private SessionHistoryAdapter sessionHistoryAdapter;
+    private TextView sessionCountText;
 
     // UI state views
     private ProgressBar progressBar;
     private TextView emptyStateText;
     private View chartsContainer;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    // Tab nav
+    private TabLayout tabLayout;
+    private View overviewContainer;
+    private View insightsContainer;
+    private View historyContainer;
 
     // Date formatters
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
@@ -78,16 +95,21 @@ public class AnalyticsFragment extends Fragment {
         // ViewModelProvider ensures same instance survives configuration changes
         viewModel = new ViewModelProvider(this).get(AnalyticsViewModel.class);
 
-        // Initialize views
+        // Initialize all views
         initializeViews(view);
 
-        // Setup RecyclerView
+        // Setup tab navigation
+        setupTabs();
+
+        // Setup RecyclerView for session history
         setupRecyclerView();
 
         // Observe ViewModel LiveData
         observeViewModel();
 
+        // Generate test data if database is empty
         generateTestDataIfNeeded();
+
         // Load data (30 days by default)
         viewModel.loadAnalyticsData(30);
     }
@@ -112,13 +134,27 @@ public class AnalyticsFragment extends Fragment {
      * @param view Root view
      */
     private void initializeViews(View view) {
+        Log.d(TAG, "Initializing views...");
+
+        // Tab navigation
+        tabLayout = view.findViewById(R.id.analyticsTabLayout);
+        overviewContainer = view.findViewById(R.id.overviewContainer);
+        insightsContainer = view.findViewById(R.id.insightsContainer);
+        historyContainer = view.findViewById(R.id.historyContainer);
+
         // Chart views
         weeklyFocusChart = view.findViewById(R.id.weeklyFocusChart);
         hourlyDistributionChart = view.findViewById(R.id.hourlyDistributionChart);
         dailyTimelineChart = view.findViewById(R.id.dailyTimelineChart);
+        //energyCurveChart = view.findViewById(R.id.energyCurveChart);
+        //qualityHeatmapChart = view.findViewById(R.id.qualityHeatmapChart);
+        //streakCalendarView = view.findViewById(R.id.streakCalendarView);
+        //goalRingsView = view.findViewById(R.id.goalRingsView);
+        //aiRecommendationView = view.findViewById(R.id.aiRecommendationView);
 
-        // RecyclerView for session history
+        // History
         sessionHistoryRecycler = view.findViewById(R.id.sessionHistoryRecycler);
+        sessionCountText = view.findViewById(R.id.sessionCountText);
 
         // UI state views
         progressBar = view.findViewById(R.id.analyticsProgressBar);
@@ -134,6 +170,65 @@ public class AnalyticsFragment extends Fragment {
         FloatingActionButton fab = view.findViewById(R.id.analyticsFilterFab);
         if (fab != null) {
             fab.setOnClickListener(v -> showFilterDialog());
+        }
+
+        Log.d(TAG, "All views initialized successfully");
+    }
+
+    /**
+     * Setup tab navigation
+     */
+    private void setupTabs() {
+        Log.d(TAG, "Setting up tabs...");
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switchContent(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // Nothing so far
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                // Nothing as well
+            }
+        });
+
+        // Default to Overview tab
+        switchContent(0);
+    }
+
+    /**
+     * Switch between different tab content
+     */
+    private void switchContent(int position) {
+        Log.d(TAG, "Switching to tab position: " + position);
+
+        // Hide all containers first
+        overviewContainer.setVisibility(View.GONE);
+        insightsContainer.setVisibility(View.GONE);
+        historyContainer.setVisibility(View.GONE);
+
+        // Show selected container
+        switch (position) {
+            case 0: // Overview
+                Log.d(TAG, "Showing Overview tab");
+                overviewContainer.setVisibility(View.VISIBLE);
+                break;
+
+            case 1: // Insights
+                Log.d(TAG, "Showing Insights tab");
+                insightsContainer.setVisibility(View.VISIBLE);
+                break;
+
+            case 2: // History
+                Log.d(TAG, "Showing History tab");
+                historyContainer.setVisibility(View.VISIBLE);
+                break;
         }
     }
 
@@ -167,6 +262,8 @@ public class AnalyticsFragment extends Fragment {
                         layoutManager.getOrientation()
                 )
         );
+
+        Log.d(TAG, "RecyclerView setup complete");
     }
 
     /**
@@ -214,13 +311,6 @@ public class AnalyticsFragment extends Fragment {
             }
         });
 
-        // Observe errors
-        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
-            Log.d("Fragment", "Error message received: " + error);
-            if (error != null && !error.isEmpty()) {
-                showError(error);
-            }
-        });
 
         Log.d("Fragment", "=== All observers registered ===");
     }
@@ -239,21 +329,21 @@ public class AnalyticsFragment extends Fragment {
 
         switch (state) {
             case LOADING:
-                Log.d("Fragment", "Showing loading state");
+                Log.d(TAG, "Showing LOADING state");
                 progressBar.setVisibility(View.VISIBLE);
                 chartsContainer.setVisibility(View.GONE);
                 emptyStateText.setVisibility(View.GONE);
                 break;
 
             case SUCCESS:
-                Log.d("Fragment", "Showing success state - CHARTS VISIBLE");
+                Log.d(TAG, "Showing SUCCESS state - charts visible");
                 progressBar.setVisibility(View.GONE);
                 chartsContainer.setVisibility(View.VISIBLE);
                 emptyStateText.setVisibility(View.GONE);
                 break;
 
             case EMPTY:
-                Log.d("Fragment", "Showing empty state");
+                Log.d(TAG, "Showing EMPTY state");
                 progressBar.setVisibility(View.GONE);
                 chartsContainer.setVisibility(View.GONE);
                 emptyStateText.setVisibility(View.VISIBLE);
@@ -261,11 +351,12 @@ public class AnalyticsFragment extends Fragment {
                 break;
 
             case ERROR:
-                Log.d("Fragment", "Showing error state");
+                Log.d(TAG, "Showing ERROR state");
                 progressBar.setVisibility(View.GONE);
                 chartsContainer.setVisibility(View.GONE);
                 emptyStateText.setVisibility(View.VISIBLE);
                 emptyStateText.setText("Error loading analytics");
+                Toast.makeText(getContext(), "Error loading analytics data", Toast.LENGTH_SHORT).show();
                 break;
         }
 
@@ -362,7 +453,6 @@ public class AnalyticsFragment extends Fragment {
 
     /**
      * Show filter dialog for date range selection.
-     * Optional feature for advanced filtering.
      */
     private void showFilterDialog() {
         String[] options = {"Last 7 days", "Last 30 days", "Last 90 days", "All time"};
@@ -418,5 +508,11 @@ public class AnalyticsFragment extends Fragment {
 
         // Refresh data when returning to fragment -> ended session in between etc.
         viewModel.refreshData();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView");
     }
 }

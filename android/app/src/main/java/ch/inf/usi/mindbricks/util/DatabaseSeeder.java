@@ -25,7 +25,7 @@ import ch.inf.usi.mindbricks.model.StudySession;
  */
 public class DatabaseSeeder {
     private static final String TAG = "DatabaseSeeder";
-    private static final String STUDY_SESSION_FILE = "initial_data/study_sessions.json";
+    private static final String STUDY_SESSION_FILE = "initial_data/study_data.json";
 
     private static final Executor dbExecutor = Executors.newSingleThreadExecutor();
 
