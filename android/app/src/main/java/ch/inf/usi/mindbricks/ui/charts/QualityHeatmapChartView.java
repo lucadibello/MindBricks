@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 
-import ch.inf.usi.mindbricks.model.HeatmapCell;
+import ch.inf.usi.mindbricks.model.visual.HeatmapCell;
 
 /**
  * Quality Heatmap:

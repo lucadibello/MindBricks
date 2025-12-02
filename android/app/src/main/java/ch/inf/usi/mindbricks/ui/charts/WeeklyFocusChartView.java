@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.model.WeeklyStats;
-import ch.inf.usi.mindbricks.util.ChartStyleUtil;
+import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
+import ch.inf.usi.mindbricks.util.visual.ChartStyleUtil;
 
 /**
  * Custom view that displays weekly study statistics as a bar chart.

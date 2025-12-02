@@ -19,14 +19,14 @@
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/analyticsTabLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="65dp"
                 android:background="?attr/colorPrimary"
                 android:elevation="4dp"
-                app:tabTextColor="@android:color/white"
-                app:tabSelectedTextColor="@android:color/white"
+                app:tabGravity="fill"
                 app:tabIndicatorColor="@android:color/white"
                 app:tabMode="fixed"
-                app:tabGravity="fill">
+                app:tabSelectedTextColor="@android:color/white"
+                app:tabTextColor="@android:color/white">
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
@@ -67,8 +67,8 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="100dp"
                     android:gravity="center"
-                    android:textSize="18sp"
                     android:textColor="?android:textColorSecondary"
+                    android:textSize="18sp"
                     android:visibility="gone" />
 
                 <!-- Charts Container (shown when data is available) -->
@@ -83,8 +83,8 @@
                         android:id="@+id/overviewContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="visible"
-                        android:fillViewport="true">
+                        android:fillViewport="true"
+                        android:visibility="visible">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -92,10 +92,49 @@
                             android:orientation="vertical"
                             android:padding="8dp">
 
-                            <!-- Goal Rings Card (NEW) -->
+                            <!-- AI Recommendations Card -->
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="match_parent"
-                                android:layout_height="650dp"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="4dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="12dp"
+                                        android:text="Recommendation"
+                                        android:textColor="?android:textColorPrimary"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold" />
+
+                                    <ch.inf.usi.mindbricks.ui.charts.AIRecommendationCardView
+                                        android:id="@+id/aiRecommendationView"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content" />
+
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.divider.MaterialDivider
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_margin="16dp"
+                                android:orientation="horizontal"
+                                android:thickness="1dp"/>
+
+                            <!-- Goal Rings Card -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
                                 android:layout_margin="8dp"
                                 app:cardCornerRadius="12dp"
                                 app:cardElevation="4dp">
@@ -103,8 +142,7 @@
                                 <ch.inf.usi.mindbricks.ui.charts.GoalRingsView
                                     android:id="@+id/goalRingsView"
                                     android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:padding="16dp" />
+                                    android:layout_height="wrap_content" />
 
                             </com.google.android.material.card.MaterialCardView>
 
@@ -126,7 +164,7 @@
                             <!-- Energy Curve Card  -->
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="match_parent"
-                                android:layout_height="400dp"
+                                android:layout_height="wrap_content"
                                 android:layout_margin="8dp"
                                 app:cardCornerRadius="12dp"
                                 app:cardElevation="4dp">
@@ -134,15 +172,14 @@
                                 <ch.inf.usi.mindbricks.ui.charts.EnergyCurveChartView
                                     android:id="@+id/energyCurveChart"
                                     android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:padding="16dp" />
+                                    android:layout_height="wrap_content" />
 
                             </com.google.android.material.card.MaterialCardView>
 
                             <!-- Streak Calendar Card -->
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="match_parent"
-                                android:layout_height="700dp"
+                                android:layout_height="wrap_content"
                                 android:layout_margin="8dp"
                                 app:cardCornerRadius="12dp"
                                 app:cardElevation="4dp">
@@ -150,8 +187,7 @@
                                 <ch.inf.usi.mindbricks.ui.charts.StreakCalendarView
                                     android:id="@+id/streakCalendarView"
                                     android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:padding="16dp" />
+                                    android:layout_height="wrap_content" />
 
                             </com.google.android.material.card.MaterialCardView>
 
@@ -170,38 +206,6 @@
 
                             </com.google.android.material.card.MaterialCardView>
 
-                            <!-- AI Recommendations Card -->
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_margin="8dp"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="4dp">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:padding="16dp">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="AI Insights"
-                                        android:textSize="20sp"
-                                        android:textStyle="bold"
-                                        android:textColor="?android:textColorPrimary"
-                                        android:layout_marginBottom="12dp" />
-
-                                    <ch.inf.usi.mindbricks.ui.charts.AIRecommendationCardView
-                                        android:id="@+id/aiRecommendationView"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content" />
-
-                                </LinearLayout>
-
-                            </com.google.android.material.card.MaterialCardView>
-
                         </LinearLayout>
 
                     </androidx.core.widget.NestedScrollView>
@@ -211,8 +215,8 @@
                         android:id="@+id/insightsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:fillViewport="true">
+                        android:fillViewport="true"
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -223,7 +227,7 @@
                             <!-- Quality Heatmap Card -->
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="match_parent"
-                                android:layout_height="800dp"
+                                android:layout_height="wrap_content"
                                 android:layout_margin="8dp"
                                 app:cardCornerRadius="12dp"
                                 app:cardElevation="4dp">
@@ -231,8 +235,7 @@
                                 <ch.inf.usi.mindbricks.ui.charts.QualityHeatmapChartView
                                     android:id="@+id/qualityHeatmapChart"
                                     android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:padding="16dp" />
+                                    android:layout_height="wrap_content" />
 
                             </com.google.android.material.card.MaterialCardView>
 
@@ -261,8 +264,8 @@
                         android:id="@+id/historyContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:fillViewport="true">
+                        android:fillViewport="true"
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -273,26 +276,26 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="16dp"
-                                android:gravity="center_vertical">
+                                android:padding="16dp">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:text="Session History"
+                                    android:textColor="?android:textColorPrimary"
                                     android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="?android:textColorPrimary" />
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/sessionCountText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0 sessions"
-                                    android:textSize="14sp"
-                                    android:textColor="?android:textColorSecondary" />
+                                    android:textColor="?android:textColorSecondary"
+                                    android:textSize="14sp" />
 
                             </LinearLayout>
 
@@ -314,11 +317,11 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginBottom="12dp"
                                         android:text="Recent Sessions"
-                                        android:textSize="16sp"
-                                        android:textStyle="bold"
                                         android:textColor="?android:textColorPrimary"
-                                        android:layout_marginBottom="12dp" />
+                                        android:textSize="16sp"
+                                        android:textStyle="bold" />
 
                                     <!-- RecyclerView for History -->
                                     <androidx.recyclerview.widget.RecyclerView

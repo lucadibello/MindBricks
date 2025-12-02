@@ -8,7 +8,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 /**
  * Data Access Object for StudySession entities

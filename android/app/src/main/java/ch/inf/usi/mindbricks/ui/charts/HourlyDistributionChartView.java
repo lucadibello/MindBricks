@@ -16,7 +16,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
@@ -24,8 +23,8 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.model.TimeSlotStats;
-import ch.inf.usi.mindbricks.util.ChartStyleUtil;
+import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
+import ch.inf.usi.mindbricks.util.visual.ChartStyleUtil;
 
 /**
  * Custom view that displays hourly study distribution.

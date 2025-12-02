@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.util;
+package ch.inf.usi.mindbricks.util.database;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
-import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 /**
  * Utility to generate test data for the database.

@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.model;
+package ch.inf.usi.mindbricks.model.visual;
 
 /**
  * Represents an AI-generated recommendation card

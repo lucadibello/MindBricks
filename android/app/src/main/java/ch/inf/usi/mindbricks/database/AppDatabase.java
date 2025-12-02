@@ -8,9 +8,9 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import ch.inf.usi.mindbricks.model.SessionSensorLog;
-import ch.inf.usi.mindbricks.model.StudySession;
-import ch.inf.usi.mindbricks.util.DatabaseSeeder;
+import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
+import ch.inf.usi.mindbricks.util.database.DatabaseSeeder;
 
 
 /**
@@ -20,6 +20,7 @@ import ch.inf.usi.mindbricks.util.DatabaseSeeder;
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
+    private static Context appContext;
     public abstract StudySessionDao studySessionDao();
     public abstract SessionSensorLogDao sessionSensorLogDao();
 
@@ -27,7 +28,10 @@ public abstract class AppDatabase extends RoomDatabase {
         // called on the database thread -> safe
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db){
-          super.onCreate(db);
+            super.onCreate(db);
+            if (INSTANCE != null && appContext != null){
+                DatabaseSeeder.seedDatabaseOnCreate(appContext, INSTANCE);
+            }
         }
 
         // called every time database is opened
@@ -39,6 +43,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
+            appContext = context.getApplicationContext();
+
             INSTANCE = Room.databaseBuilder(
                             context.getApplicationContext(),
                             AppDatabase.class,
@@ -47,8 +53,6 @@ public abstract class AppDatabase extends RoomDatabase {
                     .addCallback(DB_CALLBACK)
                     .fallbackToDestructiveMigration()
                     .build();
-
-            DatabaseSeeder.seedDatabase(context.getApplicationContext(), INSTANCE);
         }
         return INSTANCE;
     }

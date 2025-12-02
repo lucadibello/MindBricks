@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.model;
+package ch.inf.usi.mindbricks.model.visual;
 
 /**
  * Represents a single achievement ring (Apple Activity style)

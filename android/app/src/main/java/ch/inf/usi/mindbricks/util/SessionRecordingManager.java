@@ -1,6 +1,5 @@
 package ch.inf.usi.mindbricks.util;
 
-import android.accessibilityservice.GestureDescription;
 import android.content.Context;
 import android.util.Log;
 
@@ -14,8 +13,8 @@ import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.drivers.LightSensor;
 import ch.inf.usi.mindbricks.drivers.MicrophoneRecorder;
 import ch.inf.usi.mindbricks.drivers.SignificantMotionSensor;
-import ch.inf.usi.mindbricks.model.SessionSensorLog;
-import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 public class SessionRecordingManager {
 

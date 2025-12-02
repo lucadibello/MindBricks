@@ -14,7 +14,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import ch.inf.usi.mindbricks.model.StreakDay;
+import ch.inf.usi.mindbricks.model.visual.StreakDay;
 
 /**
  * Monthly calendar showing study streaks

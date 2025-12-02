@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
 import ch.inf.usi.mindbricks.ui.charts.AIRecommendationCardView;
 import ch.inf.usi.mindbricks.ui.charts.DailyTimelineChartView;
 import ch.inf.usi.mindbricks.ui.charts.EnergyCurveChartView;
@@ -38,7 +38,7 @@ import ch.inf.usi.mindbricks.ui.charts.QualityHeatmapChartView;
 import ch.inf.usi.mindbricks.ui.charts.SessionHistoryAdapter;
 import ch.inf.usi.mindbricks.ui.charts.StreakCalendarView;
 import ch.inf.usi.mindbricks.ui.charts.WeeklyFocusChartView;
-import ch.inf.usi.mindbricks.util.TestDataGenerator;
+import ch.inf.usi.mindbricks.util.database.TestDataGenerator;
 
 /**
  * Fragment that displays analytics and visualizations of study sessions.

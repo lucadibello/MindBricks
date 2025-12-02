@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 
-import ch.inf.usi.mindbricks.model.HourlyQuality;
+import ch.inf.usi.mindbricks.model.visual.HourlyQuality;
 
 /**
  * Custom view that displays the "Energy Curve" - a smooth line showing

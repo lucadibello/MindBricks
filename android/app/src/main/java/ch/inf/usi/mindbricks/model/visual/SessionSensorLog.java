@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.model;
+package ch.inf.usi.mindbricks.model.visual;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;

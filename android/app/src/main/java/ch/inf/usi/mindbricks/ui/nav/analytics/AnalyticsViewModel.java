@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import ch.inf.usi.mindbricks.model.DailyRecommendation;
-import ch.inf.usi.mindbricks.model.StudySession;
-import ch.inf.usi.mindbricks.model.TimeSlotStats;
-import ch.inf.usi.mindbricks.model.WeeklyStats;
+import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
+import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
+import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
 import ch.inf.usi.mindbricks.repository.StudySessionRepository;
-import ch.inf.usi.mindbricks.util.DataProcessor;
+import ch.inf.usi.mindbricks.util.database.DataProcessor;
 
 /**
  * ViewModel for Analytics screen.
@@ -56,71 +56,82 @@ public class AnalyticsViewModel extends AndroidViewModel {
 
     public void loadAnalyticsData(int daysToLoad) {
         Log.d("ViewModel", "=== loadAnalyticsData START ===");
-        Log.d("ViewModel", "Setting ViewState to LOADING");
-        viewState.setValue(ViewState.LOADING);
+        viewState.postValue(ViewState.LOADING);
 
         long startTime = System.currentTimeMillis() - (daysToLoad * 24L * 60 * 60 * 1000);
         Log.d("ViewModel", "Querying sessions since: " + startTime);
 
-        LiveData<List<StudySession>> sessionsLiveData = repository.getSessionsSince(startTime);
-        Log.d("ViewModel", "Got LiveData from repository, setting up observer");
+        // Execute the query on background thread directly
+        processingExecutor.execute(() -> {
+            try {
+                Log.d("ViewModel", "Background thread: Starting database query");
 
-        observeOnce(sessionsLiveData, sessions -> {
-            Log.d("ViewModel", "=== observeOnce CALLBACK TRIGGERED ===");
-            Log.d("ViewModel", "Sessions received: " + (sessions != null ? sessions.size() : "null"));
+                List<StudySession> sessions = repository.getRecentSessionsSync((int) startTime);
 
-            if (sessions == null || sessions.isEmpty()) {
-                Log.w("ViewModel", "No sessions - setting ViewState to EMPTY");
-                viewState.setValue(ViewState.EMPTY);
-                return;
+                Log.d("ViewModel", "Query returned: " + (sessions != null ? sessions.size() : 0) + " sessions");
+
+                if (sessions == null) {
+                    Log.e("ViewModel", "Sessions is NULL");
+                    viewState.postValue(ViewState.ERROR);
+                    errorMessage.postValue("Failed to load data");
+                    return;
+                }
+
+                if (sessions.isEmpty()) {
+                    Log.w("ViewModel", "No sessions found - EMPTY state");
+                    viewState.postValue(ViewState.EMPTY);
+                    return;
+                }
+
+                // Cache the data
+                Log.d("ViewModel", "Caching " + sessions.size() + " sessions");
+                cachedSessions = sessions;
+                lastLoadTime = System.currentTimeMillis();
+
+                // Process all data
+                Log.d("ViewModel", "Starting data processing...");
+                processAllData(sessions);
+
+            } catch (Exception e) {
+                Log.e("ViewModel", "ERROR in loadAnalyticsData", e);
+                viewState.postValue(ViewState.ERROR);
+                errorMessage.postValue("Error: " + e.getMessage());
             }
-
-            Log.d("ViewModel", "Valid sessions found, caching and processing");
-            cachedSessions = sessions;
-            lastLoadTime = System.currentTimeMillis();
-            processAllData(sessions);
         });
 
-        Log.d("ViewModel", "=== loadAnalyticsData END (observer registered) ===");
+        Log.d("ViewModel", "=== loadAnalyticsData END (background task started) ===");
     }
 
     private void processAllData(List<StudySession> sessions) {
         Log.d("ViewModel", "=== processAllData START ===");
-        Log.d("ViewModel", "Processing " + sessions.size() + " sessions on background thread");
 
-        processingExecutor.execute(() -> {
-            try {
-                Log.d("ViewModel", "Background thread started");
+        // This already runs on processingExecutor, so we're good
+        try {
+            Log.d("ViewModel", "Calculating weekly stats...");
+            WeeklyStats weekly = DataProcessor.calculateWeeklyStats(sessions);
+            weeklyStats.postValue(weekly);
 
-                Log.d("ViewModel", "Calculating weekly stats...");
-                WeeklyStats weekly = DataProcessor.calculateWeeklyStats(sessions);
-                weeklyStats.postValue(weekly);
-                Log.d("ViewModel", "Weekly stats posted");
+            Log.d("ViewModel", "Calculating hourly stats...");
+            List<TimeSlotStats> hourly = DataProcessor.calculateHourlyDistribution(sessions);
+            hourlyStats.postValue(hourly);
 
-                Log.d("ViewModel", "Calculating hourly stats...");
-                List<TimeSlotStats> hourly = DataProcessor.calculateHourlyDistribution(sessions);
-                hourlyStats.postValue(hourly);
-                Log.d("ViewModel", "Hourly stats posted");
+            Log.d("ViewModel", "Generating recommendations...");
+            DailyRecommendation recommendation = DataProcessor.generateDailyRecommendation(sessions);
+            dailyRecommendation.postValue(recommendation);
 
-                Log.d("ViewModel", "Generating recommendations...");
-                DailyRecommendation recommendation = DataProcessor.generateDailyRecommendation(sessions);
-                dailyRecommendation.postValue(recommendation);
-                Log.d("ViewModel", "Recommendations posted");
+            Log.d("ViewModel", "Posting session history...");
+            sessionHistory.postValue(sessions);
 
-                Log.d("ViewModel", "Posting session history...");
-                sessionHistory.postValue(sessions);
-                Log.d("ViewModel", "Session history posted");
+            Log.d("ViewModel", "*** SETTING ViewState to SUCCESS ***");
+            viewState.postValue(ViewState.SUCCESS);
 
-                Log.d("ViewModel", "*** SETTING ViewState to SUCCESS ***");
-                viewState.postValue(ViewState.SUCCESS);
-                Log.d("ViewModel", "=== processAllData COMPLETE ===");
+            Log.d("ViewModel", "=== processAllData COMPLETE ===");
 
-            } catch (Exception e) {
-                Log.e("ViewModel", "ERROR in processAllData: " + e.getMessage(), e);
-                errorMessage.postValue("Error processing data: " + e.getMessage());
-                viewState.postValue(ViewState.ERROR);
-            }
-        });
+        } catch (Exception e) {
+            Log.e("ViewModel", "ERROR in processAllData", e);
+            viewState.postValue(ViewState.ERROR);
+            errorMessage.postValue("Error: " + e.getMessage());
+        }
     }
 
     public void loadWeeklyStats() {
@@ -146,10 +157,13 @@ public class AnalyticsViewModel extends AndroidViewModel {
     }
 
     public void loadRecentSessions(int limit) {
-        LiveData<List<StudySession>> sessionsLiveData = repository.getRecentSessions(limit);
-
-        observeOnce(sessionsLiveData, sessions -> {
-            sessionHistory.setValue(sessions);
+        processingExecutor.execute(() -> {
+            try {
+                List<StudySession> sessions = repository.getRecentSessionsSync(limit);
+                sessionHistory.postValue(sessions);
+            } catch (Exception e) {
+                Log.e("ViewModel", "Error loading recent sessions", e);
+            }
         });
     }
 
@@ -192,23 +206,6 @@ public class AnalyticsViewModel extends AndroidViewModel {
     private boolean isCacheValid() {
         return cachedSessions != null &&
                 (System.currentTimeMillis() - lastLoadTime) < CACHE_VALIDITY_MS;
-    }
-
-    private <T> void observeOnce(LiveData<T> liveData, OnDataCallback<T> callback) {
-        Log.d("ViewModel", "observeOnce called");
-
-        liveData.observeForever(new Observer<T>() {
-            @Override
-            public void onChanged(T data) {
-                Log.d("ViewModel", "observeOnce - data received: " + (data != null));
-                liveData.removeObserver(this);
-                callback.onData(data);
-            }
-        });
-    }
-
-    private interface OnDataCallback<T> {
-        void onData(T data);
     }
 
     public enum ViewState {

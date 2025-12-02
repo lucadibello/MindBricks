@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.util;
+package ch.inf.usi.mindbricks.util.database;
 
 import android.content.Context;
 import android.util.Log;
@@ -17,7 +17,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
-import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 /**
  * Utility class to seed the database with initial data from JSON files in the assets folder.
@@ -39,11 +39,10 @@ public class DatabaseSeeder {
 
                     List<StudySession> sessions = loadStudySessionsFromAssets(context);
 
-                    if(!sessions.isEmpty()){
+                    if (!sessions.isEmpty()) {
                         database.studySessionDao().insertAll(sessions);
                         Log.d(TAG, "Successfully loaded database with " + sessions.size() + " sessions.");
-                    }
-                    else{
+                    } else {
                         Log.w(TAG, "No sessions loaded from JSON file.");
                     }
 
@@ -60,6 +59,25 @@ public class DatabaseSeeder {
     private static boolean isDatabaseEmpty(AppDatabase database) {
         List<StudySession> sessions = database.studySessionDao().getAllSessions();
         return sessions == null || sessions.isEmpty();
+    }
+
+    public static void seedDatabaseOnCreate(Context context, AppDatabase database) {
+        try {
+            Log.d(TAG, "Seeding database on creation...");
+
+            List<StudySession> sessions = loadStudySessionsFromAssets(context);
+
+            if (!sessions.isEmpty()) {
+                database.studySessionDao().insertAll(sessions);
+                Log.d(TAG, "Successfully seeded " + sessions.size() + " sessions.");
+            }
+            else {
+                Log.w(TAG, "No sessions loaded from JSON file.");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error during database seeding.", e);
+        }
+
     }
 
     private static List<StudySession> loadStudySessionsFromAssets(Context context) {
@@ -145,8 +163,7 @@ public class DatabaseSeeder {
 
             return session;
 
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             Log.e(TAG, "Error parsing study session from JSON", e);
             return null;
 

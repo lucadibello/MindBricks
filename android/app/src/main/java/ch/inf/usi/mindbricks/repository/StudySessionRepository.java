@@ -14,8 +14,8 @@ import java.util.concurrent.Executors;
 import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.database.SessionSensorLogDao;
 import ch.inf.usi.mindbricks.database.StudySessionDao;
-import ch.inf.usi.mindbricks.model.SessionSensorLog;
-import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 /**
  * Repository class that provides a clean API for data access.
@@ -55,6 +55,16 @@ public class StudySessionRepository {
         });
 
         return liveData;
+    }
+
+    // Add this method to StudySessionRepository
+    public List<StudySession> getSessionsSinceSync(long startTime) {
+        Log.d("Repository", "Sync query for sessions since: " + startTime);
+
+        List<StudySession> sessions = studySessionDao.getSessionsSince(startTime);
+
+        Log.d("Repository", "Query complete: " + (sessions != null ? sessions.size() : 0) + " sessions");
+        return sessions;
     }
 
     public LiveData<List<StudySession>> getSessionsSince(long startTime) {
@@ -132,6 +142,10 @@ public class StudySessionRepository {
                 new android.os.Handler(android.os.Looper.getMainLooper()).post(callback);
             }
         });
+    }
+
+    public List<StudySession> getRecentSessionsSync(int limit) {
+        return studySessionDao.getRecentSessions(limit);
     }
 
     public interface InsertCallback {

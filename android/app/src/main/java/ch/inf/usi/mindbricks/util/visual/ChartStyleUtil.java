@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.util;
+package ch.inf.usi.mindbricks.util.visual;
 
 import android.content.Context;
 import android.graphics.Color;

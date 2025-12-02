@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
-import ch.inf.usi.mindbricks.model.AIRecommendation;
+import ch.inf.usi.mindbricks.model.visual.AIRecommendation;
 
 /**
  * Displays "AI-generated" recommendation cards

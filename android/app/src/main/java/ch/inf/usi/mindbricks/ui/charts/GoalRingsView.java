@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 
-import ch.inf.usi.mindbricks.model.GoalRing;
+import ch.inf.usi.mindbricks.model.visual.GoalRing;
 
 /**
  * Apple Activity Rings style visualization for daily goals

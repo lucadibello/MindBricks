@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.model.DailyRecommendation;
+import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
 
 /**
  * Custom view that displays recommended study times for the day

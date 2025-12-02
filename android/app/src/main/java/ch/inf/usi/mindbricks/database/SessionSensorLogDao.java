@@ -7,7 +7,7 @@ import androidx.room.Query;
 
 import java.util.List;
 
-import ch.inf.usi.mindbricks.model.SessionSensorLog;
+import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 
 @Dao
 public interface SessionSensorLogDao {

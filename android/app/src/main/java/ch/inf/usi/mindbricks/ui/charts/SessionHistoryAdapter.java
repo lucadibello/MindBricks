@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 /**
  * Adapter for displaying study session history in a RecyclerView.

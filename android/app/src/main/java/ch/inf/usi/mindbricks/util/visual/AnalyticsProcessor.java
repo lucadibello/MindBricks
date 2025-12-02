@@ -1,22 +1,21 @@
-package ch.inf.usi.mindbricks.util;
+package ch.inf.usi.mindbricks.util.visual;
 
 import android.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.model.AIRecommendation;
-import ch.inf.usi.mindbricks.model.GoalRing;
-import ch.inf.usi.mindbricks.model.HeatmapCell;
-import ch.inf.usi.mindbricks.model.HourlyQuality;
-import ch.inf.usi.mindbricks.model.StreakDay;
-import ch.inf.usi.mindbricks.model.StudySession;
+import ch.inf.usi.mindbricks.model.visual.AIRecommendation;
+import ch.inf.usi.mindbricks.model.visual.GoalRing;
+import ch.inf.usi.mindbricks.model.visual.HeatmapCell;
+import ch.inf.usi.mindbricks.model.visual.HourlyQuality;
+import ch.inf.usi.mindbricks.model.visual.StreakDay;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 /*
 * Utility class for processing study session data into analytics metrics

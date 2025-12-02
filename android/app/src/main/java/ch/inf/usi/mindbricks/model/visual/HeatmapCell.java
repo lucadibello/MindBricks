@@ -1,20 +1,30 @@
-package ch.inf.usi.mindbricks.model;
+package ch.inf.usi.mindbricks.model.visual;
 
-/*
- * Represents average study quality for a specific hour of the day
+/**
+ * Represents a single cell in the quality heatmap (Hour × Day)
  */
-public class HourlyQuality {
+public class HeatmapCell {
+    private int dayOfMonth;     // 1-31
     private int hour;           // 0-23
-    private float avgQuality;   // 0-100 (average focus score)
-    private int sessionCount;   // Number of sessions in this hour
+    private float avgQuality;   // 0-100
+    private int sessionCount;   // Number of sessions in this cell
 
-    public HourlyQuality() {
+    public HeatmapCell() {
     }
 
-    public HourlyQuality(int hour, float avgQuality, int sessionCount) {
+    public HeatmapCell(int dayOfMonth, int hour, float avgQuality, int sessionCount) {
+        this.dayOfMonth = dayOfMonth;
         this.hour = hour;
         this.avgQuality = avgQuality;
         this.sessionCount = sessionCount;
+    }
+
+    public int getDayOfMonth() {
+        return dayOfMonth;
+    }
+
+    public void setDayOfMonth(int dayOfMonth) {
+        this.dayOfMonth = dayOfMonth;
     }
 
     public int getHour() {

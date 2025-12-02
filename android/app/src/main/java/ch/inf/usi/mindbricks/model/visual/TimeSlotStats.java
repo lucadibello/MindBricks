@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.model;
+package ch.inf.usi.mindbricks.model.visual;
 
 /**
  * Model representing statistics for a specific time slot (hour of day).
