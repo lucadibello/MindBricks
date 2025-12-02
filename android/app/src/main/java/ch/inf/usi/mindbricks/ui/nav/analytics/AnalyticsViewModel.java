@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -54,45 +55,68 @@ public class AnalyticsViewModel extends AndroidViewModel {
     }
 
     public void loadAnalyticsData(int daysToLoad) {
-        Log.d("ViewModel", "loadAnalyticsData called with days: " + daysToLoad);  // ADD THIS
+        Log.d("ViewModel", "=== loadAnalyticsData START ===");
+        Log.d("ViewModel", "Setting ViewState to LOADING");
         viewState.setValue(ViewState.LOADING);
 
         long startTime = System.currentTimeMillis() - (daysToLoad * 24L * 60 * 60 * 1000);
-        Log.d("ViewModel", "Calculated startTime: " + startTime);  // ADD THIS
+        Log.d("ViewModel", "Querying sessions since: " + startTime);
 
         LiveData<List<StudySession>> sessionsLiveData = repository.getSessionsSince(startTime);
+        Log.d("ViewModel", "Got LiveData from repository, setting up observer");
 
         observeOnce(sessionsLiveData, sessions -> {
-            Log.d("ViewModel", "Received sessions: " + (sessions != null ? sessions.size() : "null"));  // ADD THIS
+            Log.d("ViewModel", "=== observeOnce CALLBACK TRIGGERED ===");
+            Log.d("ViewModel", "Sessions received: " + (sessions != null ? sessions.size() : "null"));
+
             if (sessions == null || sessions.isEmpty()) {
-                Log.w("ViewModel", "No sessions found - showing empty state");  // ADD THIS
+                Log.w("ViewModel", "No sessions - setting ViewState to EMPTY");
                 viewState.setValue(ViewState.EMPTY);
                 return;
             }
 
+            Log.d("ViewModel", "Valid sessions found, caching and processing");
             cachedSessions = sessions;
             lastLoadTime = System.currentTimeMillis();
             processAllData(sessions);
         });
+
+        Log.d("ViewModel", "=== loadAnalyticsData END (observer registered) ===");
     }
 
     private void processAllData(List<StudySession> sessions) {
+        Log.d("ViewModel", "=== processAllData START ===");
+        Log.d("ViewModel", "Processing " + sessions.size() + " sessions on background thread");
+
         processingExecutor.execute(() -> {
             try {
+                Log.d("ViewModel", "Background thread started");
+
+                Log.d("ViewModel", "Calculating weekly stats...");
                 WeeklyStats weekly = DataProcessor.calculateWeeklyStats(sessions);
                 weeklyStats.postValue(weekly);
+                Log.d("ViewModel", "Weekly stats posted");
 
+                Log.d("ViewModel", "Calculating hourly stats...");
                 List<TimeSlotStats> hourly = DataProcessor.calculateHourlyDistribution(sessions);
                 hourlyStats.postValue(hourly);
+                Log.d("ViewModel", "Hourly stats posted");
 
+                Log.d("ViewModel", "Generating recommendations...");
                 DailyRecommendation recommendation = DataProcessor.generateDailyRecommendation(sessions);
                 dailyRecommendation.postValue(recommendation);
+                Log.d("ViewModel", "Recommendations posted");
 
+                Log.d("ViewModel", "Posting session history...");
                 sessionHistory.postValue(sessions);
+                Log.d("ViewModel", "Session history posted");
 
+                Log.d("ViewModel", "*** SETTING ViewState to SUCCESS ***");
                 viewState.postValue(ViewState.SUCCESS);
+                Log.d("ViewModel", "=== processAllData COMPLETE ===");
 
             } catch (Exception e) {
+                Log.e("ViewModel", "ERROR in processAllData: " + e.getMessage(), e);
                 errorMessage.postValue("Error processing data: " + e.getMessage());
                 viewState.postValue(ViewState.ERROR);
             }
@@ -171,11 +195,15 @@ public class AnalyticsViewModel extends AndroidViewModel {
     }
 
     private <T> void observeOnce(LiveData<T> liveData, OnDataCallback<T> callback) {
-        // Use MediatorLiveData to observe and remove observer after first emission
-        MediatorLiveData<T> mediator = new MediatorLiveData<>();
-        mediator.addSource(liveData, data -> {
-            callback.onData(data);
-            mediator.removeSource(liveData);
+        Log.d("ViewModel", "observeOnce called");
+
+        liveData.observeForever(new Observer<T>() {
+            @Override
+            public void onChanged(T data) {
+                Log.d("ViewModel", "observeOnce - data received: " + (data != null));
+                liveData.removeObserver(this);
+                callback.onData(data);
+            }
         });
     }
 

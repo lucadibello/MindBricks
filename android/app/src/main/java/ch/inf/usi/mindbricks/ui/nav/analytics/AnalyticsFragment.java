@@ -3,6 +3,7 @@ package ch.inf.usi.mindbricks.ui.nav.analytics;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,15 +75,6 @@ public class AnalyticsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TestDataGenerator.addTestSessions(requireContext(), 20);
-
-        // Wait a bit, then load
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            viewModel.loadAnalyticsData(30);
-        }, 1000);
-
-
-        // Initialize ViewModel
         // ViewModelProvider ensures same instance survives configuration changes
         viewModel = new ViewModelProvider(this).get(AnalyticsViewModel.class);
 
@@ -95,8 +87,23 @@ public class AnalyticsFragment extends Fragment {
         // Observe ViewModel LiveData
         observeViewModel();
 
+        generateTestDataIfNeeded();
         // Load data (30 days by default)
         viewModel.loadAnalyticsData(30);
+    }
+
+    private void generateTestDataIfNeeded() {
+        viewModel.getSessionHistory().observe(getViewLifecycleOwner(), sessions -> {
+            if (sessions != null && sessions.isEmpty()) {
+                // Only generate if truly empty
+                TestDataGenerator.addTestSessions(requireContext(), 20);
+
+                // Wait for insertion, then reload
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    viewModel.refreshData();
+                }, 2000);  // Give it time to insert
+            }
+        });
     }
 
     /**
@@ -167,13 +174,17 @@ public class AnalyticsFragment extends Fragment {
      * This is where the Fragment reacts to data changes.
      */
     private void observeViewModel() {
+        Log.d("Fragment", "=== Setting up observers ===");
+
         // Observe view state for loading/error/success
         viewModel.getViewState().observe(getViewLifecycleOwner(), state -> {
+            Log.d("Fragment", "*** ViewState changed to: " + state + " ***");
             updateUIState(state);
         });
 
         // Observe weekly stats
         viewModel.getWeeklyStats().observe(getViewLifecycleOwner(), stats -> {
+            Log.d("Fragment", "Weekly stats received: " + (stats != null ? "Yes" : "null"));
             if (stats != null) {
                 weeklyFocusChart.setData(stats);
             }
@@ -181,6 +192,7 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe hourly distribution
         viewModel.getHourlyStats().observe(getViewLifecycleOwner(), stats -> {
+            Log.d("Fragment", "Hourly stats received: " + (stats != null ? stats.size() + " items" : "null"));
             if (stats != null) {
                 hourlyDistributionChart.setData(stats);
             }
@@ -188,6 +200,7 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe daily recommendations
         viewModel.getDailyRecommendation().observe(getViewLifecycleOwner(), recommendation -> {
+            Log.d("Fragment", "Recommendation received: " + (recommendation != null ? "Yes" : "null"));
             if (recommendation != null) {
                 dailyTimelineChart.setData(recommendation);
             }
@@ -195,6 +208,7 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe session history
         viewModel.getSessionHistory().observe(getViewLifecycleOwner(), sessions -> {
+            Log.d("Fragment", "Session history received: " + (sessions != null ? sessions.size() + " items" : "null"));
             if (sessions != null) {
                 sessionHistoryAdapter.setData(sessions);
             }
@@ -202,10 +216,13 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe errors
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            Log.d("Fragment", "Error message received: " + error);
             if (error != null && !error.isEmpty()) {
                 showError(error);
             }
         });
+
+        Log.d("Fragment", "=== All observers registered ===");
     }
 
     /**
@@ -215,26 +232,28 @@ public class AnalyticsFragment extends Fragment {
      * @param state Current view state
      */
     private void updateUIState(AnalyticsViewModel.ViewState state) {
+        Log.d("Fragment", "=== updateUIState called with: " + state + " ===");
+
         // Stop refresh animation if running
         swipeRefreshLayout.setRefreshing(false);
 
         switch (state) {
             case LOADING:
-                // Show loading indicator
+                Log.d("Fragment", "Showing loading state");
                 progressBar.setVisibility(View.VISIBLE);
                 chartsContainer.setVisibility(View.GONE);
                 emptyStateText.setVisibility(View.GONE);
                 break;
 
             case SUCCESS:
-                // Show content
+                Log.d("Fragment", "Showing success state - CHARTS VISIBLE");
                 progressBar.setVisibility(View.GONE);
                 chartsContainer.setVisibility(View.VISIBLE);
                 emptyStateText.setVisibility(View.GONE);
                 break;
 
             case EMPTY:
-                // Show empty state
+                Log.d("Fragment", "Showing empty state");
                 progressBar.setVisibility(View.GONE);
                 chartsContainer.setVisibility(View.GONE);
                 emptyStateText.setVisibility(View.VISIBLE);
@@ -242,13 +261,15 @@ public class AnalyticsFragment extends Fragment {
                 break;
 
             case ERROR:
-                // Show error state
+                Log.d("Fragment", "Showing error state");
                 progressBar.setVisibility(View.GONE);
                 chartsContainer.setVisibility(View.GONE);
                 emptyStateText.setVisibility(View.VISIBLE);
-                emptyStateText.setText("Error loading analytics.\nPull down to retry.");
+                emptyStateText.setText("Error loading analytics");
                 break;
         }
+
+        Log.d("Fragment", "UI state update complete");
     }
 
     /**
