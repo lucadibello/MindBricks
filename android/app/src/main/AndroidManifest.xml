@@ -40,14 +40,6 @@
         <activity
             android:name=".ui.onboarding.OnboardingActivity"
             android:theme="@style/Theme.MindBricks.NoActionBar" />
-
-        <!-- Analytics activity -->
-        <activity
-            android:name=".ui.nav.analytics.AnalyticsFragment"
-            android:name=".ui.analytics.AnalyticsFragment"
-            android:theme="@style/Theme.MindBricks.NoActionBar"
-            android:exported="false" />
-
     </application>
 
 </manifest>
