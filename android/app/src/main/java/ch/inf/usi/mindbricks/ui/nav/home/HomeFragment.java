@@ -111,8 +111,15 @@ public class HomeFragment extends Fragment {
             startSessionButton.setText(isRunning ? R.string.stop_session : R.string.start_session);
             navigationLocker.setNavigationEnabled(state != HomeViewModel.PomodoroState.STUDY);
 
-            startSessionButton.setEnabled(false);
-            new Handler(Looper.getMainLooper()).postDelayed(() -> startSessionButton.setEnabled(true), 1500);
+            // --- THIS IS THE FIX ---
+            if (isRunning) {
+                // If the timer is STARTING, disable the button temporarily to prevent spam clicks.
+                startSessionButton.setEnabled(false);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> startSessionButton.setEnabled(true), 1500);
+            } else {
+                // If the timer is IDLE (stopped or on initial load), make sure the button is instantly enabled.
+                startSessionButton.setEnabled(true);
+            }
 
             if (!isRunning) {
                 updateTimerUI(0);
@@ -142,32 +149,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void showDurationPickerDialog() {
-        LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_timer_session, null);
-
-        final Slider durationSlider = dialogView.findViewById(R.id.duration_slider);
-        final TextView durationText = dialogView.findViewById(R.id.duration_text);
-
-        int minValue = (int) durationSlider.getValueFrom();
-        durationSlider.setValue(minValue);
-        durationText.setText(String.format(Locale.getDefault(), "%d minutes", minValue));
-
-        durationSlider.addOnChangeListener((slider, value, fromUser) ->
-                durationText.setText(String.format(Locale.getDefault(), "%d minutes", (int) value)));
-
-        new AlertDialog.Builder(requireContext())
-                .setView(dialogView)
-                .setTitle("Set Study Duration")
-                .setPositiveButton("Start", (dialog, which) -> {
-                    int durationInMinutes = (int) durationSlider.getValue();
-                    if (durationInMinutes > 0) {
-                        startTimerWithPermissionCheck(durationInMinutes);
-                    } else {
-                        Toast.makeText(getContext(), "Please select a duration greater than 0.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        SessionTimerDialogFragment dialogFragment = new SessionTimerDialogFragment();
+        dialogFragment.show(getChildFragmentManager(), "SessionTimerDialog");
     }
 
     @SuppressLint("MissingPermission")
@@ -177,6 +160,7 @@ public class HomeFragment extends Fragment {
             micPermissionRequest.launch();
             return;
         }
+        // Define the pause duration (e.g., 5 minutes)
         int pauseInMinutes = 5;
         homeViewModel.pomodoroTechnique(minutes, pauseInMinutes);
     }
