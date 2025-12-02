@@ -60,7 +60,7 @@ public class SessionTimerDialogFragment extends DialogFragment {
         startTimerButton.setOnClickListener(v -> {
             int durationInMinutes = (int) durationSlider.getValue();
             if (durationInMinutes > 0) {
-                // Define the pause duration (you can make this configurable later)
+                // Define the pause duration
                 int pauseInMinutes = 5;
 
                 // Call the correct method on the ViewModel
