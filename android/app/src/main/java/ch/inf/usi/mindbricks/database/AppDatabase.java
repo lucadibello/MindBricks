@@ -51,7 +51,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             "mindbricks_database"
                     )
                     .addCallback(DB_CALLBACK)
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigrationOnDowngrade(true)
                     .build();
         }
         return INSTANCE;
