@@ -1,7 +1,5 @@
 package ch.inf.usi.mindbricks.ui.nav.home;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,15 +17,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.slider.Slider;
-
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
-import ch.inf.usi.mindbricks.util.PermissionManager;
-import ch.inf.usi.mindbricks.util.PermissionManager.PermissionRequest;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
 public class HomeFragment extends Fragment {
@@ -40,8 +34,6 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private ProfileViewModel profileViewModel;
 
-    private PermissionRequest micPermissionRequest;
-    private Integer pendingDurationMinutes = null;
     private NavigationLocker navigationLocker;
 
     @Override
@@ -74,7 +66,6 @@ public class HomeFragment extends Fragment {
         startSessionButton = view.findViewById(R.id.start_stop_button);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
 
-        setupPermissionManager();
         setupObservers();
 
         homeViewModel.activityRecreated();
@@ -88,36 +79,16 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void setupPermissionManager() {
-        micPermissionRequest = PermissionManager.registerSinglePermission(
-                this,
-                Manifest.permission.RECORD_AUDIO,
-                () -> {
-                    if (pendingDurationMinutes != null) {
-                        startTimerWithPermissionCheck(pendingDurationMinutes);
-                        pendingDurationMinutes = null;
-                    }
-                },
-                () -> {
-                    pendingDurationMinutes = null;
-                    Toast.makeText(getContext(), "Microphone permission is required to record ambient noise.", Toast.LENGTH_SHORT).show();
-                }
-        );
-    }
-
     private void setupObservers() {
         homeViewModel.currentState.observe(getViewLifecycleOwner(), state -> {
             boolean isRunning = state != HomeViewModel.PomodoroState.IDLE;
             startSessionButton.setText(isRunning ? R.string.stop_session : R.string.start_session);
             navigationLocker.setNavigationEnabled(state != HomeViewModel.PomodoroState.STUDY);
 
-            // --- THIS IS THE FIX ---
             if (isRunning) {
-                // If the timer is STARTING, disable the button temporarily to prevent spam clicks.
                 startSessionButton.setEnabled(false);
                 new Handler(Looper.getMainLooper()).postDelayed(() -> startSessionButton.setEnabled(true), 1500);
             } else {
-                // If the timer is IDLE (stopped or on initial load), make sure the button is instantly enabled.
                 startSessionButton.setEnabled(true);
             }
 
@@ -151,18 +122,6 @@ public class HomeFragment extends Fragment {
     private void showDurationPickerDialog() {
         SessionTimerDialogFragment dialogFragment = new SessionTimerDialogFragment();
         dialogFragment.show(getChildFragmentManager(), "SessionTimerDialog");
-    }
-
-    @SuppressLint("MissingPermission")
-    private void startTimerWithPermissionCheck(int minutes) {
-        if (!PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO)) {
-            pendingDurationMinutes = minutes;
-            micPermissionRequest.launch();
-            return;
-        }
-        // Define the pause duration (e.g., 5 minutes)
-        int pauseInMinutes = 5;
-        homeViewModel.pomodoroTechnique(minutes, pauseInMinutes);
     }
 
     private void confirmEndSessionDialog() {

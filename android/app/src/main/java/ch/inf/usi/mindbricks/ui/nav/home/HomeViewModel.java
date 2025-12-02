@@ -32,6 +32,7 @@ public class HomeViewModel extends AndroidViewModel {
     private int sessionCounter = 0;
     private int studyDurationMinutes = 0;
     private int pauseDurationMinutes = 0;
+    private int lastMinuteAwarded = 0;
 
     private final MutableLiveData<Long> _currentTime = new MutableLiveData<>(0L);
     public final LiveData<Long> currentTime = _currentTime;
@@ -55,10 +56,10 @@ public class HomeViewModel extends AndroidViewModel {
         if (_currentState.getValue() != PomodoroState.IDLE) {
             return;
         }
-        // actual time duration of states
         this.studyDurationMinutes = studyMin;
         this.pauseDurationMinutes = pauseMin;
         this.sessionCounter = 0;
+        this.lastMinuteAwarded = 0;
         startStudyTimer();
     }
 
@@ -68,6 +69,7 @@ public class HomeViewModel extends AndroidViewModel {
         _stateTitle.setValue("Study Session " + sessionCounter);
         startTimeInMillis = TimeUnit.MINUTES.toMillis(studyDurationMinutes);
         remainingTimeInMillis = startTimeInMillis;
+        lastMinuteAwarded = 0; // Reset for the new study session
 
         new Thread(() -> {
             currentStudySession = new StudySession(System.currentTimeMillis(), studyDurationMinutes, "Pomodoro", android.graphics.Color.CYAN);
@@ -118,11 +120,14 @@ public class HomeViewModel extends AndroidViewModel {
                 remainingTimeInMillis = millisUntilFinished;
                 _currentTime.postValue(millisUntilFinished);
 
-                // We check the state to ensure coins are only awarded for studying
                 if (_currentState.getValue() == PomodoroState.STUDY) {
+                    // Calculate how many full minutes have passed.
                     long elapsedMillis = startTimeInMillis - millisUntilFinished;
-                    // Check on the boundary of each minute to award a coin.
-                    if (elapsedMillis > 0 && (elapsedMillis / 1000) % 60 == 0) {
+                    int minutesPassed = (int) TimeUnit.MILLISECONDS.toMinutes(elapsedMillis);
+
+                    // If a new minute has passed that we haven't awarded a coin for yet.
+                    if (minutesPassed > 0 && minutesPassed > lastMinuteAwarded) {
+                        lastMinuteAwarded = minutesPassed;
                         _earnedCoinsEvent.postValue(1);
                     }
                 }
@@ -132,20 +137,15 @@ public class HomeViewModel extends AndroidViewModel {
             public void onFinish() {
                 PomodoroState finishedState = _currentState.getValue();
 
-                // Only perform study-completion actions if the state that just finished was STUDY.
                 if (finishedState == PomodoroState.STUDY) {
-                    // Award the final coin for completing the last minute of study.
-                    if (startTimeInMillis > 0) {
-                        _earnedCoinsEvent.postValue(1);
-                    }
-
                     // Stop recording the session.
                     if (currentStudySession != null) {
                         sessionRecordingManager.stopSession(currentStudySession);
                         currentStudySession = null;
                     }
 
-                    // Award the bonus for completing the entire block.
+                    // Award bonus coins for completing the study block.
+                    // The per-minute coin is handled by onTick, so we only give the bonus here.
                     _earnedCoinsEvent.postValue(3);
 
                     // Now, decide the next state (break).
@@ -154,12 +154,10 @@ public class HomeViewModel extends AndroidViewModel {
 
                 } else if (finishedState == PomodoroState.PAUSE) {
                     // A short pause finished. Start the next study block.
-                    // NO COINS are awarded here.
                     startStudyTimer();
 
                 } else if (finishedState == PomodoroState.LONG_PAUSE) {
                     // The long pause finished. The entire cycle is complete.
-                    // NO COINS are awarded here.
                     stopTimerAndReset();
                 }
             }
