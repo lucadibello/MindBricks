@@ -15,8 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -72,10 +70,8 @@ public class HomeFragment extends Fragment {
         settingsIcon = view.findViewById(R.id.settings_icon);
 
         settingsIcon.setOnClickListener(v -> {
-            DrawerLayout drawerLayout = requireActivity().findViewById(R.id.drawer_layout);
-            if (drawerLayout != null) {
-                drawerLayout.openDrawer(GravityCompat.END);
-            }
+            SettingsFragment settingsDialog = new SettingsFragment();
+            settingsDialog.show(getParentFragmentManager(), "SettingsDialog");
         });
 
         setupObservers();
@@ -109,13 +105,9 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // It listens for coin earning events from the ViewModel
         homeViewModel.earnedCoinsEvent.observe(getViewLifecycleOwner(), amount -> {
-            // Check that the amount is not null and is greater than 0.
             if (amount != null && amount > 0) {
-                // Add the coins and show a toast message.
                 earnCoin(amount);
-                // Tell the ViewModel the coin has been awarded to prevent re-awarding on rotation.
                 homeViewModel.onCoinsAwarded();
             }
         });
