@@ -33,7 +33,7 @@
         android:valueFrom="15.0"
         android:valueTo="60.0"
         android:stepSize="5.0"
-        android:value="15.0" />
+        android:value="25.0" />
 
     <Button
         android:id="@+id/start_stop_button"
