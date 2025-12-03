@@ -1,7 +1,7 @@
 package ch.inf.usi.mindbricks.ui.nav.home;
 
 import android.content.Context;
-import android.content.SharedPreferences; // Import SharedPreferences
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,7 +28,6 @@ import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
 public class HomeFragment extends Fragment {
 
-    // ... (your existing variables)
     private TextView timerTextView;
     private Button startSessionButton;
     private TextView coinBalanceTextView;
@@ -79,8 +78,6 @@ public class HomeFragment extends Fragment {
 
         homeViewModel.activityRecreated();
 
-        // **THIS IS THE KEY CHANGE**
-        // The click listener is now much simpler.
         startSessionButton.setOnClickListener(v -> {
             if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {
                 // If a session is already running, show the confirmation dialog to stop it.
@@ -111,7 +108,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupObservers() {
-        // ... (this method remains exactly the same, no changes needed)
         homeViewModel.currentState.observe(getViewLifecycleOwner(), state -> {
             boolean isRunning = state != HomeViewModel.PomodoroState.IDLE;
             startSessionButton.setText(isRunning ? R.string.stop_session : R.string.start_session);
@@ -142,16 +138,9 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    // THIS METHOD IS NO LONGER NEEDED, you can delete it.
-    /*
-    private void showDurationPickerDialog() {
-        SessionTimerDialogFragment dialogFragment = new SessionTimerDialogFragment();
-        dialogFragment.show(getChildFragmentManager(), "SessionTimerDialog");
-    }
-    */
+
 
     private void confirmEndSessionDialog() {
-        // ... (this method remains exactly the same)
         new AlertDialog.Builder(requireContext())
                 .setTitle("End Cycle?")
                 .setMessage("Are you sure you want to stop the current Pomodoro cycle?")
@@ -163,7 +152,6 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
-    // ... (updateTimerUI and earnCoin methods remain the same)
     private void updateTimerUI(long millisUntilFinished) {
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(minutes);

@@ -22,7 +22,6 @@ import ch.inf.usi.mindbricks.R;
 
 public class SettingsFragment extends DialogFragment {
 
-    // Declare all the views
     private TextView studyDurationText;
     private Slider studyDurationSlider;
     private TextView pauseDurationText;
@@ -81,12 +80,12 @@ public class SettingsFragment extends DialogFragment {
     }
 
     private void loadSettings() {
-        // Load the saved study duration, or default to 25 if not found.
+        // Load the saved study duration, or default to 25 if not found
         float savedStudyValue = sharedPreferences.getFloat(KEY_STUDY_DURATION, 25.0f);
         studyDurationSlider.setValue(savedStudyValue);
         studyDurationText.setText(String.format(Locale.getDefault(), "%.0f min", savedStudyValue));
 
-        // Load the saved pause duration, or default to 5.
+        // Load the saved pause duration, or default to 5
         float savedPauseValue = sharedPreferences.getFloat(KEY_PAUSE_DURATION, 5.0f);
         pauseDurationSlider.setValue(savedPauseValue);
         pauseDurationText.setText(String.format(Locale.getDefault(), "%.0f min", savedPauseValue));

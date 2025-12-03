@@ -130,7 +130,7 @@ public class HomeViewModel extends AndroidViewModel {
                     // Convert elapsed milliseconds to full minutes.
                     int minutesPassed = (int) TimeUnit.MILLISECONDS.toMinutes(elapsedMillis);
 
-                    //    This only becomes true after the first full minute is completed.
+                    //    This only becomes true after the first full minute is completed
                     if (minutesPassed > 0 && minutesPassed > lastMinuteAwarded) {
                         lastMinuteAwarded = minutesPassed;
                         _earnedCoinsEvent.postValue(1);
@@ -148,8 +148,7 @@ public class HomeViewModel extends AndroidViewModel {
                         currentStudySession = null;
                     }
 
-                    // The last minute coin is awarded by onTick when it passes the 1:00 mark.
-                    // So we only need to add the bonus coins here.
+                    // add the bonus coins here.
                     _earnedCoinsEvent.postValue(3);
 
                     boolean isLongBreakTime = (sessionCounter >= 3);
