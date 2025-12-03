@@ -1,6 +1,7 @@
 package ch.inf.usi.mindbricks.ui.nav.home;
 
 import android.content.Context;
+import android.content.SharedPreferences; // Import SharedPreferences
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,15 +28,14 @@ import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
 public class HomeFragment extends Fragment {
 
+    // ... (your existing variables)
     private TextView timerTextView;
     private Button startSessionButton;
     private TextView coinBalanceTextView;
-    private TextView sessionTitleTextView;
     private ImageView settingsIcon;
 
     private HomeViewModel homeViewModel;
     private ProfileViewModel profileViewModel;
-
     private NavigationLocker navigationLocker;
 
     @Override
@@ -70,6 +70,7 @@ public class HomeFragment extends Fragment {
         settingsIcon = view.findViewById(R.id.settings_icon);
 
         settingsIcon.setOnClickListener(v -> {
+            // This correctly opens your settings fragment
             SettingsFragment settingsDialog = new SettingsFragment();
             settingsDialog.show(getParentFragmentManager(), "SettingsDialog");
         });
@@ -78,16 +79,39 @@ public class HomeFragment extends Fragment {
 
         homeViewModel.activityRecreated();
 
+        // **THIS IS THE KEY CHANGE**
+        // The click listener is now much simpler.
         startSessionButton.setOnClickListener(v -> {
             if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {
+                // If a session is already running, show the confirmation dialog to stop it.
                 confirmEndSessionDialog();
             } else {
-                showDurationPickerDialog();
+                // If no session is running, start one immediately with saved settings.
+                startDefaultSession();
             }
         });
     }
 
+    /**
+     * This new method reads the saved duration values from SharedPreferences
+     * and tells the ViewModel to start the timer.
+     */
+    private void startDefaultSession() {
+        // Access the same SharedPreferences file used by SettingsFragment
+        SharedPreferences prefs = requireActivity().getSharedPreferences(SettingsFragment.PREFS_NAME, Context.MODE_PRIVATE);
+
+        // Read the saved study duration, defaulting to 25 minutes if not found.
+        int studyDuration = (int) prefs.getFloat(SettingsFragment.KEY_STUDY_DURATION, 25.0f);
+
+        // Read the saved pause duration, defaulting to 5 minutes if not found.
+        int pauseDuration = (int) prefs.getFloat(SettingsFragment.KEY_PAUSE_DURATION, 5.0f);
+
+        // Call the ViewModel to start the Pomodoro session with these values.
+        homeViewModel.pomodoroTechnique(studyDuration, pauseDuration);
+    }
+
     private void setupObservers() {
+        // ... (this method remains exactly the same, no changes needed)
         homeViewModel.currentState.observe(getViewLifecycleOwner(), state -> {
             boolean isRunning = state != HomeViewModel.PomodoroState.IDLE;
             startSessionButton.setText(isRunning ? R.string.stop_session : R.string.start_session);
@@ -104,16 +128,13 @@ public class HomeFragment extends Fragment {
                 updateTimerUI(0);
             }
         });
-
         homeViewModel.earnedCoinsEvent.observe(getViewLifecycleOwner(), amount -> {
             if (amount != null && amount > 0) {
                 earnCoin(amount);
                 homeViewModel.onCoinsAwarded();
             }
         });
-
         homeViewModel.currentTime.observe(getViewLifecycleOwner(), this::updateTimerUI);
-
         profileViewModel.coins.observe(getViewLifecycleOwner(), balance -> {
             if (balance != null) {
                 coinBalanceTextView.setText(String.valueOf(balance));
@@ -121,12 +142,16 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    // THIS METHOD IS NO LONGER NEEDED, you can delete it.
+    /*
     private void showDurationPickerDialog() {
         SessionTimerDialogFragment dialogFragment = new SessionTimerDialogFragment();
         dialogFragment.show(getChildFragmentManager(), "SessionTimerDialog");
     }
+    */
 
     private void confirmEndSessionDialog() {
+        // ... (this method remains exactly the same)
         new AlertDialog.Builder(requireContext())
                 .setTitle("End Cycle?")
                 .setMessage("Are you sure you want to stop the current Pomodoro cycle?")
@@ -138,6 +163,7 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
+    // ... (updateTimerUI and earnCoin methods remain the same)
     private void updateTimerUI(long millisUntilFinished) {
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(minutes);

@@ -58,8 +58,8 @@ public class HomeViewModel extends AndroidViewModel {
         if (_currentState.getValue() != PomodoroState.IDLE) {
             return;
         }
-        this.studyDurationMinutes = 2;
-        this.pauseDurationMinutes = 1;
+        this.studyDurationMinutes = studyMin;
+        this.pauseDurationMinutes = pauseMin;
         this.sessionCounter = 0;
         startStudyTimer();
     }
