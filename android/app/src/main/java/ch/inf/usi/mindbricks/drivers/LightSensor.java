@@ -73,14 +73,18 @@ public class LightSensor extends BaseSensor implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         // Read raw light level from sensor
         float rawLightLevel = event.values[0];
+        
+        // Normalize to 0-100
+        float maxRange = getSensor().getMaximumRange();
+        if (maxRange == 0) maxRange = 40000f; // Safety fallback
+        float normalizedLight = Math.min(100f, (rawLightLevel / maxRange) * 100f);
 
         // Logic: record light state only when screen is facing upwards.
         if (isFaceUp) {
-            currentLightLevel = rawLightLevel;
+            currentLightLevel = normalizedLight;
             Log.v(TAG, "Light sensor (face up): " + currentLightLevel);
         } else {
-            // FIXME: If face down, currently we set 0 but we should report the last valid value.
-            currentLightLevel = 0;
+            // When face down, keep the last valid value (do not reset to 0)
             Log.v(TAG, "Light sensor (face down): " + currentLightLevel);
         }
 

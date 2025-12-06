@@ -23,8 +23,6 @@ public class SessionRecordingManager {
     private static final int SAMPLE_RATE = 1; // in seconds (1 sample per second)
     private static final int EMPTY_SESSION_ID = -1;
 
-    // References to utility instances
-    private final Context context;
     private final MicrophoneRecorder microphoneRecorder;
     private final LightSensor lightSensor;
     private final SignificantMotionSensor motionSensor;
@@ -33,7 +31,6 @@ public class SessionRecordingManager {
 
     // information about current study session
     private long currentSessionId = EMPTY_SESSION_ID;
-    private long sessionStartTime;
 
     // sensor data for current iteration
     private float currentLightLevel = 0;
@@ -48,7 +45,7 @@ public class SessionRecordingManager {
 
     public SessionRecordingManager(Context context) {
         // store context
-        this.context = context.getApplicationContext();
+        // References to utility instances
         this.db = AppDatabase.getInstance(context);
         this.microphoneRecorder = new MicrophoneRecorder();
 
@@ -66,7 +63,6 @@ public class SessionRecordingManager {
 
         // store basic information about current study session
         this.currentSessionId = sessionId;
-        this.sessionStartTime = System.currentTimeMillis();
         this.logBuffer = new ArrayList<>();
 
         // clear counters / state flags
@@ -162,11 +158,9 @@ public class SessionRecordingManager {
             sumLight += log.getLightLevel();
         }
 
-
-        if (count > 0) {
-            session.setAvgNoiseLevel(sumNoise / count);
-            session.setAvgLightLevel(sumLight / count);
-        }
+        // NOTE: never zero as count > 0 - logBuffer is never empty!
+        session.setAvgNoiseLevel(sumNoise / count);
+        session.setAvgLightLevel(sumLight / count);
 
         // store # of phone pick ups
         session.setPhonePickupCount(totalPickups);
@@ -206,14 +200,14 @@ public class SessionRecordingManager {
     private void sampleSensors() {
         if (currentSessionId == EMPTY_SESSION_ID) return;
 
-        // read noise level from recorder
-        float noise = (float) microphoneRecorder.getCurrentAmplitude();
+        // read noise level from recorder (RMS)
+        float noiseRms = (float) microphoneRecorder.getCurrentAmplitude();
 
         // Create + record log entry for this time step
         SessionSensorLog log = new SessionSensorLog(
                 currentSessionId,
                 System.currentTimeMillis(),
-                noise,
+                noiseRms,
                 currentLightLevel,
                 motionDetectedInInterval,
                 isFaceUp
@@ -221,8 +215,8 @@ public class SessionRecordingManager {
         logBuffer.add(log);
 
         // Log everything for debugging
-        Log.v(TAG, String.format("Sampled - Noise: %.2f, Light: %.2f, Motion: %b, FaceUp: %b",
-                noise, currentLightLevel, motionDetectedInInterval, isFaceUp));
+        Log.v(TAG, String.format("Sampled - Noise (RMS): %.2f, Light: %.2f, Motion: %b, FaceUp: %b",
+                noiseRms, currentLightLevel, motionDetectedInInterval, isFaceUp));
 
         // Reset interval flags to force recalculation during next step
         motionDetectedInInterval = false;

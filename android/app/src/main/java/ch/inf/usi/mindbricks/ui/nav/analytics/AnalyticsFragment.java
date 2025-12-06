@@ -393,7 +393,7 @@ public class AnalyticsFragment extends Fragment {
         focusScoreText.setText(String.format(Locale.getDefault(),
                 "Focus Score: %.1f%%", session.getFocusScore()));
         noiseText.setText(String.format(Locale.getDefault(),
-                "Noise Level: %.1f%%", session.getAvgNoiseLevel()));
+                "Noise (RMS): %.1f", session.getAvgNoiseLevel()));
         lightText.setText(String.format(Locale.getDefault(),
                 "Light Level: %.1f%%", session.getAvgLightLevel()));
         pickupsText.setText(String.format(Locale.getDefault(),

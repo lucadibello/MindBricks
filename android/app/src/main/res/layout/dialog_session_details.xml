@@ -98,7 +98,7 @@
             android:id="@+id/sessionDetailNoise"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Noise Level: 40%"
+            android:text="Noise (RMS): 40"
             android:textSize="14sp"
             android:layout_marginBottom="4dp" />
 

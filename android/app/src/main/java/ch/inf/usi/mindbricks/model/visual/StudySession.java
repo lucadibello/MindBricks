@@ -35,9 +35,7 @@ public class StudySession {
 
     // Environmental metrics
 
-    /**
-     * Average noise level during the session (0-100)
-     */
+    // Average noise level during the session (RMS amplitude)
     private float avgNoiseLevel;
 
     /**

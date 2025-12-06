@@ -13,6 +13,7 @@ public class MicrophoneRecorder {
     private static final int SAMPLE_RATE = 44100;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+
     private final int bufferSize;
     private AudioRecord audioRecord;
     private Thread recordingThread = null;
@@ -78,9 +79,6 @@ public class MicrophoneRecorder {
      * RMS allows to estimate loudness over short time windows.
      * <p>
      * SOURCES:
-     * - <a href="https://en.wikipedia.org/wiki/DBFS">...</a>
-     * - states that RMS is used for loudness measurement
-     *      FIXME: this reference is not used currently in the code, I should remove it later
      * - <a href="https://discourse.ardour.org/t/calculating-rms-in-digital-audio/109812">...</a>
      *      - details the RMS calculation
      *
@@ -109,6 +107,14 @@ public class MicrophoneRecorder {
         isRecording = false;
 
         if (audioRecord != null) {
+            if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
+                try {
+                    audioRecord.stop();
+                } catch (IllegalStateException e) {
+                    Log.e(LOG_TAG, "Error stopping AudioRecord", e);
+                }
+            }
+
             try {
                 // wait for the recording thread to finish before releasing resources
                 if (recordingThread != null) {
@@ -118,11 +124,15 @@ public class MicrophoneRecorder {
                 Log.e(LOG_TAG, "Interrupted while waiting for thread to finish");
             }
 
-            if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
-                audioRecord.stop();
-            }
             audioRecord.release();
             audioRecord = null;
+
+            // clear current values
+            currentAmplitude = 0;
+
+            // clear audio buffer
+            recordingThread = null;
+            Log.d(LOG_TAG, "Recording stopped.");
         }
 
         recordingThread = null;

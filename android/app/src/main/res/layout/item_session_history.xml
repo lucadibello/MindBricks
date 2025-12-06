@@ -102,7 +102,7 @@
                 android:id="@+id/sessionStats"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Noise: 40% • Light: 60% • 2 pickups"
+                android:text="Noise RMS: 40 • Light: 60% • 2 pickups"
                 android:textSize="11sp"
                 android:textColor="@android:color/darker_gray" />
 

@@ -23,9 +23,6 @@ public class TestDataGenerator {
     /**
      * Add test sessions to the database.
      * Call this from your Activity/Fragment to populate test data.
-     *
-     * Usage in AnalyticsFragment or HomeFragment:
-     * TestDataGenerator.addTestSessions(requireContext(), 20);
      */
     public static void addTestSessions(Context context, int numberOfSessions) {
         AppDatabase db = AppDatabase.getInstance(context);
@@ -108,9 +105,9 @@ public class TestDataGenerator {
             }
             session.setFocusScore(focusScore);
 
-            // Noise level: generally low (20-60)
-            float noiseLevel = 20 + random.nextInt(40);
-            session.setAvgNoiseLevel(noiseLevel);
+            // Noise level: RMS amplitude, keep in a realistic mid-range (e.g., 200-1200)
+            float noiseLevelRms = 200 + random.nextInt(1001);
+            session.setAvgNoiseLevel(noiseLevelRms);
 
             // Light level: varies more (30-90)
             float lightLevel = 30 + random.nextInt(60);
@@ -144,8 +141,8 @@ public class TestDataGenerator {
 
     /**
      * Clear all sessions from database.
-     * Use with caution!
      */
+    @SuppressWarnings("unused")
     public static void clearAllSessions(Context context) {
         AppDatabase db = AppDatabase.getInstance(context);
 
@@ -155,22 +152,6 @@ public class TestDataGenerator {
                 Log.d(TAG, "All sessions cleared");
             } catch (Exception e) {
                 Log.e(TAG, "Error clearing sessions", e);
-            }
-        }).start();
-    }
-
-    /**
-     * Get count of current sessions in database.
-     */
-    public static void logSessionCount(Context context) {
-        AppDatabase db = AppDatabase.getInstance(context);
-
-        new Thread(() -> {
-            try {
-                List<StudySession> sessions = db.studySessionDao().getAllSessions();
-                Log.d(TAG, "Current session count: " + (sessions != null ? sessions.size() : 0));
-            } catch (Exception e) {
-                Log.e(TAG, "Error getting session count", e);
             }
         }).start();
     }
