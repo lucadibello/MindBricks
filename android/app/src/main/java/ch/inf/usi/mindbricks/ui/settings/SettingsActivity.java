@@ -39,8 +39,10 @@ public class SettingsActivity extends AppCompatActivity {
         new TabLayoutMediator(tabs, viewPager, (tab, position) -> {
             if (position == 0) {
                 tab.setText(R.string.settings_tab_profile);
-            } else {
+            } else if (position == 1) {
                 tab.setText(R.string.settings_tab_study_plan);
+            } else {
+                tab.setText(R.string.settings_tab_pomodoro);
             }
         }).attach();
     }
@@ -65,14 +67,16 @@ public class SettingsActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             if (position == 0) {
                 return new SettingsProfileFragment();
-            } else {
+            } else if (position == 1) {
                 return new SettingsStudyPlanFragment();
+            } else {
+                return new SettingsPomodoroFragment();
             }
         }
 
         @Override
         public int getItemCount() {
-            return 2;
+            return 3;
         }
     }
 }
