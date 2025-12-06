@@ -89,7 +89,7 @@ public class TimeSlotStats {
      *
      * @param minutes Duration in minutes
      * @param focusScore Focus score (0-100)
-     * @param noiseLevel Noise level (0-100)
+     * @param noiseLevel Noise level (RMS amplitude)
      * @param lightLevel Light level (0-100)
      */
     public void addSession(int minutes, float focusScore, float noiseLevel, float lightLevel) {

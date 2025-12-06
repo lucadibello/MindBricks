@@ -32,7 +32,7 @@ public class SessionSensorLog {
     /**
      * Current noise level at the time of the log
      */
-    private float noiseLevel; // FIXME: currently we use Root Mean Square of audio buffer
+    private float noiseLevel; // Stored as RMS amplitude
 
     /**
      * Current light level at the time of the log

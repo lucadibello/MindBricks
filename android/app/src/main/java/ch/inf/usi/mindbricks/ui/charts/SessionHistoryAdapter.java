@@ -173,7 +173,7 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
             // Add noise level if available
             if (session.getAvgNoiseLevel() > 0) {
                 stats.add(String.format(Locale.getDefault(),
-                        "Noise: %.0f%%", session.getAvgNoiseLevel()));
+                        "Noise RMS: %.0f", session.getAvgNoiseLevel()));
             }
 
             // Add light level if available

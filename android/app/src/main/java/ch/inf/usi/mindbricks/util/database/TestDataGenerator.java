@@ -108,9 +108,9 @@ public class TestDataGenerator {
             }
             session.setFocusScore(focusScore);
 
-            // Noise level: generally low (20-60)
-            float noiseLevel = 20 + random.nextInt(40);
-            session.setAvgNoiseLevel(noiseLevel);
+            // Noise level: RMS amplitude, keep in a realistic mid-range (e.g., 200-1200)
+            float noiseLevelRms = 200 + random.nextInt(1001);
+            session.setAvgNoiseLevel(noiseLevelRms);
 
             // Light level: varies more (30-90)
             float lightLevel = 30 + random.nextInt(60);

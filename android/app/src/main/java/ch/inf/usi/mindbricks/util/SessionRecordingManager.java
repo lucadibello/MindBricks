@@ -162,11 +162,9 @@ public class SessionRecordingManager {
             sumLight += log.getLightLevel();
         }
 
-
-        if (count > 0) {
-            session.setAvgNoiseLevel(sumNoise / count);
-            session.setAvgLightLevel(sumLight / count);
-        }
+        // NOTE: never zero as count > 0 - logBuffer is never empty!
+        session.setAvgNoiseLevel(sumNoise / count);
+        session.setAvgLightLevel(sumLight / count);
 
         // store # of phone pick ups
         session.setPhonePickupCount(totalPickups);
@@ -206,14 +204,14 @@ public class SessionRecordingManager {
     private void sampleSensors() {
         if (currentSessionId == EMPTY_SESSION_ID) return;
 
-        // read noise level from recorder
-        float noise = (float) microphoneRecorder.getCurrentAmplitude();
+        // read noise level from recorder (RMS)
+        float noiseRms = (float) microphoneRecorder.getCurrentAmplitude();
 
         // Create + record log entry for this time step
         SessionSensorLog log = new SessionSensorLog(
                 currentSessionId,
                 System.currentTimeMillis(),
-                noise,
+                noiseRms,
                 currentLightLevel,
                 motionDetectedInInterval,
                 isFaceUp
@@ -221,8 +219,8 @@ public class SessionRecordingManager {
         logBuffer.add(log);
 
         // Log everything for debugging
-        Log.v(TAG, String.format("Sampled - Noise: %.2f, Light: %.2f, Motion: %b, FaceUp: %b",
-                noise, currentLightLevel, motionDetectedInInterval, isFaceUp));
+        Log.v(TAG, String.format("Sampled - Noise (RMS): %.2f, Light: %.2f, Motion: %b, FaceUp: %b",
+                noiseRms, currentLightLevel, motionDetectedInInterval, isFaceUp));
 
         // Reset interval flags to force recalculation during next step
         motionDetectedInInterval = false;

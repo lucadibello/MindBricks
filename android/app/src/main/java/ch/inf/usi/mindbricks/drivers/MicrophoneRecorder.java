@@ -14,8 +14,6 @@ public class MicrophoneRecorder {
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 
-    private static final int MAX_AMPLITUDE_16BIT = 32768; 
-
     private final int bufferSize;
     private AudioRecord audioRecord;
     private Thread recordingThread = null;
@@ -81,9 +79,6 @@ public class MicrophoneRecorder {
      * RMS allows to estimate loudness over short time windows.
      * <p>
      * SOURCES:
-     * - <a href="https://en.wikipedia.org/wiki/DBFS">...</a>
-     * - states that RMS is used for loudness measurement
-     *      FIXME: this reference is not used currently in the code, I should remove it later
      * - <a href="https://discourse.ardour.org/t/calculating-rms-in-digital-audio/109812">...</a>
      *      - details the RMS calculation
      *
@@ -101,23 +96,7 @@ public class MicrophoneRecorder {
             // compute RMS:
             // A_rms = sqrt(sum_i x_i^2 / N)
             double rms = Math.sqrt(sum / readSize);
-
-
-            // Convert to Decibels (dB)
-            // Source:  https://en.wikipedia.org/wiki/Sound_pressure#Sound_pressure_level
-            // NOTE: PCM is signed, so 16 bits have range [-32768, 32767]
-            // 20 * log10(32767) approx 90.3 dB.
-            // 20 * log10(1) = 0 dB.
-      
-            // FIXME: this formula don't take in consideration the
-            // reference sound pressure level (20 µPa for air)
-
-            // check to to avoid log(0)
-            if (rms > 1) {
-                currentAmplitude = 20 * Math.log10(rms);
-            } else {
-                currentAmplitude = 0;
-            }
+            currentAmplitude = rms;
         }
     }
 
@@ -148,6 +127,13 @@ public class MicrophoneRecorder {
 
             audioRecord.release();
             audioRecord = null;
+
+            // clear current values
+            currentAmplitude = 0;
+
+            // clear audio buffer
+            recordingThread = null;
+            Log.d(LOG_TAG, "Recording stopped.");
         }
 
         recordingThread = null;
