@@ -18,12 +18,12 @@ import ch.inf.usi.mindbricks.database.SessionSensorLogDao;
 import ch.inf.usi.mindbricks.database.StudySessionDao;
 import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 
 /**
  * Repository class that provides a clean API for data access.
  * This abstracts the database from the rest of the app.
  */
-
 public class StudySessionRepository {
     private final StudySessionDao studySessionDao;
     private final SessionSensorLogDao sessionSensorLogDao;
@@ -37,36 +37,36 @@ public class StudySessionRepository {
         dbExecutor = Executors.newSingleThreadExecutor();
     }
 
-    public LiveData<List<StudySession>> getAllSessions(int limit) {
+    public LiveData<List<StudySessionWithStats>> getAllSessions(int limit) {
         return studySessionDao.observeRecentSessions(limit);
     }
 
-    public LiveData<List<StudySession>> getRecentSessions(int limit) {
+    public LiveData<List<StudySessionWithStats>> getRecentSessions(int limit) {
         return studySessionDao.observeRecentSessions(limit);
     }
 
     // Add this method to StudySessionRepository
-    public List<StudySession> getSessionsSinceSync(long startTime) {
+    public List<StudySessionWithStats> getSessionsSinceSync(long startTime) {
         Log.d("Repository", "Sync query for sessions since: " + startTime);
 
-        List<StudySession> sessions = studySessionDao.getSessionsSince(startTime);
+        List<StudySessionWithStats> sessions = studySessionDao.getSessionsSince(startTime);
 
         Log.d("Repository", "Query complete: " + (sessions != null ? sessions.size() : 0) + " sessions");
         return sessions;
     }
 
-    public LiveData<List<StudySession>> getSessionsSince(long startTime) {
+    public LiveData<List<StudySessionWithStats>> getSessionsSince(long startTime) {
         Log.d("Repository", "Querying sessions since: " + startTime);
         return studySessionDao.observeSessionsSince(startTime);
     }
-    public LiveData<List<StudySession>> getSessionsInRange(long startTime, long endTime){
+    public LiveData<List<StudySessionWithStats>> getSessionsInRange(long startTime, long endTime){
         return Transformations.map(studySessionDao.observeSessionsSince(startTime), allSessions -> {
             if (allSessions == null) {
                 return Collections.emptyList();
             }
 
-            List<StudySession> filteredSessions = new ArrayList<>();
-            for (StudySession session : allSessions) {
+            List<StudySessionWithStats> filteredSessions = new ArrayList<>();
+            for (StudySessionWithStats session : allSessions) {
                 if (session.getTimestamp() >= startTime && session.getTimestamp() <= endTime) {
                     filteredSessions.add(session);
                 }
@@ -124,7 +124,7 @@ public class StudySessionRepository {
         });
     }
 
-    public List<StudySession> getRecentSessionsSync(int limit) {
+    public List<StudySessionWithStats> getRecentSessionsSync(int limit) {
         return studySessionDao.getRecentSessions(limit);
     }
 

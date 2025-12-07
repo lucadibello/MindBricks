@@ -33,21 +33,6 @@ public class StudySession {
      */
     private int tagColor;
 
-    // Environmental metrics
-
-    // Average noise level during the session (RMS amplitude)
-    private float avgNoiseLevel;
-
-    /**
-     * Average light level during the session (0-100)
-     */
-    private float avgLightLevel;
-
-    /**
-     * Number of times phone was picked up during the session
-     */
-    private int phonePickupCount;
-
     // Focus metrics
 
     /**
@@ -68,9 +53,6 @@ public class StudySession {
         this.durationMinutes = durationMinutes;
         this.tagTitle = tagTitle;
         this.tagColor = tagColor;
-        this.avgNoiseLevel = 0;
-        this.avgLightLevel = 0;
-        this.phonePickupCount = 0;
         this.focusScore = 0;
         this.coinsEarned = 0;
         this.notes = "";
@@ -115,30 +97,6 @@ public class StudySession {
 
     public void setTagColor(int tagColor) {
         this.tagColor = tagColor;
-    }
-
-    public float getAvgNoiseLevel() {
-        return avgNoiseLevel;
-    }
-
-    public void setAvgNoiseLevel(float avgNoiseLevel) {
-        this.avgNoiseLevel = avgNoiseLevel;
-    }
-
-    public float getAvgLightLevel() {
-        return avgLightLevel;
-    }
-
-    public void setAvgLightLevel(float avgLightLevel) {
-        this.avgLightLevel = avgLightLevel;
-    }
-
-    public int getPhonePickupCount() {
-        return phonePickupCount;
-    }
-
-    public void setPhonePickupCount(int phonePickupCount) {
-        this.phonePickupCount = phonePickupCount;
     }
 
     public float getFocusScore() {

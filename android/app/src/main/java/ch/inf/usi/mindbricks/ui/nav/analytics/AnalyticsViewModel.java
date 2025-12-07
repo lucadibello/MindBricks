@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
-import ch.inf.usi.mindbricks.model.visual.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
 import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
 import ch.inf.usi.mindbricks.repository.StudySessionRepository;
@@ -29,54 +29,43 @@ public class AnalyticsViewModel extends AndroidViewModel {
     private final Executor processingExecutor;
 
     // LiveData for different chart types
-    // MutableLiveData allows us to update values internally
-    // External classes only see LiveData (read-only)
     private final MutableLiveData<WeeklyStats> weeklyStats = new MutableLiveData<>();
     private final MutableLiveData<List<TimeSlotStats>> hourlyStats = new MutableLiveData<>();
     private final MutableLiveData<DailyRecommendation> dailyRecommendation = new MutableLiveData<>();
-    private final MutableLiveData<List<StudySession>> sessionHistory = new MutableLiveData<>();
+    private final MutableLiveData<List<StudySessionWithStats>> sessionHistory = new MutableLiveData<>();
 
     // ViewState for UI feedback
     private final MutableLiveData<ViewState> viewState = new MutableLiveData<>(ViewState.LOADING);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     // Cache for processed data to avoid reprocessing
-    private List<StudySession> cachedSessions;
+    private List<StudySessionWithStats> cachedSessions;
     private long lastLoadTime = 0;
     private static final long CACHE_VALIDITY_MS = 5 * 60 * 1000; // 5 minutes
-    private LiveData<List<StudySession>> sessionsSource;
-    private final Observer<List<StudySession>> sessionsObserver = this::handleSessionsUpdate;
+    private LiveData<List<StudySessionWithStats>> sessionsSource;
+    private final Observer<List<StudySessionWithStats>> sessionsObserver = this::handleSessionsUpdate;
 
     public AnalyticsViewModel(@NonNull Application application) {
         super(application);
         this.repository = new StudySessionRepository(application);
-
-        // Separate executor for data processing to avoid blocking database operations
         this.processingExecutor = Executors.newSingleThreadExecutor();
     }
 
     public void loadAnalyticsData(int daysToLoad) {
         Log.d("ViewModel", "=== loadAnalyticsData START ===");
-        Log.d("ViewModel", "Setting ViewState to LOADING");
         viewState.setValue(ViewState.LOADING);
 
         long startTime = System.currentTimeMillis() - (daysToLoad * 24L * 60 * 60 * 1000);
-        Log.d("ViewModel", "Querying sessions since: " + startTime);
 
         if (sessionsSource != null) {
             sessionsSource.removeObserver(sessionsObserver);
         }
 
         sessionsSource = repository.getSessionsSince(startTime);
-        Log.d("ViewModel", "Got LiveData from repository, setting up observer");
         sessionsSource.observeForever(sessionsObserver);
-
-        Log.d("ViewModel", "=== loadAnalyticsData END (observer registered) ===");
     }
 
-    private void handleSessionsUpdate(List<StudySession> sessions) {
-        Log.d("ViewModel", "Sessions updated: " + (sessions != null ? sessions.size() : "null"));
-
+    private void handleSessionsUpdate(List<StudySessionWithStats> sessions) {
         if (sessions == null) {
             errorMessage.setValue("Error loading sessions");
             viewState.setValue(ViewState.ERROR);
@@ -84,48 +73,30 @@ public class AnalyticsViewModel extends AndroidViewModel {
         }
 
         if (sessions.isEmpty()) {
-            Log.w("ViewModel", "No sessions - setting ViewState to EMPTY");
             sessionHistory.setValue(sessions);
             viewState.setValue(ViewState.EMPTY);
             return;
         }
 
-        Log.d("ViewModel", "Valid sessions found, caching and processing");
         cachedSessions = sessions;
         lastLoadTime = System.currentTimeMillis();
         processAllData(sessions);
     }
 
-    private void processAllData(List<StudySession> sessions) {
-        Log.d("ViewModel", "=== processAllData START ===");
-        Log.d("ViewModel", "Processing " + sessions.size() + " sessions on background thread");
-
+    private void processAllData(List<StudySessionWithStats> sessions) {
         processingExecutor.execute(() -> {
             try {
-                Log.d("ViewModel", "Background thread started");
-
-                Log.d("ViewModel", "Calculating weekly stats...");
                 WeeklyStats weekly = DataProcessor.calculateWeeklyStats(sessions);
                 weeklyStats.postValue(weekly);
-                Log.d("ViewModel", "Weekly stats posted");
 
-                Log.d("ViewModel", "Calculating hourly stats...");
                 List<TimeSlotStats> hourly = DataProcessor.calculateHourlyDistribution(sessions);
                 hourlyStats.postValue(hourly);
-                Log.d("ViewModel", "Hourly stats posted");
 
-                Log.d("ViewModel", "Generating recommendations...");
                 DailyRecommendation recommendation = DataProcessor.generateDailyRecommendation(sessions);
                 dailyRecommendation.postValue(recommendation);
-                Log.d("ViewModel", "Recommendations posted");
 
-                Log.d("ViewModel", "Posting session history...");
                 sessionHistory.postValue(sessions);
-                Log.d("ViewModel", "Session history posted");
-
-                Log.d("ViewModel", "*** SETTING ViewState to SUCCESS ***");
                 viewState.postValue(ViewState.SUCCESS);
-                Log.d("ViewModel", "=== processAllData COMPLETE ===");
 
             } catch (Exception e) {
                 Log.e("ViewModel", "ERROR in processAllData: " + e.getMessage(), e);
@@ -135,110 +106,33 @@ public class AnalyticsViewModel extends AndroidViewModel {
         });
     }
 
-    public void loadWeeklyStats() {
-        if (cachedSessions != null && isCacheValid()) {
-            processingExecutor.execute(() -> {
-                WeeklyStats stats = DataProcessor.calculateWeeklyStats(cachedSessions);
-                weeklyStats.postValue(stats);
-            });
-        } else {
-            loadAnalyticsData(30);
-        }
-    }
-
-    public void loadHourlyDistribution() {
-        if (cachedSessions != null && isCacheValid()) {
-            processingExecutor.execute(() -> {
-                List<TimeSlotStats> stats = DataProcessor.calculateHourlyDistribution(cachedSessions);
-                hourlyStats.postValue(stats);
-            });
-        } else {
-            loadAnalyticsData(30);
-        }
-    }
-
-    public void loadRecentSessions(int limit) {
-        LiveData<List<StudySession>> sessionsLiveData = repository.getRecentSessions(limit);
-
-        observeOnce(sessionsLiveData, sessionHistory::setValue);
-    }
-
-
     public void refreshData() {
         cachedSessions = null;
         lastLoadTime = 0;
         loadAnalyticsData(30);
     }
 
-    public void deleteSession(StudySession session) {
-        repository.deleteSession(session, this::refreshData);
+    public void deleteSession(StudySessionWithStats session) {
+        repository.deleteSession(session.session, this::refreshData);
     }
 
-    // Getters for LiveData (read-only access from UI)
-    public LiveData<WeeklyStats> getWeeklyStats() {
-        return weeklyStats;
-    }
-
-    public LiveData<List<TimeSlotStats>> getHourlyStats() {
-        return hourlyStats;
-    }
-
-    public LiveData<DailyRecommendation> getDailyRecommendation() {
-        return dailyRecommendation;
-    }
-
-    public LiveData<List<StudySession>> getSessionHistory() {
-        return sessionHistory;
-    }
-
-    public LiveData<ViewState> getViewState() {
-        return viewState;
-    }
-
-    public LiveData<String> getErrorMessage() {
-        return errorMessage;
-    }
-
-    private boolean isCacheValid() {
-        return cachedSessions != null &&
-                (System.currentTimeMillis() - lastLoadTime) < CACHE_VALIDITY_MS;
-    }
-
-    private <T> void observeOnce(LiveData<T> liveData, OnDataCallback<T> callback) {
-        Log.d("ViewModel", "observeOnce called");
-
-        liveData.observeForever(new Observer<T>() {
-            @Override
-            public void onChanged(T data) {
-                Log.d("ViewModel", "observeOnce - data received: " + (data != null));
-                liveData.removeObserver(this);
-                callback.onData(data);
-            }
-        });
-    }
-
-    private interface OnDataCallback<T> {
-        void onData(T data);
-    }
+    // Getters for LiveData
+    public LiveData<WeeklyStats> getWeeklyStats() { return weeklyStats; }
+    public LiveData<List<TimeSlotStats>> getHourlyStats() { return hourlyStats; }
+    public LiveData<DailyRecommendation> getDailyRecommendation() { return dailyRecommendation; }
+    public LiveData<List<StudySessionWithStats>> getSessionHistory() { return sessionHistory; }
+    public LiveData<ViewState> getViewState() { return viewState; }
+    public LiveData<String> getErrorMessage() { return errorMessage; }
 
     public enum ViewState {
-        LOADING,
-        SUCCESS,
-        ERROR,
-        EMPTY
+        LOADING, SUCCESS, ERROR, EMPTY
     }
-
 
     @Override
     protected void onCleared() {
         super.onCleared();
         if (sessionsSource != null) {
             sessionsSource.removeObserver(sessionsObserver);
-        }
-        // Executor shutdown is handled automatically by garbage collection
-        // But we can explicitly shut it down for cleaner code
-        if (processingExecutor instanceof java.util.concurrent.ExecutorService) {
-            ((java.util.concurrent.ExecutorService) processingExecutor).shutdown();
         }
     }
 }

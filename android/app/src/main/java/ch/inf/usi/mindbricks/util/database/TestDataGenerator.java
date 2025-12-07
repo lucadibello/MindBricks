@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
+import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 /**
@@ -33,15 +34,49 @@ public class TestDataGenerator {
 
                 List<StudySession> sessions = generateTestSessions(numberOfSessions);
 
-                // Insert all at once
-                List<Long> ids = db.studySessionDao().insertAll(sessions);
+                // Insert each session and generate fake logs for it
+                for (StudySession session : sessions) {
+                    long sessionId = db.studySessionDao().insert(session);
+                    generateAndInsertLogs(db, sessionId, session);
+                }
 
-                Log.d(TAG, "Successfully inserted " + ids.size() + " test sessions");
+                Log.d(TAG, "Successfully inserted " + sessions.size() + " test sessions with logs");
 
             } catch (Exception e) {
                 Log.e(TAG, "Error adding test sessions", e);
             }
         }).start();
+    }
+
+    private static void generateAndInsertLogs(AppDatabase db, long sessionId, StudySession session) {
+        Random random = new Random();
+        List<SessionSensorLog> logs = new ArrayList<>();
+        
+        // Generate fake stats that match what we want to see
+        // We'll generate 10 logs per session to get an average
+        float targetNoise = 200 + random.nextInt(1001);
+        float targetLight = 30 + random.nextInt(60);
+        int targetPickups = random.nextInt(6);
+        
+        for (int i = 0; i < 10; i++) {
+            // Variate slightly around target
+            float noise = Math.max(0, targetNoise + (random.nextInt(100) - 50));
+            float light = Math.max(0, Math.min(100, targetLight + (random.nextInt(20) - 10)));
+            
+            // Distribute pickups randomly across logs
+            boolean motion = i < targetPickups; 
+            
+            logs.add(new SessionSensorLog(
+                sessionId,
+                session.getTimestamp() + (i * 60000), // spread out by minutes
+                noise,
+                light,
+                motion,
+                true // face up
+            ));
+        }
+        
+        db.sessionSensorLogDao().insertAll(logs);
     }
 
     /**
@@ -104,18 +139,6 @@ public class TestDataGenerator {
                 focusScore = 85 + random.nextInt(16);
             }
             session.setFocusScore(focusScore);
-
-            // Noise level: RMS amplitude, keep in a realistic mid-range (e.g., 200-1200)
-            float noiseLevelRms = 200 + random.nextInt(1001);
-            session.setAvgNoiseLevel(noiseLevelRms);
-
-            // Light level: varies more (30-90)
-            float lightLevel = 30 + random.nextInt(60);
-            session.setAvgLightLevel(lightLevel);
-
-            // Phone pickups: 0-5, fewer is better
-            int pickups = random.nextInt(6);
-            session.setPhonePickupCount(pickups);
 
             // Coins earned proportional to duration and focus
             int coins = (int) (duration * focusScore / 100);

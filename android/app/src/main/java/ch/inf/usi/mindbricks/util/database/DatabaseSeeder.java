@@ -13,11 +13,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
+import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 
 /**
  * Utility class to seed the database with initial data from JSON files in the assets folder.
@@ -40,7 +43,10 @@ public class DatabaseSeeder {
                     List<StudySession> sessions = loadStudySessionsFromAssets(context);
 
                     if (!sessions.isEmpty()) {
-                        database.studySessionDao().insertAll(sessions);
+                        for (StudySession session : sessions) {
+                            long id = database.studySessionDao().insert(session);
+                            generateAndInsertLogs(database, id, session);
+                        }
                         Log.d(TAG, "Successfully loaded database with " + sessions.size() + " sessions.");
                     } else {
                         Log.w(TAG, "No sessions loaded from JSON file.");
@@ -57,7 +63,7 @@ public class DatabaseSeeder {
     }
 
     private static boolean isDatabaseEmpty(AppDatabase database) {
-        List<StudySession> sessions = database.studySessionDao().getAllSessions();
+        List<StudySessionWithStats> sessions = database.studySessionDao().getAllSessions();
         return sessions == null || sessions.isEmpty();
     }
 
@@ -68,7 +74,10 @@ public class DatabaseSeeder {
             List<StudySession> sessions = loadStudySessionsFromAssets(context);
 
             if (!sessions.isEmpty()) {
-                database.studySessionDao().insertAll(sessions);
+                for (StudySession session : sessions) {
+                    long id = database.studySessionDao().insert(session);
+                    generateAndInsertLogs(database, id, session);
+                }
                 Log.d(TAG, "Successfully seeded " + sessions.size() + " sessions.");
             }
             else {
@@ -78,6 +87,32 @@ public class DatabaseSeeder {
             Log.e(TAG, "Error during database seeding.", e);
         }
 
+    }
+
+    private static void generateAndInsertLogs(AppDatabase db, long sessionId, StudySession session) {
+        Random random = new Random();
+        List<SessionSensorLog> logs = new ArrayList<>();
+        
+        // Generate fake stats
+        float targetNoise = 200 + random.nextInt(1001);
+        float targetLight = 30 + random.nextInt(60);
+        int targetPickups = random.nextInt(6);
+        
+        for (int i = 0; i < 10; i++) {
+            float noise = Math.max(0, targetNoise + (random.nextInt(100) - 50));
+            float light = Math.max(0, Math.min(100, targetLight + (random.nextInt(20) - 10)));
+            boolean motion = i < targetPickups; 
+            
+            logs.add(new SessionSensorLog(
+                sessionId,
+                session.getTimestamp() + (i * 60000), 
+                noise,
+                light,
+                motion,
+                true
+            ));
+        }
+        db.sessionSensorLogDao().insertAll(logs);
     }
 
     private static List<StudySession> loadStudySessionsFromAssets(Context context) {
@@ -142,15 +177,6 @@ public class DatabaseSeeder {
             );
 
             // Set optional fields
-            if (json.has("avgNoiseLevel")) {
-                session.setAvgNoiseLevel((float) json.getDouble("avgNoiseLevel"));
-            }
-            if (json.has("avgLightLevel")) {
-                session.setAvgLightLevel((float) json.getDouble("avgLightLevel"));
-            }
-            if (json.has("phonePickupCount")) {
-                session.setPhonePickupCount(json.getInt("phonePickupCount"));
-            }
             if (json.has("focusScore")) {
                 session.setFocusScore((float) json.getDouble("focusScore"));
             }

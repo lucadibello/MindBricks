@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.model.visual.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 
 /**
  * Adapter for displaying study session history in a RecyclerView.
  */
 public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAdapter.SessionViewHolder> {
 
-    private List<StudySession> sessions;
+    private List<StudySessionWithStats> sessions;
     private final OnSessionClickListener clickListener;
 
     // Date formatter for displaying timestamps
@@ -33,8 +33,8 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
 
     public interface OnSessionClickListener {
-        void onSessionClick(StudySession session);
-        void onSessionLongClick(StudySession session);
+        void onSessionClick(StudySessionWithStats session);
+        void onSessionLongClick(StudySessionWithStats session);
     }
 
     public SessionHistoryAdapter(OnSessionClickListener listener) {
@@ -42,13 +42,13 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
         this.clickListener = listener;
     }
 
-    public void setData(List<StudySession> sessions) {
+    public void setData(List<StudySessionWithStats> sessions) {
         this.sessions = sessions != null ? new ArrayList<>(sessions) : new ArrayList<>();
         // Refresh entire list
         notifyDataSetChanged();
     }
 
-    public void addSession(StudySession session) {
+    public void addSession(StudySessionWithStats session) {
         // Add at beginning -> sorted list
         sessions.add(0, session);
         notifyItemInserted(0);
@@ -61,7 +61,7 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
         }
     }
 
-    public StudySession getSessionAt(int position) {
+    public StudySessionWithStats getSessionAt(int position) {
         return sessions.get(position);
     }
 
@@ -76,7 +76,7 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
 
     @Override
     public void onBindViewHolder(@NonNull SessionViewHolder holder, int position) {
-        StudySession session = sessions.get(position);
+        StudySessionWithStats session = sessions.get(position);
         holder.bind(session, clickListener);
     }
 
@@ -111,7 +111,7 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
             statsText = itemView.findViewById(R.id.sessionStats);
         }
 
-        void bind(StudySession session, OnSessionClickListener listener) {
+        void bind(StudySessionWithStats session, OnSessionClickListener listener) {
             // Format and set date/time
             Date sessionDate = new Date(session.getTimestamp());
             dateText.setText(dateFormat.format(sessionDate));
@@ -167,7 +167,7 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
         }
 
 
-        private String formatStats(StudySession session) {
+        private String formatStats(StudySessionWithStats session) {
             List<String> stats = new ArrayList<>();
 
             // Add noise level if available
