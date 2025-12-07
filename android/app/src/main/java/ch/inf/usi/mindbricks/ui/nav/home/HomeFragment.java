@@ -73,6 +73,17 @@ public class HomeFragment extends Fragment {
         );
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // If idle, refresh timer display in case settings changed
+        if (homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE &&
+                homeViewModel.currentTime.getValue() == 0L) {
+            PreferencesManager prefs = new PreferencesManager(requireContext());
+            updateTimerUI(TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -112,6 +123,11 @@ public class HomeFragment extends Fragment {
             intent.putExtra(SettingsActivity.EXTRA_TAB_INDEX, 2);
             startActivity(intent);
         });
+
+        // Initialize timer display with default study duration
+        PreferencesManager prefs = new PreferencesManager(requireContext());
+        int defaultStudyDurationMinutes = prefs.getTimerStudyDuration();
+        updateTimerUI(TimeUnit.MINUTES.toMillis(defaultStudyDurationMinutes));
 
         // Set up observers to listen for data changes from the ViewModels
         setupObservers();
@@ -167,7 +183,14 @@ public class HomeFragment extends Fragment {
         });
 
         // Observe the countdown timer's current time to update the display
-        homeViewModel.currentTime.observe(getViewLifecycleOwner(), this::updateTimerUI);
+        homeViewModel.currentTime.observe(getViewLifecycleOwner(), millis -> {
+            if (millis == 0L && homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
+                PreferencesManager prefs = new PreferencesManager(requireContext());
+                updateTimerUI(TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
+            } else {
+                updateTimerUI(millis);
+            }
+        });
 
         // Observe the user's total coin balance from the shared ProfileViewModel
         profileViewModel.coins.observe(getViewLifecycleOwner(), balance -> {
