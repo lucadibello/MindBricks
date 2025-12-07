@@ -52,6 +52,9 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         RecyclerView shopRecyclerView1 = binding.itemsRecyclerView1;
         RecyclerView shopRecyclerView2 = binding.itemsRecyclerView2;
 
+        shopRecyclerView1.setScrollBarFadeDuration(0);
+        shopRecyclerView2.setScrollBarFadeDuration(0);
+
         List<ShopItem> items = new ArrayList<>();
         items.add(new ShopItem("avatar_cool_1", "name1", 1, R.drawable.ic_avatar_placeholder));
         items.add(new ShopItem("avatar_pro_2", "name2", 2, R.drawable.ic_avatar_placeholder));

@@ -25,7 +25,6 @@ public class PreferencesManager {
         preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    //  Onboarding flag
     public void setOnboardingComplete() {
         preferences.edit().putBoolean(PreferencesKey.ONBOARDING_COMPLETE.getName(), true).apply();
     }
