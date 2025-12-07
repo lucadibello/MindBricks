@@ -327,6 +327,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
             Chip chip = (Chip) LayoutInflater.from(requireContext())
                     .inflate(R.layout.view_tag_chip, tagChipGroup, false);
             chip.setText(tag.title());
+            chip.setTextColor(requireContext().getColor(R.color.black));
             chip.setChipBackgroundColor(ColorStateList.valueOf(tag.color()));
             chip.setChipIconTint(ColorStateList.valueOf(tag.color()));
             chip.setOnCloseIconClickListener(v -> {
