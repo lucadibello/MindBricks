@@ -6,10 +6,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import java.util.concurrent.TimeUnit;
+import ch.inf.usi.mindbricks.util.NotificationHelper;
 
 public class HomeViewModel extends AndroidViewModel {
 
-    // Pomodoro states
     public enum PomodoroState {
         IDLE,
         STUDY,
@@ -24,15 +24,16 @@ public class HomeViewModel extends AndroidViewModel {
     public final MutableLiveData<Integer> earnedCoinsEvent = new MutableLiveData<>();
 
     private int sessionCounter = 0;
+    private final NotificationHelper notificationHelper;
 
     public HomeViewModel(Application application) {
         super(application);
+        this.notificationHelper = new NotificationHelper(application);
     }
 
     // The main entry point to start a new Pomodoro cycle
     //help source: https://stackoverflow.com/questions/39215947/stuck-on-trying-to-resume-paused-stopped-function-pomodoro-timer
     public void pomodoroTechnique(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes) {
-        // Prevent starting a new timer if one is already running.
         if (currentState.getValue() != PomodoroState.IDLE) {
             return;
         }
@@ -65,7 +66,8 @@ public class HomeViewModel extends AndroidViewModel {
 
             @Override
             public void onFinish() {
-                // Award 3 bonus coins at the successful end of the session
+                notificationHelper.showNotification("Study Complete!", "Time for a well-deserved break.", 1);
+                // Award 3 bonus coins at the end of the session
                 earnedCoinsEvent.postValue(3);
 
                 // Decide whether to start a short pause or a long pause
@@ -101,16 +103,18 @@ public class HomeViewModel extends AndroidViewModel {
             public void onFinish() {
                 // end the cycle if longpause
                 if (isLongPause) {
+                    notificationHelper.showNotification("Cycle Complete!", "Great work. Ready for the next round?", 2);
                     stopTimerAndReset();
                 } else {
                     //  continue to the next study session.
+                    notificationHelper.showNotification("Break's Over!", "Time to get back to studying.", 3);
                     startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
                 }
             }
         }.start();
     }
 
-    // Stops the timer and resets the state to IDLE.
+    // Stops the timer and resets the state to IDLE
     public void stopTimerAndReset() {
         if (timer != null) {
             timer.cancel();
@@ -120,7 +124,6 @@ public class HomeViewModel extends AndroidViewModel {
         currentTime.setValue(0L);
     }
 
-    // Resets the coin event LiveData to prevent it from re-firing
     public void onCoinsAwarded() {
         earnedCoinsEvent.setValue(null);
     }
