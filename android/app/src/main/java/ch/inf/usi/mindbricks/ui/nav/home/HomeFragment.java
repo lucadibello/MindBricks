@@ -2,7 +2,7 @@ package ch.inf.usi.mindbricks.ui.nav.home;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,10 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintLayout; // Import this
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.transition.TransitionManager; // Import this
+import androidx.transition.TransitionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,9 @@ import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
+import ch.inf.usi.mindbricks.ui.settings.SettingsActivity;
 import ch.inf.usi.mindbricks.util.PermissionManager;
+import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
 public class HomeFragment extends Fragment {
@@ -37,7 +39,6 @@ public class HomeFragment extends Fragment {
     private TextView timerTextView;
     private Button startSessionButton;
     private TextView coinBalanceTextView;
-    private ImageView settingsIcon;
 
     private HomeViewModel homeViewModel;
     private ProfileViewModel profileViewModel;
@@ -45,7 +46,7 @@ public class HomeFragment extends Fragment {
     private NavigationLocker navigationLocker;
 
     private List<ImageView> sessionDots;
-    private ConstraintLayout sessionDotsLayout; // Add this for the container
+    private ConstraintLayout sessionDotsLayout;
 
     private PermissionManager.PermissionRequest audioPermissionRequest;
 
@@ -92,7 +93,7 @@ public class HomeFragment extends Fragment {
         timerTextView = view.findViewById(R.id.timer_text_view);
         startSessionButton = view.findViewById(R.id.start_stop_button);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
-        settingsIcon = view.findViewById(R.id.settings_icon);
+        ImageView settingsIcon = view.findViewById(R.id.settings_icon);
 
         // Find the container for the dots
         sessionDotsLayout = view.findViewById(R.id.session_dots_layout);
@@ -104,10 +105,12 @@ public class HomeFragment extends Fragment {
         sessionDots.add(view.findViewById(R.id.dot3));
         sessionDots.add(view.findViewById(R.id.dot4));
 
-        // Set a click listener for the settings icon to open the settings dialog
+        // Click listener to open settings activity
         settingsIcon.setOnClickListener(v -> {
-            SettingsFragment settingsDialog = new SettingsFragment();
-            settingsDialog.show(getParentFragmentManager(), "SettingsDialog");
+            Intent intent = new Intent(requireContext(), SettingsActivity.class);
+            // force to select the Pomodoro tab at the start
+            intent.putExtra(SettingsActivity.EXTRA_TAB_INDEX, 2);
+            startActivity(intent);
         });
 
         // Set up observers to listen for data changes from the ViewModels
@@ -176,18 +179,16 @@ public class HomeFragment extends Fragment {
 
     // Reads timer durations from SharedPreferences and starts a Pomodoro cycle
     private void startDefaultSession() {
-        // Access the saved settings file
-        SharedPreferences prefs = requireActivity().getSharedPreferences(SettingsFragment.PREFS_NAME, Context.MODE_PRIVATE);
+        PreferencesManager prefs = new PreferencesManager(requireContext());
 
-        // Retrieve the durations, using default values if none are found
-        int studyDuration = (int) prefs.getFloat(SettingsFragment.KEY_STUDY_DURATION, 25.0f);
-        int shortPauseDuration = (int) prefs.getFloat(SettingsFragment.KEY_PAUSE_DURATION, 5.0f);
-        int longPauseDuration = (int) prefs.getFloat(SettingsFragment.KEY_LONG_PAUSE_DURATION, 15.0f);
+        // Retrieve study settings
+        int studyDuration = prefs.getTimerStudyDuration();
+        int shortPauseDuration = prefs.getTimerShortPauseDuration();
+        int longPauseDuration = prefs.getTimerLongPauseDuration();
 
-        // Tell the ViewModel to start the cycle with these settings
+        // start focus session
         homeViewModel.pomodoroTechnique(studyDuration, shortPauseDuration, longPauseDuration);
     }
-
 
     // Updates the color and width of the session indicator dots based on the current state
     private void updateSessionDots() {
@@ -232,7 +233,7 @@ public class HomeFragment extends Fragment {
                 .setTitle("End Cycle?")
                 .setMessage("Are you sure you want to stop the current Pomodoro cycle?")
                 .setPositiveButton("Confirm", (dialog, which) -> {
-                    // If confirmed, tell the ViewModel to stop and reset the timer
+                    // stop timer
                     homeViewModel.stopTimerAndReset();
                     Toast.makeText(getContext(), "Pomodoro cycle stopped.", Toast.LENGTH_SHORT).show();
                 })

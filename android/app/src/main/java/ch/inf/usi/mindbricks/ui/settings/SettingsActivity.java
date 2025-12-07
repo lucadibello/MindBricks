@@ -18,6 +18,8 @@ import ch.inf.usi.mindbricks.R;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    public static final String EXTRA_TAB_INDEX = "tab_index";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +47,12 @@ public class SettingsActivity extends AppCompatActivity {
                 tab.setText(R.string.settings_tab_pomodoro);
             }
         }).attach();
+
+        // Handle initial tab selection (needed for pomodoro settings from home)
+        int initialTab = getIntent().getIntExtra(EXTRA_TAB_INDEX, 0);
+        if (initialTab > 0 && initialTab < adapter.getItemCount()) {
+            viewPager.setCurrentItem(initialTab, false);
+        }
     }
 
     @Override

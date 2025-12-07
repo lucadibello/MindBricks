@@ -170,5 +170,30 @@ public class PreferencesManager {
         List<DayHours> plan = gson.fromJson(json, type);
         return plan != null ? plan : new ArrayList<>();
     }
+
+    // -- Timer Settings --
+    public int getTimerStudyDuration() {
+        return preferences.getInt(PreferencesKey.TIMER_STUDY_DURATION.getName(), 25);
+    }
+
+    public void setTimerStudyDuration(int minutes) {
+        preferences.edit().putInt(PreferencesKey.TIMER_STUDY_DURATION.getName(), minutes).apply();
+    }
+
+    public int getTimerShortPauseDuration() {
+        return preferences.getInt(PreferencesKey.TIMER_SHORT_PAUSE_DURATION.getName(), 5);
+    }
+
+    public void setTimerShortPauseDuration(int minutes) {
+        preferences.edit().putInt(PreferencesKey.TIMER_SHORT_PAUSE_DURATION.getName(), minutes).apply();
+    }
+
+    public int getTimerLongPauseDuration() {
+        return preferences.getInt(PreferencesKey.TIMER_LONG_PAUSE_DURATION.getName(), 15);
+    }
+
+    public void setTimerLongPauseDuration(int minutes) {
+        preferences.edit().putInt(PreferencesKey.TIMER_LONG_PAUSE_DURATION.getName(), minutes).apply();
+    }
 }
 

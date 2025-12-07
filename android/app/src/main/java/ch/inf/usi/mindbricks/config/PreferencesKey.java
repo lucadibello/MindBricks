@@ -14,7 +14,10 @@ public enum PreferencesKey {
     USER_PURCHASED_ITEMS("user_purchased_items"),
     STUDY_OBJECTIVE("study_objective"),
     STUDY_PLAN_JSON("study_plan_json"),
-    STUDY_GOAL_SET("study_goal_set");
+    STUDY_GOAL_SET("study_goal_set"),
+    TIMER_STUDY_DURATION("timer_study_duration"),
+    TIMER_SHORT_PAUSE_DURATION("timer_short_pause_duration"),
+    TIMER_LONG_PAUSE_DURATION("timer_long_pause_duration");
 
 
     private final String name;
