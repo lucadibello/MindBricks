@@ -127,7 +127,7 @@ public class HomeViewModel extends AndroidViewModel {
             pauseDurationMillis = TimeUnit.MINUTES.toMillis(pauseDurationMinutes);
         }
 
-        // Create and start a new countdown timer for the pause
+        // Create and start a new timer for the pause
         timer = new CountDownTimer(pauseDurationMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -138,10 +138,11 @@ public class HomeViewModel extends AndroidViewModel {
             public void onFinish() {
                 // end the cycle if long pause
                 if (isLongPause) {
+                    SoundPlayer.playSound(getApplication(), R.raw.end_cycle);
                     notificationHelper.showNotification("Cycle Complete!", "Great work. Ready for the next round?", 2);
                     stopTimerAndReset();
                 } else {
-                    //  continue to the next study session.
+                    //  continue to the next study session
                     notificationHelper.showNotification("Break's Over!", "Time to get back to studying.", 3);
                     startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
                 }
