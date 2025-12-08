@@ -97,6 +97,7 @@ public class HomeViewModel extends AndroidViewModel {
 
             @Override
             public void onFinish() {
+                SoundPlayer.playSound(getApplication(), R.raw.end_session);
                 // Stop Service and complete Session
                 completeSessionAndStopService();
                 notificationHelper.showNotification("Study Complete!", "Time for a well-deserved break.", 1);
@@ -152,6 +153,9 @@ public class HomeViewModel extends AndroidViewModel {
     public void stopTimerAndReset() {
         if (timer != null) {
             timer.cancel();
+            if(currentState.getValue() == PomodoroState.STUDY){
+                SoundPlayer.playSound(getApplication(), R.raw.end_session);
+            }
         }
         completeSessionAndStopService();
         this.sessionCounter = 0;

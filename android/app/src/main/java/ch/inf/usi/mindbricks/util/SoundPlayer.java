@@ -14,7 +14,7 @@ public final class SoundPlayer {
             return;
         }
 
-        // If a sound is already playing, stop and release it before starting a new one
+        // If a sound is already playing, stops and it before starting a new one
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
