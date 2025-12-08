@@ -2,6 +2,8 @@ package ch.inf.usi.mindbricks.model.visual;
 
 import androidx.room.Embedded;
 
+import java.util.Calendar;
+
 public class StudySessionWithStats {
     @Embedded
     public StudySession session;
@@ -32,4 +34,36 @@ public class StudySessionWithStats {
     public float getAvgNoiseLevel() { return avgNoiseLevel; }
     public float getAvgLightLevel() { return avgLightLevel; }
     public int getPhonePickupCount() { return phonePickupCount; }
+
+    //getters for time
+    public int getYear() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(getTimestamp());
+        return calendar.get(Calendar.YEAR);
+    }
+
+    public int getMonth() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(getTimestamp());
+
+        return calendar.get(Calendar.MONTH) + 1;
+    }
+
+    public int getDayOfMonth() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(getTimestamp());
+        return calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public int getHourOfDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(getTimestamp());
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public int getDayOfWeek() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(getTimestamp());
+        return calendar.get(Calendar.DAY_OF_WEEK);
+    }
 }

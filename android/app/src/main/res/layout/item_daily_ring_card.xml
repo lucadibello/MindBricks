@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Date Header -->
+        <TextView
+            android:id="@+id/dateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/analytics_text_primary"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Summary -->
+        <TextView
+            android:id="@+id/summaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="120 min • 3 sessions"
+            android:textSize="14sp"
+            android:textColor="@color/analytics_text_secondary"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Goal Rings View -->
+        <ch.inf.usi.mindbricks.ui.charts.GoalRingsView
+            android:id="@+id/goalRingsView"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

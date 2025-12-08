@@ -26,16 +26,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.model.visual.DailyRings;
 import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 import ch.inf.usi.mindbricks.model.visual.DateRange;
 import ch.inf.usi.mindbricks.model.visual.StreakDay;
@@ -73,6 +76,19 @@ public class AnalyticsFragment extends Fragment {
     private EnergyCurveChartView energyCurveChart;
     private AIRecommendationCardView aiRecommendationView;
     private LinearLayout aiLegendContainer;
+
+    // rings
+    private View todayRingCard;
+    private GoalRingsView todayGoalRingsView;
+    private TextView todayDateText;
+    private TextView todaySummaryText;
+    private View historyDivider;
+    private LinearLayout historyHeader;
+    private RecyclerView dailyRingsRecyclerView;
+    private DailyRingsAdapter dailyRingsAdapter;
+    private MaterialButton expandRingsButton;
+    private boolean isHistoryExpanded = false;
+
 
     // Session history
     private RecyclerView sessionHistoryRecycler;
@@ -125,8 +141,52 @@ public class AnalyticsFragment extends Fragment {
         // Generate test data if database is empty
         generateTestDataIfNeeded();
 
+        // Daily rings
+        setupDailyRingsRecyclerView(view);
+
         Log.d(TAG, "All setup complete, now loading initial data");
         viewModel.loadLastNDays(30);
+    }
+
+    private void setupDailyRingsRecyclerView(View view) {
+        // Find views
+        todayRingCard = view.findViewById(R.id.todayRingCard);
+        todayGoalRingsView = todayRingCard.findViewById(R.id.goalRingsView);
+        todayDateText = todayRingCard.findViewById(R.id.dateText);
+        todaySummaryText = todayRingCard.findViewById(R.id.summaryText);
+
+        historyDivider = view.findViewById(R.id.historyDivider);
+        historyHeader = view.findViewById(R.id.historyHeader);
+        dailyRingsRecyclerView = view.findViewById(R.id.dailyRingsRecyclerView);
+        expandRingsButton = view.findViewById(R.id.expandRingsButton);
+
+        // Setup horizontal RecyclerView for previous days
+        dailyRingsAdapter = new DailyRingsAdapter();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        dailyRingsRecyclerView.setAdapter(dailyRingsAdapter);
+        dailyRingsRecyclerView.setLayoutManager(layoutManager);
+
+        // Handle item clicks
+        dailyRingsAdapter.setOnDayClickListener((position, data) -> {
+            Toast.makeText(getContext(), "Clicked: " + data.getDisplayDate(), Toast.LENGTH_SHORT).show();
+        });
+        expandRingsButton.setOnClickListener(v -> {
+            isHistoryExpanded = !isHistoryExpanded;
+            updateHistoryVisibility();
+        });
+    }
+
+
+    private void updateHistoryVisibility() {
+        if (isHistoryExpanded) {
+            dailyRingsRecyclerView.setVisibility(View.VISIBLE);
+            expandRingsButton.setText("Hide");
+            expandRingsButton.setIconResource(R.drawable.ic_expand_less);
+        } else {
+            dailyRingsRecyclerView.setVisibility(View.GONE);
+            expandRingsButton.setText("Show");
+            expandRingsButton.setIconResource(R.drawable.ic_expand_more);
+        }
     }
 
     /**
@@ -166,6 +226,20 @@ public class AnalyticsFragment extends Fragment {
 
         // Setup swipe to refresh
         swipeRefreshLayout.setOnRefreshListener(() -> viewModel.refreshData());
+
+        // Daily Rings
+        RecyclerView dailyRingsRecyclerView = view.findViewById(R.id.dailyRingsRecyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(
+                getContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+        );
+        dailyRingsRecyclerView.setLayoutManager(layoutManager);
+
+        // Force scrollbar to always show
+        dailyRingsRecyclerView.setScrollbarFadingEnabled(false);
+        dailyRingsRecyclerView.setHorizontalScrollBarEnabled(true);
+
 
         // Setup filter FAB
         filterFab = view.findViewById(R.id.analyticsFilterFab);
@@ -347,11 +421,9 @@ public class AnalyticsFragment extends Fragment {
         });
 
         // Observe goal rings
-        viewModel.getGoalRingsData().observe(getViewLifecycleOwner(), rings -> {
-            Log.d(TAG, "Goal rings received: " + (rings != null ? rings.size() + " items" : "null"));
-            if (rings != null && goalRingsView != null) {
-                goalRingsView.setData(rings);
-            }
+        viewModel.getDailyRingsHistory().observe(getViewLifecycleOwner(), history -> {
+            Log.d(TAG, "Daily rings history received: " + (history != null ? history.size() + " days" : "null"));
+            updateDailyRingsDisplay(history);
         });
 
         // Observe AI Recommendations
@@ -389,6 +461,69 @@ public class AnalyticsFragment extends Fragment {
         });
 
         Log.d(TAG, "=== All observers registered ===");
+    }
+
+    private void updateDailyRingsList(List<DailyRings> history) {
+        if (history == null || history.isEmpty()) {
+            dailyRingsAdapter.submitList(new ArrayList<>());
+            return;
+        }
+
+        boolean isExpanded = Boolean.TRUE.equals(viewModel.isRingsExpanded().getValue());
+
+        if (isExpanded) {
+            // Show all days
+            dailyRingsAdapter.submitList(history);
+        } else {
+            // Show only today (first item)
+            dailyRingsAdapter.submitList(history.subList(0, Math.min(1, history.size())));
+        }
+    }
+
+    private void updateDailyRingsDisplay(List<DailyRings> history) {
+        if (history == null || history.isEmpty()) {
+            todayRingCard.setVisibility(View.GONE);
+            historyDivider.setVisibility(View.GONE);
+            historyHeader.setVisibility(View.GONE);
+            dailyRingsRecyclerView.setVisibility(View.GONE);
+            return;
+        }
+
+        // Show today's card (first item)
+        DailyRings today = history.get(0);
+        todayRingCard.setVisibility(View.VISIBLE);
+        todayDateText.setText(today.getDisplayDate());
+        todaySummaryText.setText(today.getSummary());
+        todayGoalRingsView.setData(today.getRings(), false);
+
+        // Show previous days in horizontal list
+        if (history.size() > 1) {
+            historyDivider.setVisibility(View.VISIBLE);
+            historyHeader.setVisibility(View.VISIBLE);
+
+            // Get all days except today
+            List<DailyRings> previousDays = history.subList(1, history.size());
+            dailyRingsAdapter.submitList(previousDays);
+
+            // Update visibility based on expand state
+            updateHistoryVisibility();
+        } else {
+            historyDivider.setVisibility(View.GONE);
+            historyHeader.setVisibility(View.GONE);
+            dailyRingsRecyclerView.setVisibility(View.GONE);
+        }
+    }
+
+    private void updateExpandButton(boolean isExpanded) {
+        if (expandRingsButton == null) return;
+
+        if (isExpanded) {
+            expandRingsButton.setText("Hide history");
+            expandRingsButton.setIconResource(R.drawable.ic_expand_less);
+        } else {
+            expandRingsButton.setText("Show history");
+            expandRingsButton.setIconResource(R.drawable.ic_expand_more);
+        }
     }
 
     /**

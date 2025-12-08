@@ -10,11 +10,10 @@ public class GoalRing {
     private int color;
     private String unit;
 
-    public GoalRing(String title, float current, float target, int color, String unit) {
+    public GoalRing(String title, float current, float target, String unit) {
         this.title = title;
         this.current = current;
         this.target = target;
-        this.color = color;
         this.unit = unit;
     }
 

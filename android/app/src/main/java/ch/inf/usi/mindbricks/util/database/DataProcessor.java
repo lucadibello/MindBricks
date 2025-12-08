@@ -1,7 +1,10 @@
 package ch.inf.usi.mindbricks.util.database;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -9,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.model.visual.DailyRings;
 import ch.inf.usi.mindbricks.model.visual.DateRange;
 import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
 import ch.inf.usi.mindbricks.model.visual.HeatmapCell;
@@ -325,9 +330,139 @@ public class DataProcessor {
         return result;
     }
 
-    public static List<GoalRing> calculateGoalRings(List<StudySessionWithStats> sessions,
-                                                    int dailyMinutesTarget,
-                                                    float dailyFocusTarget) {
+    public static List<DailyRings> calculateDailyRingsHistory(
+            Context context,
+            List<StudySessionWithStats> allSessions,
+            DateRange dateRange,
+            int dailyMinutesTarget,
+            float dailyFocusTarget) {
+
+        List<DailyRings> result = new ArrayList<>();
+
+        if (allSessions == null || allSessions.isEmpty()) {
+            return createEmptyDailyRings(context, dateRange, dailyMinutesTarget, dailyFocusTarget);
+        }
+
+        // Group sessions by date
+        Map<String, List<StudySessionWithStats>> sessionsByDate = new HashMap<>();
+
+        for (StudySessionWithStats session : allSessions) {
+            if (!dateRange.contains(session.getTimestamp())) {
+                continue;
+            }
+
+            @SuppressLint("DefaultLocale") String dateKey = String.format("%d-%02d-%02d",
+                    session.getYear(),
+                    session.getMonth(),
+                    session.getDayOfMonth());
+
+            sessionsByDate.computeIfAbsent(dateKey, k -> new ArrayList<>()).add(session);
+        }
+
+        // Get date range boundaries
+        Calendar startCal = getStartCalendar(dateRange);
+        Calendar endCal = getEndCalendar(dateRange);
+
+        // Create DailyRings for each day in range (newest first)
+        Calendar currentCal = (Calendar) endCal.clone();
+
+        while (!currentCal.before(startCal)) {
+            int year = currentCal.get(Calendar.YEAR);
+            int month = currentCal.get(Calendar.MONTH) + 1;
+            int day = currentCal.get(Calendar.DAY_OF_MONTH);
+
+            LocalDate date = LocalDate.of(year, month, day);
+            @SuppressLint("DefaultLocale") String dateKey = String.format( "%d-%02d-%02d", year, month, day);
+
+            // Get sessions for this day (or empty list)
+            List<StudySessionWithStats> sessionsForDay = sessionsByDate.getOrDefault(dateKey, new ArrayList<>());
+
+            // Calculate rings for this day
+            List<GoalRing> rings = calculateGoalRings(
+                    context,
+                    sessionsForDay,
+                    dailyMinutesTarget,
+                    dailyFocusTarget
+            );
+
+            DailyRings dayData = new DailyRings(date, rings);
+            result.add(dayData);
+
+            // Move to previous day
+            currentCal.add(Calendar.DAY_OF_MONTH, -1);
+        }
+
+        return result;
+    }
+    
+    private static Calendar getStartCalendar(DateRange dateRange) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(dateRange.getStartTimestamp());
+
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar;
+    }
+
+    private static Calendar getEndCalendar(DateRange dateRange) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(dateRange.getEndTimestamp());
+
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+
+        return calendar;
+    }
+
+
+    private static List<DailyRings> createEmptyDailyRings(
+            Context context,
+            DateRange dateRange,
+            int dailyMinutesTarget,
+            float dailyFocusTarget) {
+
+        List<DailyRings> result = new ArrayList<>();
+
+        Calendar startCal = getStartCalendar(dateRange);
+        Calendar endCal = getEndCalendar(dateRange);
+
+        // Start from end date and go backwards to start date
+        Calendar currentCal = (Calendar) endCal.clone();
+
+        while (!currentCal.before(startCal)) {
+            int year = currentCal.get(Calendar.YEAR);
+            int month = currentCal.get(Calendar.MONTH) + 1;
+            int day = currentCal.get(Calendar.DAY_OF_MONTH);
+
+            LocalDate date = LocalDate.of(year, month, day);
+
+            List<GoalRing> emptyRings = calculateGoalRings(
+                    context,
+                    new ArrayList<>(),
+                    dailyMinutesTarget,
+                    dailyFocusTarget
+            );
+
+            DailyRings dayData = new DailyRings(date, emptyRings);
+            result.add(dayData);
+
+            currentCal.add(Calendar.DAY_OF_MONTH, -1);
+        }
+
+        return result;
+    }
+
+    public static List<GoalRing> calculateGoalRings(
+            Context context,
+            List<StudySessionWithStats> sessions,
+            int dailyMinutesTarget,
+            float dailyFocusTarget) {
+
         List<GoalRing> rings = new ArrayList<>();
 
         // Calculate totals from sessions
@@ -347,7 +482,6 @@ public class DataProcessor {
                 "Study Time",
                 totalMinutes,
                 dailyMinutesTarget,
-                Color.parseColor("#4CAF50"), // Green
                 "min"
         ));
 
@@ -355,7 +489,6 @@ public class DataProcessor {
                 "Focus Quality",
                 avgFocus,
                 dailyFocusTarget,
-                Color.parseColor("#2196F3"), // Blue
                 "%"
         ));
 
@@ -364,7 +497,6 @@ public class DataProcessor {
                 "Sessions",
                 sessionCount,
                 5,
-                Color.parseColor("#FF9800"), // Orange
                 "sessions"
         ));
 

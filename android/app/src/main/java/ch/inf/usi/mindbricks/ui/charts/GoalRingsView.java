@@ -40,6 +40,13 @@ public class GoalRingsView extends View {
     private int colorTextPrimary;
     private int colorTextSecondary;
 
+    boolean isCompactView = false;
+
+    private int colorOut;
+    private int colorMid;
+    private int colorIn;
+
+
     public GoalRingsView(Context context) {
         super(context);
         init();
@@ -55,6 +62,9 @@ public class GoalRingsView extends View {
         colorBackground = ContextCompat.getColor(context, R.color.goal_ring_background);
         colorTextPrimary = ContextCompat.getColor(context, R.color.analytics_text_primary);
         colorTextSecondary = ContextCompat.getColor(context, R.color.analytics_text_secondary);
+        colorOut = ContextCompat.getColor(context, R.color.chart_scale_7);
+        colorMid = ContextCompat.getColor(context, R.color.chart_scale_5);
+        colorIn = ContextCompat.getColor(context, R.color.chart_scale_3);
 
         ringPaint = new Paint();
         ringPaint.setStyle(Paint.Style.STROKE);
@@ -88,8 +98,9 @@ public class GoalRingsView extends View {
         labelPaint.setTextAlign(Paint.Align.LEFT);
     }
 
-    public void setData(List<GoalRing> rings) {
+    public void setData(List<GoalRing> rings, boolean compact) {
         this.rings = rings;
+        this.isCompactView = compact;
         invalidate();
     }
 
@@ -97,51 +108,95 @@ public class GoalRingsView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // Draw title
-        titlePaint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText("How did you do today:", 50, 30, titlePaint);
-
         if (rings == null || rings.isEmpty()) {
             drawEmptyState(canvas);
             return;
         }
 
         centerX = getWidth() / 2f;
-        centerY = (getHeight() / 2f) - 110.f;
+        centerY = (getHeight() / 2f);
 
-        drawRings(canvas);
-        drawCenterText(canvas);
+        if (!isCompactView) {
+            drawFull(canvas);
+            isCompactView = true;
+        } else
+            drawCompact(canvas);
+    }
+
+    private void drawFull(Canvas canvas) {
+        drawRings(canvas, 250f, 35f, 15f);
+        drawCenterText(canvas, 72f);
         drawLabels(canvas);
     }
 
-    private void drawRings(Canvas canvas) {
-        float baseRadius = 250f;
+    private void drawCompact(Canvas canvas) {
+        drawRings(canvas, 125f, 17.5f, 7.5f);
+        drawCenterText(canvas, 36f);
+    }
+
+    private void drawRings(Canvas canvas, float baseRadius, float strokeWidth, float spacing) {
+        float originalStrokeWidth = ringPaint.getStrokeWidth();
+        ringPaint.setStrokeWidth(strokeWidth);
+        backgroundPaint.setStrokeWidth(strokeWidth);
+
+        float offset = 0;
+        if (isCompactView)
+            offset = 20;
+        else
+            offset = 120;
 
         for (int i = 0; i < rings.size(); i++) {
             GoalRing ring = rings.get(i);
-            float radius = baseRadius - (i * (ringStrokeWidth + ringSpacing));
+            float radius = baseRadius - (i * (strokeWidth + spacing));
 
             // Draw background ring
             RectF bgRect = new RectF(
-                    centerX - radius, centerY - radius,
-                    centerX + radius, centerY + radius
+                    centerX - radius, centerY - radius - offset,
+                    centerX + radius, centerY + radius - offset
             );
             canvas.drawArc(bgRect, -90, 360, false, backgroundPaint);
 
             // Draw progress ring
             float sweepAngle = (ring.getProgress() / 100f) * 360f;
-            ringPaint.setColor(ring.getColor());
+
+            switch (i) {
+                case 0:
+                    ring.setColor(colorIn);
+                    ringPaint.setColor(colorIn);
+                    break;
+                case 1:
+                    ring.setColor(colorMid);
+                    ringPaint.setColor(colorMid);
+                    break;
+                case 2:
+                    ring.setColor(colorOut);
+                    ringPaint.setColor(colorOut);
+                    break;
+                default:
+                    ringPaint.setColor(colorOut);
+                    break;
+            }
 
             RectF rect = new RectF(
-                    centerX - radius, centerY - radius,
-                    centerX + radius, centerY + radius
+                    centerX - radius, centerY - radius - offset,
+                    centerX + radius, centerY + radius - offset
             );
             canvas.drawArc(rect, -90, sweepAngle, false, ringPaint);
         }
+
+        ringPaint.setStrokeWidth(originalStrokeWidth);
+        backgroundPaint.setStrokeWidth(originalStrokeWidth);
     }
 
-    private void drawCenterText(Canvas canvas) {
+
+    private void drawCenterText(Canvas canvas, float textSize) {
         if (rings.isEmpty()) return;
+
+        float offset = 0;
+        if (isCompactView)
+            offset = 10;
+        else
+            offset = 120;
 
         // Calculate overall completion
         float totalProgress = 0;
@@ -152,19 +207,23 @@ public class GoalRingsView extends View {
 
         // Draw percentage
         String percentText = String.format(Locale.getDefault(), "%.0f%%", avgProgress);
-        textPaint.setTextSize(72f);
+        textPaint.setTextSize(textSize);
         textPaint.setColor(colorTextPrimary);
-        canvas.drawText(percentText, centerX, centerY + 20, textPaint);
+        canvas.drawText(percentText, centerX, centerY - offset, textPaint);
 
-        // Draw subtitle
-        Paint subtitlePaint = new Paint(textPaint);
-        subtitlePaint.setTextSize(28f);
-        subtitlePaint.setColor(colorTextSecondary);
-        canvas.drawText("Complete", centerX, centerY + 60, subtitlePaint);
+        if (!isCompactView) {
+            Paint subtitlePaint = new Paint(textPaint);
+            subtitlePaint.setTextSize(textSize / 2);
+            subtitlePaint.setColor(colorTextSecondary);
+            canvas.drawText("Complete", centerX, centerY - 60, subtitlePaint);
+        }
     }
 
     private void drawLabels(Canvas canvas) {
-        float startY = centerY + 350f;
+        if (isCompactView)
+            return;
+
+        float startY = centerY + 210f;
         float lineHeight = 70f;
 
         for (int i = 0; i < rings.size(); i++) {

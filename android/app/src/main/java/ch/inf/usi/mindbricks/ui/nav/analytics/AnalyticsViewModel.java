@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ch.inf.usi.mindbricks.model.visual.AIRecommendation;
+import ch.inf.usi.mindbricks.model.visual.DailyRings;
 import ch.inf.usi.mindbricks.model.visual.DateRange;
 import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
 import ch.inf.usi.mindbricks.model.visual.GoalRing;
@@ -52,6 +53,9 @@ public class AnalyticsViewModel extends AndroidViewModel {
     private final MutableLiveData<List<HeatmapCell>> heatmapData = new MutableLiveData<>();
     private final MutableLiveData<List<StreakDay>> streakData = new MutableLiveData<>();
     private final MutableLiveData<List<GoalRing>> goalRingsData = new MutableLiveData<>();
+    private MutableLiveData<List<DailyRings>> dailyRingsHistory = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isRingsExpanded = new MutableLiveData<>(false);
+
     private final MutableLiveData<List<AIRecommendation>> aiRecommendations = new MutableLiveData<>();
 
     // ViewState for UI feedback
@@ -233,36 +237,29 @@ public class AnalyticsViewModel extends AndroidViewModel {
                 Log.d(TAG, "Filtered sessions: " + filtered.size());
 
                 if (filtered.isEmpty()) {
-                    Log.w(TAG, "No sessions in range, setting EMPTY state");
                     sessionHistory.postValue(filtered);
                     viewState.postValue(ViewState.EMPTY);
-                    return; // Don't process if no data
+                    return;
                 }
 
                 // Process data
                 WeeklyStats weekly = DataProcessor.calculateWeeklyStats(allSessions, dateRange);
                 weeklyStats.postValue(weekly);
-                Log.d(TAG, "Weekly stats computed: " + weekly.getTotalMinutes() + " mins");
-
 
                 List<TimeSlotStats> hourly = DataProcessor.calculateHourlyDistribution(allSessions, dateRange);
                 hourlyStats.postValue(hourly);
-                Log.d(TAG, "Hourly stats computed: " + hourly.size() + " slots");
 
                 DailyRecommendation recommendation = DataProcessor.generateDailyRecommendation(allSessions, dateRange);
                 dailyRecommendation.postValue(recommendation);
                 Log.d(TAG, "Recommendations computed");
 
 
-                Log.d("ViewModel", "Calculating energy curve data...");
                 List<HourlyQuality> energyCurve = DataProcessor.calculateEnergyCurve(filtered);
                 energyCurveData.postValue(energyCurve);
 
-                Log.d("ViewModel", "Calculating heatmap data...");
                 List<HeatmapCell> heatmap = DataProcessor.calculateQualityHeatmap(filtered);
                 heatmapData.postValue(heatmap);
 
-                Log.d("ViewModel", "Calculating streak data...");
                 Calendar cal = Calendar.getInstance();
                 int currentMonth = cal.get(Calendar.MONTH);
                 int currentYear = cal.get(Calendar.YEAR);
@@ -275,10 +272,21 @@ public class AnalyticsViewModel extends AndroidViewModel {
                 );
                 streakData.postValue(streak);
 
+                /*
                 List<StudySessionWithStats> todaySessions = DataProcessor.filterSessionsInRange(
                         allSessions, DateRange.lastNDays(1));
-                List<GoalRing> rings = DataProcessor.calculateGoalRings(todaySessions, 120, 70);
+                List<GoalRing> rings = DataProcessor.calculateGoalRings(context, todaySessions, 120, 70);
                 goalRingsData.postValue(rings);
+                */
+
+                List<DailyRings> history = DataProcessor.calculateDailyRingsHistory(
+                        getApplication(),
+                        allSessions,
+                        currentDateRange,
+                        30,
+                        5
+                );
+                dailyRingsHistory.postValue(history);
 
                 List<AIRecommendation> recommendations = new ArrayList<>();
                 recommendations.add(DataProcessor.generateAIRecommendations(filtered, dateRange));
@@ -308,6 +316,10 @@ public class AnalyticsViewModel extends AndroidViewModel {
         cachedSessions = null;
         lastLoadTime = 0;
         loadData();
+    }
+
+    public void setRingsExpanded(boolean expanded) {
+        isRingsExpanded.setValue(expanded);
     }
 
     // getters
@@ -360,7 +372,13 @@ public class AnalyticsViewModel extends AndroidViewModel {
         return viewState;
     }
 
+    public LiveData<List<DailyRings>> getDailyRingsHistory() {
+        return dailyRingsHistory;
+    }
 
+    public LiveData<Boolean> isRingsExpanded() {
+        return isRingsExpanded;
+    }
 
     public LiveData<String> getErrorMessage() {
         return errorMessage;
