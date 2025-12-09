@@ -231,9 +231,9 @@ public class AIRecommendationCardView extends View {
             case EXERCISE:
                 return R.drawable.ic_exercise;
             case SOCIAL:
-                return R.drawable.ic_coffee;
+                return R.drawable.ic_chat;
             case MEALS:
-                return android.R.drawable.ic_menu_today;
+                return R.drawable.ic_coffee;
             case BREAKS:
                 return R.drawable.ic_pause;
             case SLEEP:

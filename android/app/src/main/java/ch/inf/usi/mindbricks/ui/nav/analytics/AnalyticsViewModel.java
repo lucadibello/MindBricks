@@ -257,7 +257,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
                 List<HourlyQuality> energyCurve = DataProcessor.calculateEnergyCurve(filtered);
                 energyCurveData.postValue(energyCurve);
 
-                List<HeatmapCell> heatmap = DataProcessor.calculateQualityHeatmap(filtered);
+                List<HeatmapCell> heatmap = DataProcessor.calculateQualityHeatmap(filtered, dateRange);
                 heatmapData.postValue(heatmap);
 
                 Calendar cal = Calendar.getInstance();
@@ -297,7 +297,6 @@ public class AnalyticsViewModel extends AndroidViewModel {
 
                 // Set SUCCESS only after all data is posted
                 viewState.postValue(ViewState.SUCCESS);
-                Log.d(TAG, "=== processAllData COMPLETE - ViewState.SUCCESS ===");
 
             } catch (Exception e) {
                 Log.e(TAG, "ERROR in processAllData", e);

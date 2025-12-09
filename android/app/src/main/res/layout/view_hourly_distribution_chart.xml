@@ -5,17 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/hourlyDistributionTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Study Time by Hour"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="8dp" />
-
     <!-- Summary text -->
     <TextView
         android:id="@+id/hourlyDistributionSummary"
@@ -23,13 +12,38 @@
         android:layout_height="wrap_content"
         android:text="Your most productive hours"
         android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="@color/analytics_text_secondary"
         android:layout_marginBottom="16dp" />
 
-    <!-- Line Chart -->
+    <!-- Study Minutes Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Study Minutes by Hour"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/analytics_text_primary"
+        android:layout_marginBottom="8dp" />
+
     <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/hourlyDistributionLineChart"
+        android:id="@+id/studyMinutesChart"
         android:layout_width="match_parent"
-        android:layout_height="250dp" />
+        android:layout_height="220dp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Focus Score Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Focus Score by Hour"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/analytics_text_primary"
+        android:layout_marginBottom="8dp" />
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/focusChart"
+        android:layout_width="match_parent"
+        android:layout_height="220dp" />
 
 </LinearLayout>

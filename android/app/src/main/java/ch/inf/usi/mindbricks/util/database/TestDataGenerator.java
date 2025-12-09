@@ -101,19 +101,18 @@ public class TestDataGenerator {
         // Generate sessions spread over last 30 days
         for (int i = 0; i < count; i++) {
             // Random day in last 30 days
-            int daysAgo = random.nextInt(30);
+            int daysAgo = random.nextInt(365);
             calendar.setTimeInMillis(System.currentTimeMillis());
             calendar.add(Calendar.DAY_OF_MONTH, -daysAgo);
 
             // Random hour between 8 AM and 10 PM
-            int hour = 8 + random.nextInt(14);
+            int hour = random.nextInt(23);
             calendar.set(Calendar.HOUR_OF_DAY, hour);
             calendar.set(Calendar.MINUTE, random.nextInt(60));
             calendar.set(Calendar.SECOND, 0);
 
             long timestamp = calendar.getTimeInMillis();
 
-            // Random duration: 15-180 minutes (more realistic distribution)
             int duration;
             double rand = random.nextDouble();
             if (rand < 0.5) {

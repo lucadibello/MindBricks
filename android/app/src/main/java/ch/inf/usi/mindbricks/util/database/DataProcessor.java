@@ -30,6 +30,7 @@ import ch.inf.usi.mindbricks.model.visual.GoalRing;
  * Contains methods to transform raw session data into chart-ready statistics.
  */
 public class DataProcessor {
+
     public static WeeklyStats calculateWeeklyStats(List<StudySessionWithStats> allSessions, DateRange dateRange) {
         WeeklyStats stats = new WeeklyStats();
         List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
@@ -38,7 +39,6 @@ public class DataProcessor {
             return stats;
         }
 
-        // Arrays to accumulate data per day
         int[] minutesPerDay = new int[7];
         float[] focusScoreSum = new float[7];
         int[] sessionCountPerDay = new int[7];
@@ -49,7 +49,6 @@ public class DataProcessor {
         for (StudySessionWithStats session : sessions) {
             calendar.setTimeInMillis(session.getTimestamp());
 
-            // Get day of week (Calendar.MONDAY = 2, so adjust to 0-6)
             int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
             int dayIndex = convertCalendarDayToIndex(dayOfWeek);
 
@@ -66,11 +65,12 @@ public class DataProcessor {
         int daysWithSessions = 0;
 
         for (int i = 0; i < 7; i++) {
-            stats.setDayMinutes(i, minutesPerDay[i]);
+            stats.setDayMinutes(i,0);
             stats.setDaySessionCount(i, sessionCountPerDay[i]);
 
             if (sessionCountPerDay[i] > 0) {
                 float avgFocusScore = focusScoreSum[i] / sessionCountPerDay[i];
+                stats.setDayMinutes(i, minutesPerDay[i]/sessionCountPerDay[i]);
                 stats.setDayFocusScore(i, avgFocusScore);
 
                 totalMinutes += minutesPerDay[i];
@@ -222,18 +222,20 @@ public class DataProcessor {
         return hourlyData;
     }
 
-    public static List<HeatmapCell> calculateQualityHeatmap(List<StudySessionWithStats> sessions) {
+    public static List<HeatmapCell> calculateQualityHeatmap(List<StudySessionWithStats> sessions, DateRange dateRange) {
         Map<String, HeatmapCell> cellMap = new HashMap<>();
-
         Calendar calendar = Calendar.getInstance();
 
+        // STEP 1: Process actual session data first
         for (StudySessionWithStats session : sessions) {
             calendar.setTimeInMillis(session.getTimestamp());
 
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
             int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
-            String key = dayOfMonth + "-" + hour;
+            String key = year + "-" + month + "-" + dayOfMonth + "-" + hour;
 
             HeatmapCell cell = cellMap.get(key);
             if (cell == null) {
@@ -241,9 +243,28 @@ public class DataProcessor {
                 cellMap.put(key, cell);
             }
 
-            // Accumulate data
             cell.setAvgQuality(cell.getAvgQuality() + session.getFocusScore());
             cell.setSessionCount(cell.getSessionCount() + 1);
+        }
+
+        calendar.setTimeInMillis(dateRange.getStartTimestamp());
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.setTimeInMillis(dateRange.getEndTimestamp());
+
+        while (calendar.before(endCalendar) || calendar.equals(endCalendar)) {
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+            for (int hour = 0; hour < 24; hour++) {
+                String key = year + "-" + month + "-" + dayOfMonth + "-" + hour;
+
+                if (!cellMap.containsKey(key)) {
+                    cellMap.put(key, new HeatmapCell(dayOfMonth, hour, 0, 0));
+                }
+            }
+
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
         // Calculate averages
@@ -562,6 +583,7 @@ public class DataProcessor {
         AIRecommendation.ActivityType[] hourlyActivities =
                 new AIRecommendation.ActivityType[24];
 
+        // TODO add values to be customizable
         // Default schedule based on typical patterns
         // Sleep hours
         for (int h = 0; h < 6; h++) {
@@ -612,6 +634,7 @@ public class DataProcessor {
                 }
                 // Evening low productivity -> Social
                 else if (hour >= 18 && hour <= 22) {
+                    //TODO replace with calendar activities
                     hourlyActivities[hour] = AIRecommendation.ActivityType.SOCIAL;
                 }
                 // Otherwise -> Breaks

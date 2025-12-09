@@ -62,9 +62,9 @@ public class GoalRingsView extends View {
         colorBackground = ContextCompat.getColor(context, R.color.goal_ring_background);
         colorTextPrimary = ContextCompat.getColor(context, R.color.analytics_text_primary);
         colorTextSecondary = ContextCompat.getColor(context, R.color.analytics_text_secondary);
-        colorOut = ContextCompat.getColor(context, R.color.chart_scale_7);
-        colorMid = ContextCompat.getColor(context, R.color.chart_scale_5);
-        colorIn = ContextCompat.getColor(context, R.color.chart_scale_3);
+        colorOut = ContextCompat.getColor(context, R.color.goal_ring_focus);
+        colorMid = ContextCompat.getColor(context, R.color.goal_ring_quality);
+        colorIn = ContextCompat.getColor(context, R.color.goal_ring_time);
 
         ringPaint = new Paint();
         ringPaint.setStyle(Paint.Style.STROKE);
@@ -96,6 +96,8 @@ public class GoalRingsView extends View {
         labelPaint.setTextSize(35f);
         labelPaint.setAntiAlias(true);
         labelPaint.setTextAlign(Paint.Align.LEFT);
+
+        isCompactView = false;
     }
 
     public void setData(List<GoalRing> rings, boolean compact) {

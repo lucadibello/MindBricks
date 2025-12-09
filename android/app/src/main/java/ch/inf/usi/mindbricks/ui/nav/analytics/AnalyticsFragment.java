@@ -42,10 +42,8 @@ import ch.inf.usi.mindbricks.model.visual.DailyRings;
 import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 import ch.inf.usi.mindbricks.model.visual.DateRange;
 import ch.inf.usi.mindbricks.model.visual.StreakDay;
-import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 import ch.inf.usi.mindbricks.ui.charts.AIRecommendationCardView;
 import ch.inf.usi.mindbricks.ui.charts.DailyTimelineChartView;
-import ch.inf.usi.mindbricks.ui.charts.EnergyCurveChartView;
 import ch.inf.usi.mindbricks.ui.charts.GoalRingsView;
 import ch.inf.usi.mindbricks.ui.charts.HourlyDistributionChartView;
 import ch.inf.usi.mindbricks.ui.charts.QualityHeatmapChartView;
@@ -61,7 +59,7 @@ import ch.inf.usi.mindbricks.util.database.TestDataGenerator;
  */
 public class AnalyticsFragment extends Fragment {
     private static final String TAG = "AnalyticsFragment";
-    private static final int TEST_DATA_COUNT = 20;
+    private static final int TEST_DATA_COUNT = 900;
 
     // ViewModel
     private AnalyticsViewModel viewModel;
@@ -73,7 +71,6 @@ public class AnalyticsFragment extends Fragment {
     private QualityHeatmapChartView qualityHeatmapChart;
     private StreakCalendarView streakCalendarView;
     private GoalRingsView goalRingsView;
-    private EnergyCurveChartView energyCurveChart;
     private AIRecommendationCardView aiRecommendationView;
     private LinearLayout aiLegendContainer;
 
@@ -206,8 +203,6 @@ public class AnalyticsFragment extends Fragment {
         // Chart views
         weeklyFocusChart = view.findViewById(R.id.weeklyFocusChart);
         hourlyDistributionChart = view.findViewById(R.id.hourlyDistributionChart);
-        dailyTimelineChart = view.findViewById(R.id.dailyTimelineChart);
-        energyCurveChart = view.findViewById(R.id.energyCurveChart);
         qualityHeatmapChart = view.findViewById(R.id.qualityHeatmapChart);
         streakCalendarView = view.findViewById(R.id.streakCalendarView);
         goalRingsView = view.findViewById(R.id.goalRingsView);
@@ -382,13 +377,6 @@ public class AnalyticsFragment extends Fragment {
         viewModel.getDailyRecommendation().observe(getViewLifecycleOwner(), recommendation -> {
             if (recommendation != null && dailyTimelineChart != null) {
                 dailyTimelineChart.setData(recommendation);
-            }
-        });
-
-        // Observe energy curve
-        viewModel.getEnergyCurveData().observe(getViewLifecycleOwner(), data -> {
-            if (data != null && energyCurveChart != null) {
-                energyCurveChart.setData(data);
             }
         });
 

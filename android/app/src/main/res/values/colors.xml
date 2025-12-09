@@ -15,6 +15,7 @@
     <color name="tag_color_lime">#D4E157</color>
     <color name="tag_color_brown">#A1887F</color>
 
+    <!-- Env colors -->
     <color name="md_theme_error">#BA1A1A</color>
     <color name="empty_state_text">#79747E</color>
     <color name="empty_state_icon">#CAC4D0</color>
@@ -30,13 +31,13 @@
     <color name="analytics_grid_line">#E6E1E5</color>
     <color name="analytics_grid_line_major">#CAC4D0</color>
 
-    <!-- Text Colors for Analytics -->
+    <!-- Text Colors -->
     <color name="analytics_text_primary">#1C1B1F</color>
     <color name="analytics_text_secondary">#49454F</color>
     <color name="analytics_text_tertiary">#79747E</color>
     <color name="analytics_text_disabled">#C4C7C5</color>
 
-    <!-- Analytics Accent Colors -->
+    <!-- Accent Colors -->
     <color name="analytics_accent_purple">#9D83CE</color>
     <color name="analytics_accent_blue">#5B8DEE</color>
     <color name="analytics_accent_green">#52C197</color>
@@ -44,7 +45,7 @@
     <color name="analytics_accent_orange">#F39C63</color>
     <color name="analytics_accent_red">#E57373</color>
 
-    <!-- Activity Type Colors -->
+    <!-- Type Colors -->
     <color name="activity_deep_study">#6B4FBB</color>
     <color name="activity_light_study">#8B7FC7</color>
     <color name="activity_work">#5B8DEE</color>
@@ -54,7 +55,7 @@
     <color name="activity_breaks">#7ED6E5</color>
     <color name="activity_sleep">#8E9CB8</color>
 
-    <!-- Activity Type Colors (muted alternatives) -->
+    <!-- Type Colors (muted alternatives) -->
     <color name="activity_deep_study_muted">#A08DC9</color>
     <color name="activity_light_study_muted">#BFB3DB</color>
     <color name="activity_work_muted">#91AEF0</color>

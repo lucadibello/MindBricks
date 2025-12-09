@@ -51,6 +51,24 @@ public class QualityHeatmapChartView extends View {
         init();
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (cells == null || cells.isEmpty()) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+
+        int minDay = getMinDay();
+        int maxDay = getMaxDay();
+        int dayCount = maxDay - minDay + 1;
+
+        int requiredWidth = (int) (padding * 2 + (dayCount * (cellSize + cellSpacing)));
+
+        int requiredHeight = (int) (topPadding + (24 * (cellSize + cellSpacing)));
+
+        setMeasuredDimension(requiredWidth, requiredHeight);
+    }
+
     private void init() {
         Context context = getContext();
         colorGrid = ContextCompat.getColor(context, R.color.analytics_grid_line_major);
@@ -96,7 +114,6 @@ public class QualityHeatmapChartView extends View {
         drawHourLabels(canvas);
         drawDayLabels(canvas);
         drawHeatmap(canvas);
-        drawLegend(canvas);
     }
 
     private void drawHourLabels(Canvas canvas) {
@@ -132,51 +149,28 @@ public class QualityHeatmapChartView extends View {
 
     private void drawHeatmap(Canvas canvas) {
         for (HeatmapCell cell : cells) {
-            if (cell.getSessionCount() == 0) continue;
-
             int dayIndex = cell.getDayOfMonth() - getMinDay();
             int hourIndex = cell.getHour();
 
             float x = padding + (dayIndex * (cellSize + cellSpacing));
             float y = topPadding + (hourIndex * (cellSize + cellSpacing));
 
-            // Determine color based on quality
-            int color = getColorForQuality(cell.getAvgQuality());
+            int color;
+            if (cell.getSessionCount() == 0) {
+                cellPaint.setAlpha(10);
+                borderPaint.setAlpha(10);
+                color = ContextCompat.getColor(getContext(), R.color.analytics_grid_line_major);
+            } else {
+                color = getColorForQuality(cell.getAvgQuality());
+            }
+
             cellPaint.setColor(color);
+
 
             // Draw cell
             RectF rect = new RectF(x, y, x + cellSize, y + cellSize);
             canvas.drawRoundRect(rect, 8f, 8f, cellPaint);
             canvas.drawRoundRect(rect, 8f, 8f, borderPaint);
-        }
-    }
-
-    private void drawLegend(Canvas canvas) {
-        float legendY = getHeight() - 60;
-        float legendX = padding;
-
-        textPaint.setTextAlign(Paint.Align.LEFT);
-        textPaint.setTextSize(28f);
-        textPaint.setColor(colorTextSecondary);
-        canvas.drawText("Quality: ", legendX, legendY + 25, textPaint);
-
-        legendX += 120;
-
-        String[] labels = {"Low", "Medium", "High", "Excellent"};
-        float[] qualities = {25f, 50f, 75f, 95f};
-
-        for (int i = 0; i < labels.length; i++) {
-            int color = getColorForQuality(qualities[i]);
-            cellPaint.setColor(color);
-
-            RectF rect = new RectF(legendX, legendY, legendX + 30, legendY + 30);
-            canvas.drawRoundRect(rect, 4f, 4f, cellPaint);
-            canvas.drawRoundRect(rect, 4f, 4f, borderPaint);
-
-            textPaint.setTextSize(24f);
-            canvas.drawText(labels[i], legendX + 40, legendY + 22, textPaint);
-
-            legendX += 150;
         }
     }
 
@@ -210,6 +204,18 @@ public class QualityHeatmapChartView extends View {
             }
         }
         return min;
+    }
+
+    private int getMaxDay() {
+        if (cells == null || cells.isEmpty()) return 1;
+
+        int max = Integer.MIN_VALUE;
+        for (HeatmapCell cell : cells) {
+            if (cell.getDayOfMonth() > max) {
+                max = cell.getDayOfMonth();
+            }
+        }
+        return max;
     }
 
     private void drawEmptyState(Canvas canvas) {

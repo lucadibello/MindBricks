@@ -5,17 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/weeklyFocusTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Weekly Focus"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="8dp" />
-
     <!-- Summary text -->
     <TextView
         android:id="@+id/weeklyFocusSummary"

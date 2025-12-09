@@ -156,7 +156,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:layout_marginTop="8dp"
-                                        android:text="Swipe to explore full schedule | Tap for details"
+                                        android:text="Swipe to explore full schedule"
                                         android:textSize="14dp"
                                         android:textColor="#9D83CE"
                                         android:textStyle="italic" />
@@ -293,6 +293,14 @@
 
                             </com.google.android.material.card.MaterialCardView>
 
+
+                            <com.google.android.material.divider.MaterialDivider
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_margin="30dp"
+                                android:orientation="horizontal"
+                                android:thickness="0dp"/>
+
                         </LinearLayout>
 
                     </androidx.core.widget.NestedScrollView>
@@ -342,10 +350,69 @@
                                         android:textColor="?android:textColorSecondary"
                                         android:textSize="14sp" />
 
-                                    <ch.inf.usi.mindbricks.ui.charts.QualityHeatmapChartView
-                                        android:id="@+id/qualityHeatmapChart"
+                                    <LinearLayout
                                         android:layout_width="match_parent"
-                                        android:layout_height="500dp" />
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical">
+
+                                        <!-- Scrollable Heatmap -->
+                                        <HorizontalScrollView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:scrollbars="horizontal"
+                                            android:fadeScrollbars="false">
+
+                                            <ch.inf.usi.mindbricks.ui.charts.QualityHeatmapChartView
+                                                android:id="@+id/qualityHeatmapChart"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="460dp" />
+
+                                        </HorizontalScrollView>
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal"
+                                            android:gravity="center"
+                                            android:padding="12dp">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="Quality: "
+                                                android:textSize="13sp"
+                                                android:layout_marginEnd="6dp"/>
+
+                                            <!-- Show color gradient with single label -->
+                                            <LinearLayout
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:orientation="horizontal"
+                                                android:layout_marginEnd="4dp">
+
+                                                <View android:layout_width="20dp" android:layout_height="20dp"
+                                                    android:background="@color/analytics_grid_line_major"/>
+                                                <View android:layout_width="20dp" android:layout_height="20dp"
+                                                    android:background="@color/chart_scale_0"/>
+                                                <View android:layout_width="20dp" android:layout_height="20dp"
+                                                    android:background="@color/chart_scale_2"/>
+                                                <View android:layout_width="20dp" android:layout_height="20dp"
+                                                    android:background="@color/chart_scale_3"/>
+                                                <View android:layout_width="20dp" android:layout_height="20dp"
+                                                    android:background="@color/chart_scale_5"/>
+                                                <View android:layout_width="20dp" android:layout_height="20dp"
+                                                    android:background="@color/chart_scale_7"/>
+                                            </LinearLayout>
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="0% - 100%"
+                                                android:textSize="12sp"/>
+
+                                        </LinearLayout>
+
+                                    </LinearLayout>
 
                                 </LinearLayout>
 
@@ -377,7 +444,7 @@
                                     <ch.inf.usi.mindbricks.ui.charts.HourlyDistributionChartView
                                         android:id="@+id/hourlyDistributionChart"
                                         android:layout_width="match_parent"
-                                        android:layout_height="330dp" />
+                                        android:layout_height="600dp" />
 
                                 </LinearLayout>
 
@@ -400,7 +467,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Weekly Focus"
+                                        android:text="Average Weekly Focus"
                                         android:textColor="?android:textColorPrimary"
                                         android:textSize="20sp"
                                         android:textStyle="bold" />
@@ -408,44 +475,18 @@
                                     <ch.inf.usi.mindbricks.ui.charts.WeeklyFocusChartView
                                         android:id="@+id/weeklyFocusChart"
                                         android:layout_width="match_parent"
-                                        android:layout_height="330dp" />
-
+                                        android:layout_height="320dp" />
+                                    
                                 </LinearLayout>
 
                             </com.google.android.material.card.MaterialCardView>
 
-
-                            <!-- Energy Curve Card -->
-                            <com.google.android.material.card.MaterialCardView
+                            <com.google.android.material.divider.MaterialDivider
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="16dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:padding="16dp">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginBottom="12dp"
-                                        android:text="Energy Curve"
-                                        android:textColor="?android:textColorPrimary"
-                                        android:textSize="20sp"
-                                        android:textStyle="bold" />
-
-                                    <ch.inf.usi.mindbricks.ui.charts.EnergyCurveChartView
-                                        android:id="@+id/energyCurveChart"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="300dp" />
-
-                                </LinearLayout>
-
-                            </com.google.android.material.card.MaterialCardView>
+                                android:layout_height="match_parent"
+                                android:layout_margin="30dp"
+                                android:orientation="horizontal"
+                                android:thickness="0dp"/>
 
                         </LinearLayout>
 
@@ -491,46 +532,6 @@
                                     android:textSize="14sp" />
 
                             </LinearLayout>
-
-                            <!-- Daily Timeline Card -->
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="16dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:padding="16dp">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginBottom="12dp"
-                                        android:text="Recommended Study Times"
-                                        android:textColor="?android:textColorPrimary"
-                                        android:textSize="20sp"
-                                        android:textStyle="bold" />
-
-                                    <ch.inf.usi.mindbricks.ui.charts.DailyTimelineChartView
-                                        android:id="@+id/dailyTimelineChart"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="300dp" />
-
-                                </LinearLayout>
-
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <com.google.android.material.divider.MaterialDivider
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_margin="16dp"
-                                android:orientation="horizontal"
-                                android:thickness="1dp"/>
-
                             <!-- Session History Card -->
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="match_parent"
@@ -561,10 +562,16 @@
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:nestedScrollingEnabled="false" />
-
                                 </LinearLayout>
 
                             </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.divider.MaterialDivider
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_margin="40dp"
+                                android:orientation="horizontal"
+                                android:thickness="0dp"/>
 
                         </LinearLayout>
 
@@ -573,11 +580,11 @@
                 </FrameLayout>
 
             </FrameLayout>
-
+            
         </LinearLayout>
-
+        
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
+    
     <!-- Filter FAB -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/analyticsFilterFab"
