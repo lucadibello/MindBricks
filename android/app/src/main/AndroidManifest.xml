@@ -17,6 +17,10 @@
     <!-- Gallery Permissions -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
+    <!-- Significant Motion Permission -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"

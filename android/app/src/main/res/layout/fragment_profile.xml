@@ -67,7 +67,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_user_name">
-        <!-- ... (Coin balance content is unchanged) ... -->
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -96,7 +95,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/coin_balance_layout" />
 
-    <!-- START REFACTOR: Added ScrollView for expanding content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -121,7 +119,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingHorizontal="32dp">
-                <!-- ... (Sprint length content is unchanged) ... -->
+
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -154,7 +152,6 @@
                 android:layout_marginTop="24dp"
                 android:orientation="vertical"
                 android:paddingHorizontal="32dp">
-                <!-- ... (Tags content is unchanged) ... -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -179,7 +176,6 @@
                     tools:visibility="visible" />
             </LinearLayout>
 
-            <!-- ⭐️ START: ADDED SECTION FOR PURCHASED ITEMS ⭐️ -->
             <LinearLayout
                 android:id="@+id/purchased_items_layout"
                 android:layout_width="match_parent"
@@ -203,7 +199,6 @@
                     tools:itemCount="2"
                     tools:listitem="@layout/item_purchased_asset" />
 
-                <!-- Text to show when the user has not purchased any items -->
                 <TextView
                     android:id="@+id/purchased_items_empty_state"
                     android:layout_width="wrap_content"
@@ -216,10 +211,8 @@
                     tools:visibility="visible" />
 
             </LinearLayout>
-            <!-- ⭐️ END: ADDED SECTION FOR PURCHASED ITEMS ⭐️ -->
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-    <!-- END REFACTOR: Added ScrollView -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

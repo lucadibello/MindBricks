@@ -61,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             getOnBackPressedDispatcher().onBackPressed();
-            // added save_settings sound when leaving the settigs activity
+            // save_settings sound when leaving the settigs activity
             SoundPlayer.playSound(this, R.raw.save_settings);
             return true;
         }

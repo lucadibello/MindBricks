@@ -53,6 +53,7 @@ public class HomeFragment extends Fragment {
     private ConstraintLayout sessionDotsLayout;
 
     private PermissionManager.PermissionRequest audioPermissionRequest;
+    private PermissionManager.PermissionRequest motionPermissionRequest;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -74,6 +75,13 @@ public class HomeFragment extends Fragment {
                 Manifest.permission.RECORD_AUDIO,
                 this::startDefaultSession,
                 () -> Toast.makeText(getContext(), "Microphone permission is required for focus sessions.", Toast.LENGTH_LONG).show()
+        );
+
+        motionPermissionRequest = PermissionManager.registerSinglePermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION,
+                this::startDefaultSession,
+                () -> Toast.makeText(getContext(), "Significant motion permission is required for focus session.", Toast.LENGTH_LONG).show()
         );
     }
 
@@ -145,15 +153,22 @@ public class HomeFragment extends Fragment {
                 confirmEndSessionDialog();
             } else {
                 // Check for permission before starting
+
                 if (PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO)) {
                     startDefaultSession();
                 } else {
                     audioPermissionRequest.launch();
                 }
+
+                if (PermissionManager.hasPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION)) {
+                    startDefaultSession();
+                } else {
+                    motionPermissionRequest.launch();
+                }
             }
         });
 
-        // test questionnare
+        // test questionnaire
         Button testButton = view.findViewById(R.id.test_questionnaire_button);
         if (testButton != null) {
             testButton.setOnClickListener(v -> {
