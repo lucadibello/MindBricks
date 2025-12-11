@@ -160,13 +160,6 @@ public class OnboardingActivity extends AppCompatActivity {
             return false;
         }
 
-        // guard required sensor permission
-        // FIXME: the only required sensor is the mic -> what about luminance?
-        if (!PermissionManager.hasPermission(this, Manifest.permission.RECORD_AUDIO)) {
-            viewPager.setCurrentItem(PAGE_SENSORS, true);
-            Snackbar.make(viewPager, R.string.onboarding_error_microphone_required, Snackbar.LENGTH_SHORT).show();
-            return false;
-        }
 
         return true;
     }

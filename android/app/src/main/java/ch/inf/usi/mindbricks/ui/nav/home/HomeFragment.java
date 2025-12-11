@@ -163,15 +163,8 @@ public class HomeFragment extends Fragment {
                     startDefaultSession();
                 } else if (isFirstTime) {
                     prefsListener.setFirstSession(false);
-
-                    // Sequentially ask for the missing permissions.
-                    if (!hasAudio) {
-                        // Ask for audio
                         audioPermissionRequest.launch();
-                    } else {
-                        // ask for motion
                         motionPermissionRequest.launch();
-                    }
                 } else {
                     startDefaultSession();
                 }
