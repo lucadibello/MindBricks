@@ -140,7 +140,7 @@ public class HomeFragment extends Fragment {
         tagSpinner = view.findViewById(R.id.tag_spinner);
         startSessionButton = view.findViewById(R.id.start_stop_button);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
-        ImageView settingsIcon = view.findViewById(R.id.settings_icon);
+        settingsIcon = view.findViewById(R.id.settings_icon);
         cityView = view.findViewById(R.id.cityView);
 
         // Initialize cityViewModel before any observer uses it
