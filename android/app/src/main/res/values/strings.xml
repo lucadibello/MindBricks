@@ -100,6 +100,7 @@
     <string name="validation_error_name_required">Add your name so we can personalize your coaching.</string>
     <string name="validation_error_name_format">Use a real name (letters, accents, spaces, &amp; allowed).</string>
     <string name="validation_error_tag_name_format">Use letters/numbers with simple punctuation for tag names.</string>
+    <string name="validation_error_tag_name_too_long">Tag name must be 20 characters or less.</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
@@ -251,6 +252,8 @@
     <string name="default_sprint_length">25 minute</string>
     <string name="tags_label">Tags label</string>
     <string name="no_tags_defined">No tags defined</string>
+    <string name="my_items_label">My Items</string>
+    <string name="no_items_purchased">No items purchased yet</string>
     <string name="onboarding_sensors_pickup_fallback_in_use">
         fallback in use
     </string>

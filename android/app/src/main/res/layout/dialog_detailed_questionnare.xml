@@ -30,17 +30,41 @@
             android:orientation="vertical">
         </LinearLayout>
 
-        <!-- Submit Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/submit_button"
+        <!-- Buttons Container -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Submit Feedback"
-            android:textAllCaps="false"
+            android:orientation="horizontal"
             android:layout_marginTop="24dp"
-            android:paddingVertical="12dp"
-            app:cornerRadius="8dp"
-            style="@style/Widget.Material3.Button.ElevatedButton" />
+            android:gravity="center">
+
+            <!-- Skip Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/skip_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Skip"
+                android:textAllCaps="false"
+                android:paddingVertical="12dp"
+                android:layout_marginEnd="8dp"
+                app:cornerRadius="8dp"
+                style="@style/Widget.Material3.Button.OutlinedButton" />
+
+            <!-- Submit Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/submit_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Submit Feedback"
+                android:textAllCaps="false"
+                android:paddingVertical="12dp"
+                android:layout_marginStart="8dp"
+                app:cornerRadius="8dp"
+                style="@style/Widget.Material3.Button.ElevatedButton" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

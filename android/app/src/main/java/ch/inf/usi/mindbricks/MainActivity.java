@@ -1,6 +1,8 @@
 package ch.inf.usi.mindbricks;
 
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -13,6 +15,7 @@ import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
 public class MainActivity extends AppCompatActivity implements NavigationLocker {
 
     private ActivityMainBinding binding;
+    private boolean isNavigationEnabled = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,14 +26,30 @@ public class MainActivity extends AppCompatActivity implements NavigationLocker 
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        // Add touch listener to show toast when navigation is locked
+        binding.navView.setOnTouchListener((v, event) -> {
+            if (!isNavigationEnabled && event.getAction() == MotionEvent.ACTION_DOWN) {
+                Toast.makeText(MainActivity.this,
+                        "Navigation locked during focus session",
+                        Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override
     public void setNavigationEnabled(boolean enabled) {
+        isNavigationEnabled = enabled;
         if (binding != null) {
             for (int i = 0; i < binding.navView.getMenu().size(); i++) {
                 binding.navView.getMenu().getItem(i).setEnabled(enabled);
             }
+            // Visual feedback: change opacity and elevation
+            binding.navView.setAlpha(enabled ? 1.0f : 0.5f);
+            binding.navView.setElevation(enabled ?
+                    getResources().getDimension(R.dimen.bottom_nav_elevation) : 0f);
         }
     }
 }

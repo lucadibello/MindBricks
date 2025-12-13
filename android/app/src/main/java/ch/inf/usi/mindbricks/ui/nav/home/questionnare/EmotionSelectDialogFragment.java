@@ -88,23 +88,11 @@ public class EmotionSelectDialogFragment extends DialogFragment {
 
 
     private void onEmotionClicked(int emotionIndex) {
-        // Show choice dialog ->  skip or continue
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Would you like to answer more questions?")
-                .setMessage("This helps us understand your focus patterns better.")
-                .setPositiveButton("Yes, continue", (dialog, which) -> {
-                    if (listener != null) {
-                        listener.onEmotionSelected(emotionIndex, true);
-                    }
-                    dismiss();
-                })
-                .setNegativeButton("Skip", (dialog, which) -> {
-                    if (listener != null) {
-                        listener.onEmotionSelected(emotionIndex, false);
-                    }
-                    dismiss();
-                })
-                .show();
+        // Directly proceed to detailed questions
+        if (listener != null) {
+            listener.onEmotionSelected(emotionIndex, true);
+        }
+        dismiss();
     }
 
     private ImageView createEmotionImageView(int emotionIndex) {

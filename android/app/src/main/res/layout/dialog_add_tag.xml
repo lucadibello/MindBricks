@@ -11,13 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/onboarding_tags_dialog_name_label"
-        app:boxBackgroundMode="outline">
+        app:boxBackgroundMode="outline"
+        app:counterEnabled="true"
+        app:counterMaxLength="20">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editTagName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords" />
+            android:inputType="textCapWords"
+            android:maxLength="20" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

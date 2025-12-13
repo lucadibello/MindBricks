@@ -1,7 +1,9 @@
 package ch.inf.usi.mindbricks.model.questionnare;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import ch.inf.usi.mindbricks.model.visual.StudySession;
@@ -14,7 +16,8 @@ import ch.inf.usi.mindbricks.model.visual.StudySession;
 
                 // Delete questionnaire if session is deleted
                 onDelete = ForeignKey.CASCADE
-        ))
+        ),
+        indices = {@Index(value = "sessionId")})
 
 public class SessionQuestionnaire {
     @PrimaryKey(autoGenerate = true)
@@ -156,6 +159,7 @@ public class SessionQuestionnaire {
                 satisfactionRating + anticipationRating) / 5f;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "SessionQuestionnaire{" +

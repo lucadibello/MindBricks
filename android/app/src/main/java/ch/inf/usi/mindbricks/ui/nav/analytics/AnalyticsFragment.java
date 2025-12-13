@@ -419,12 +419,38 @@ public class AnalyticsFragment extends Fragment {
         viewModel.getSessionHistory().observe(getViewLifecycleOwner(), sessions -> {
             Log.d(TAG, "Session history received: " + (sessions != null ? sessions.size() + " items" : "null"));
             if (sessions != null) {
-                sessionHistoryAdapter.setData(sessions);
+                // for large datasets, update UI asynchronously to prevent blocking
+                // NOTE: this is done to avoid showing the spinner for a fraction of a second
+                if (sessions.size() > 100) {
+                    // Show progress bar for large datasets
+                    if (progressBar != null && historyContainer.getVisibility() == View.VISIBLE) {
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
 
-                // Update session count display
-                if (sessionCountText != null) {
-                    String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
-                    sessionCountText.setText(countText);
+                    // Use handler to avoid blocking main thread
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        sessionHistoryAdapter.setData(sessions);
+
+                        // Update session count display
+                        if (sessionCountText != null) {
+                            String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
+                            sessionCountText.setText(countText);
+                        }
+
+                        // Hide progress indicator
+                        if (progressBar != null) {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
+                } else {
+                    // For small datasets, update immediately
+                    sessionHistoryAdapter.setData(sessions);
+
+                    // Update session count display
+                    if (sessionCountText != null) {
+                        String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
+                        sessionCountText.setText(countText);
+                    }
                 }
             }
         });
@@ -604,19 +630,69 @@ public class AnalyticsFragment extends Fragment {
     }
 
     private void showSessionsForDay(StreakDay day) {
-        // TODO: Query database for sessions on this date
+        // Format the date nicely
+        Calendar cal = Calendar.getInstance();
+        cal.set(day.getYear(), day.getMonth(), day.getDayOfMonth());
+        String dateStr = dateFormat.format(cal.getTime());
 
-        String message = String.format(Locale.getDefault(),
-                "Day: %d/%d/%d\nStatus: %s\nMinutes: %d",
-                day.getDayOfMonth(), day.getMonth() + 1, day.getYear(),
-                day.getStatus().toString(),
-                day.getTotalMinutes()
-        );
+        // Build a nicely formatted message
+        StringBuilder message = new StringBuilder();
+        message.append("Date: ").append(dateStr).append("\n\n");
+
+        // Show study status with icon
+        // FIXME: I don't like emojis as they seem a bit cheap, but we need to see if we have enough time
+        String statusIcon;
+        String statusText = switch (day.getStatus()) {
+            case HIT_TARGET -> {
+                statusIcon = "✅";
+                yield "Goal Completed";
+            }
+            case PARTIAL -> {
+                statusIcon = "⏳";
+                yield "Partially Completed";
+            }
+            case EXCEPTIONAL -> {
+                statusIcon = "⭐";
+                yield "Exceptional!";
+            }
+            case NONE -> {
+                statusIcon = "❌";
+                yield "No Study";
+            }
+            default -> {
+                statusIcon = "❓";
+                yield "Unknown";
+            }
+        };
+        message.append(statusIcon).append(" ").append(statusText).append("\n\n");
+
+        // Show duration details
+        int totalMinutes = day.getTotalMinutes();
+        int hours = totalMinutes / 60;
+        int minutes = totalMinutes % 60;
+
+        if (hours > 0) {
+            message.append("Total Study Time: ").append(hours).append("h ").append(minutes).append("m\n");
+        } else {
+            message.append("Total Study Time: ").append(minutes).append(" minutes\n");
+        }
+
+        // Add motivational message based on status
+        message.append("\n");
+        if (day.getStatus() == StreakDay.StreakStatus.HIT_TARGET) {
+            message.append("Great job on reaching your goal!");
+        } else if (day.getStatus() == StreakDay.StreakStatus.EXCEPTIONAL) {
+            message.append("Outstanding effort! You exceeded your goal!");
+        } else if (day.getStatus() == StreakDay.StreakStatus.PARTIAL) {
+            message.append("Good effort! Keep building your streak.");
+        } else if (day.getStatus() == StreakDay.StreakStatus.NONE) {
+            message.append("Every day is a new opportunity to focus!");
+        }
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("Study Sessions")
-                .setMessage(message)
-                .setPositiveButton("OK", null)
+                .setTitle("Study Summary")
+                .setMessage(message.toString())
+                .setPositiveButton("Close", null)
                 .show();
     }
 

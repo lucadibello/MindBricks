@@ -49,6 +49,8 @@ public class DetailedQuestionsDialogFragment extends DialogFragment {
                 int satisfaction,
                 int anticipation
         );
+
+        void onQuestionnaireSkipped(int emotionIndex);
     }
 
     private interface RatingCallback {
@@ -97,6 +99,10 @@ public class DetailedQuestionsDialogFragment extends DialogFragment {
         // Set up submit button
         Button submitButton = view.findViewById(R.id.submit_button);
         submitButton.setOnClickListener(v -> onSubmitClicked());
+
+        // Set up skip button
+        Button skipButton = view.findViewById(R.id.skip_button);
+        skipButton.setOnClickListener(v -> onSkipClicked());
 
         Dialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle("How did you feel during this session?")
@@ -161,6 +167,13 @@ public class DetailedQuestionsDialogFragment extends DialogFragment {
                     satisfactionRating,
                     anticipationRating
             );
+        }
+        dismiss();
+    }
+
+    private void onSkipClicked() {
+        if (listener != null) {
+            listener.onQuestionnaireSkipped(emotionIndex);
         }
         dismiss();
     }

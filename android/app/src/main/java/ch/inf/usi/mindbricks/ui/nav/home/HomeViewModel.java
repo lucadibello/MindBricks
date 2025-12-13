@@ -5,11 +5,7 @@ import android.app.Application;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.concurrent.ExecutorService;
@@ -19,7 +15,9 @@ import java.util.concurrent.TimeUnit;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.NotificationHelper;
 import ch.inf.usi.mindbricks.util.PermissionManager;
+import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
+import ch.inf.usi.mindbricks.util.VibrationHelper;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.Tag;
@@ -36,10 +34,17 @@ public class HomeViewModel extends AndroidViewModel {
         LONG_PAUSE
     }
 
+    public enum NextPhase {
+        FOCUS,
+        SHORT_BREAK,
+        LONG_BREAK
+    }
+
     private CountDownTimer timer;
 
     public final MutableLiveData<Long> currentTime = new MutableLiveData<>(0L);
     public final MutableLiveData<PomodoroState> currentState = new MutableLiveData<>(PomodoroState.IDLE);
+    public final MutableLiveData<NextPhase> nextPhase = new MutableLiveData<>(NextPhase.FOCUS);
     public final MutableLiveData<Integer> earnedCoinsEvent = new MutableLiveData<>();
 
     public final MutableLiveData<Long> studyElapsedTime = new MutableLiveData<>(0L);
@@ -72,15 +77,43 @@ public class HomeViewModel extends AndroidViewModel {
         }
 
         this.sessionCounter = 0;
+        nextPhase.setValue(NextPhase.FOCUS);
+        // Start the first study session
         startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes, hasMicPermission);
     }
 
+    // Continues to the next phase based on the current nextPhase value
+    public void continueToNextPhase(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes) {
+        if (currentState.getValue() != PomodoroState.IDLE) {
+            return;
+        }
+
+        NextPhase phase = nextPhase.getValue();
+        if (phase == null) phase = NextPhase.FOCUS;
+
+        switch (phase) {
+            case FOCUS:
+                boolean hasMicPermission = PermissionManager.hasPermission(getApplication(), Manifest.permission.RECORD_AUDIO);
+                startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes, hasMicPermission);
+                break;
+            case SHORT_BREAK:
+                startPauseSession(false, studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
+                break;
+            case LONG_BREAK:
+                startPauseSession(true, studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
+                break;
+        }
+    }
+
+
+    // Starts a study session
     private void startStudySession(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes, boolean startSensorService) {
         this.sessionCounter++;
         currentState.setValue(PomodoroState.STUDY);
         long studyDurationMillis = TimeUnit.MINUTES.toMillis(studyDurationMinutes);
 
         SoundPlayer.playSound(getApplication(), R.raw.start_session);
+        VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_START);
 
         long startTime = System.currentTimeMillis();
         String tagName = (currentSessionTag != null) ? currentSessionTag.title() : "General";
@@ -119,6 +152,8 @@ public class HomeViewModel extends AndroidViewModel {
             @Override
             public void onFinish() {
                 SoundPlayer.playSound(getApplication(), R.raw.end_session);
+                VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_END);
+                // Stop Service and complete Session
                 completeSessionAndStopService();
                 notificationHelper.showNotification("Study Complete!", "Time for a well-deserved break.", 1);
                 earnedCoinsEvent.postValue(3);
@@ -132,10 +167,8 @@ public class HomeViewModel extends AndroidViewModel {
         }.start();
     }
 
-    private void completeSession(long sessionID){
-        showQuestionnaireEvent.postValue(sessionID);
-    }
-
+    // Starts a pause session
+    // help source: https://www.reddit.com/r/developersIndia/comments/v5b06t/i_built_a_pomodoro_timer_to_demonstrate_how_a/
     private void startPauseSession(boolean isLongPause, int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes) {
         long pauseDurationMillis;
         if (isLongPause) {
@@ -156,6 +189,7 @@ public class HomeViewModel extends AndroidViewModel {
             public void onFinish() {
                 if (isLongPause) {
                     SoundPlayer.playSound(getApplication(), R.raw.end_cycle);
+                    VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.CYCLE_COMPLETE);
                     notificationHelper.showNotification("Cycle Complete!", "Great work!", 2);
                     stopTimerAndReset();
                 } else {
@@ -167,16 +201,75 @@ public class HomeViewModel extends AndroidViewModel {
         }.start();
     }
 
+    // Skips the current step and proceeds to the next one in the cycle
+    public void skipCurrentStep() {
+        if (timer != null) {
+            timer.cancel();
+        }
+
+        PomodoroState state = currentState.getValue();
+        if (state == null) state = PomodoroState.IDLE;
+
+        // Get the stored durations from preferences
+        PreferencesManager prefs = new PreferencesManager(getApplication());
+        int studyDuration = prefs.getTimerStudyDuration();
+        int shortPauseDuration = prefs.getTimerShortPauseDuration();
+        int longPauseDuration = prefs.getTimerLongPauseDuration();
+
+        switch (state) {
+            case STUDY:
+                // Complete the current study session and prepare for break
+                SoundPlayer.playSound(getApplication(), R.raw.end_session);
+                VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_CANCELLED);
+                completeSessionAndStopService();
+
+                // Set up for next phase but don't start timer
+                currentState.setValue(PomodoroState.IDLE);
+                if (sessionCounter < 4) {
+                    // Prepare for short break
+                    nextPhase.setValue(NextPhase.SHORT_BREAK);
+                    currentTime.setValue(TimeUnit.MINUTES.toMillis(shortPauseDuration));
+                } else {
+                    // Prepare for long break
+                    nextPhase.setValue(NextPhase.LONG_BREAK);
+                    currentTime.setValue(TimeUnit.MINUTES.toMillis(longPauseDuration));
+                }
+                break;
+
+            case PAUSE:
+            case LONG_PAUSE:
+                // If it was a long pause, reset the cycle first (before state change)
+                if (state == PomodoroState.LONG_PAUSE) {
+                    SoundPlayer.playSound(getApplication(), R.raw.end_cycle);
+                    VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.CYCLE_COMPLETE);
+                    sessionCounter = 0;
+                }
+
+                // Prepare for next study session but don't start timer
+                currentState.setValue(PomodoroState.IDLE);
+                nextPhase.setValue(NextPhase.FOCUS);
+                currentTime.setValue(TimeUnit.MINUTES.toMillis(studyDuration));
+                break;
+
+            default:
+                // Already idle, do nothing
+                break;
+        }
+    }
+
+    // Stops the timer and resets the state to IDLE
     public void stopTimerAndReset() {
         if (timer != null) {
             timer.cancel();
             if(currentState.getValue() == PomodoroState.STUDY){
                 SoundPlayer.playSound(getApplication(), R.raw.end_session);
+                VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_CANCELLED);
             }
         }
         completeSessionAndStopService();
         this.sessionCounter = 0;
         currentState.setValue(PomodoroState.IDLE);
+        nextPhase.setValue(NextPhase.FOCUS);
         currentTime.setValue(0L);
         studyElapsedTime.setValue(0L);
     }

@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <!-- Internet: needed to download the generated avatar from the APIs -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Vibration: needed for haptic feedback during key moments -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     
     <!-- Service Permissions -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
