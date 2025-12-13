@@ -3,6 +3,7 @@ package ch.inf.usi.mindbricks.ui.nav.home;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,15 +24,19 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.TransitionManager;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import android.widget.Spinner;
-import ch.inf.usi.mindbricks.model.Tag;
-
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
 import ch.inf.usi.mindbricks.ui.nav.home.questionnare.DetailedQuestionsDialogFragment;
@@ -39,6 +45,9 @@ import ch.inf.usi.mindbricks.ui.settings.SettingsActivity;
 import ch.inf.usi.mindbricks.util.PermissionManager;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
+import ch.inf.usi.mindbricks.util.Tags;
+import ch.inf.usi.mindbricks.util.ValidationResult;
+import ch.inf.usi.mindbricks.util.validators.TagValidator;
 
 public class HomeFragment extends Fragment {
 
@@ -177,7 +186,7 @@ public class HomeFragment extends Fragment {
                 }
                 // If we're starting a break, continue to the next phase
                 else if (nextPhase == HomeViewModel.NextPhase.SHORT_BREAK ||
-                         nextPhase == HomeViewModel.NextPhase.LONG_BREAK) {
+                        nextPhase == HomeViewModel.NextPhase.LONG_BREAK) {
                     startNextPhase();
                 }
                 // Otherwise, start new cycle
@@ -368,17 +377,17 @@ public class HomeFragment extends Fragment {
                     case FOCUS:
                         startSessionButton.setText(R.string.start_session);
                         startSessionButton.setBackgroundTintList(
-                            getResources().getColorStateList(R.color.analytics_accent_blue, null));
+                                getResources().getColorStateList(R.color.analytics_accent_blue, null));
                         break;
                     case SHORT_BREAK:
                         startSessionButton.setText("Start Break");
                         startSessionButton.setBackgroundTintList(
-                            getResources().getColorStateList(R.color.analytics_accent_green, null));
+                                getResources().getColorStateList(R.color.analytics_accent_green, null));
                         break;
                     case LONG_BREAK:
                         startSessionButton.setText("Start Long Break");
                         startSessionButton.setBackgroundTintList(
-                            getResources().getColorStateList(R.color.analytics_accent_purple, null));
+                                getResources().getColorStateList(R.color.analytics_accent_purple, null));
                         break;
                 }
                 break;
@@ -386,7 +395,7 @@ public class HomeFragment extends Fragment {
             case STUDY:
                 startSessionButton.setText("End Focus");
                 startSessionButton.setBackgroundTintList(
-                    getResources().getColorStateList(R.color.md_theme_error, null));
+                        getResources().getColorStateList(R.color.md_theme_error, null));
                 stateLabel.setText("Focusing...");
                 stateLabel.setTextColor(getResources().getColor(R.color.md_theme_error, null));
                 stateLabel.setVisibility(View.VISIBLE);
@@ -395,7 +404,7 @@ public class HomeFragment extends Fragment {
             case PAUSE:
                 startSessionButton.setText("Skip Break");
                 startSessionButton.setBackgroundTintList(
-                    getResources().getColorStateList(R.color.analytics_accent_green, null));
+                        getResources().getColorStateList(R.color.analytics_accent_green, null));
                 stateLabel.setText("Short Break");
                 stateLabel.setTextColor(getResources().getColor(R.color.analytics_accent_green, null));
                 stateLabel.setVisibility(View.VISIBLE);
@@ -404,7 +413,7 @@ public class HomeFragment extends Fragment {
             case LONG_PAUSE:
                 startSessionButton.setText("Skip Long Break");
                 startSessionButton.setBackgroundTintList(
-                    getResources().getColorStateList(R.color.analytics_accent_purple, null));
+                        getResources().getColorStateList(R.color.analytics_accent_purple, null));
                 stateLabel.setText("Long Break");
                 stateLabel.setTextColor(getResources().getColor(R.color.analytics_accent_purple, null));
                 stateLabel.setVisibility(View.VISIBLE);
