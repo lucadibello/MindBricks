@@ -58,7 +58,7 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
 
         List<ShopItem> items = new ArrayList<>();
         items.add(new ShopItem("building_1", "house1",  1, R.drawable.house1));
-        items.add(new ShopItem("building_2", "house2",2,  R.drawable.house1));
+        items.add(new ShopItem("building_2", "house2",2,  R.drawable.house2));
         items.add(new ShopItem("building_3", "house3", 3, R.drawable.ic_avatar_placeholder));
         items.add(new ShopItem("building_4", "house4", 10, R.drawable.ic_coin_icon));
         items.add(new ShopItem("building_5", "house5", 5, R.drawable.ic_home_black_24dp));

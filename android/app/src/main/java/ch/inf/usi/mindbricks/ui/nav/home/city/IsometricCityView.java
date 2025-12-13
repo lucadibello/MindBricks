@@ -7,12 +7,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
@@ -69,8 +72,16 @@ public class IsometricCityView extends View {
 
             // Draw building if assigned
             if (slot.getBuildingResId() != null) {
-                Bitmap buildingBitmap = BitmapFactory.decodeResource(getResources(), slot.getBuildingResId());
-                canvas.drawBitmap(buildingBitmap, null, new android.graphics.Rect((int) left, (int) top, (int) right, (int) bottom), null);
+                Bitmap buildingBitmap = BitmapFactory.decodeResource(
+                        getResources(),
+                        slot.getBuildingResId()
+                );
+                canvas.drawBitmap(
+                        buildingBitmap,
+                        null,
+                        new Rect((int) left, (int) top, (int) right, (int) bottom),
+                        null
+                );
             }
         }
     }
@@ -107,14 +118,33 @@ public class IsometricCityView extends View {
         Context context = getContext();
         PreferencesManager prefs = new PreferencesManager(context);
 
-        String[] purchasedBuildings = {"House 1"};
-        Integer[] buildingResIds = {R.drawable.house1};
+        Set<String> purchasedIds = prefs.getPurchasedItemIds();
+
+        if (purchasedIds == null || purchasedIds.isEmpty()) {
+            Toast.makeText(context, "You need to own a building first!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        List<String> names = new ArrayList<>();
+        List<Integer> resIds = new ArrayList<>();
+
+        for (String id : purchasedIds) {
+            if (id.equals("building_1")) {
+                names.add("house1");
+                resIds.add(R.drawable.house1);
+            }
+            if (id.equals("building_2")) {
+                names.add("house2");
+                resIds.add(R.drawable.house2);
+            }
+        }
+
+        if (names.isEmpty()) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Select Building");
 
-        builder.setItems(purchasedBuildings, (dialog, which) -> {
-            slot.setBuildingResId(buildingResIds[which]);
+        builder.setItems(names.toArray(new String[0]), (dialog, which) -> {
+            slot.setBuildingResId(resIds.get(which));
             invalidate();
         });
 
