@@ -8,23 +8,6 @@
     android:background="?android:colorBackground"
     android:padding="24dp">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Timer Settings"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary"/>
-
-
-    </FrameLayout>
-
     <!-- Study Session Settings -->
     <TextView
         android:layout_width="wrap_content"
@@ -50,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:valueFrom="15.0"
-        android:valueTo="60.0"
+        android:valueTo="120.0"
         android:stepSize="5.0"
         android:value="25.0" />
 
@@ -113,20 +96,5 @@
         android:valueTo="45.0"
         android:stepSize="5.0"
         android:value="15.0" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <!-- Save Button -->
-    <Button
-        android:id="@+id/save_settings_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save and Close"
-        android:padding="16dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="32dp"/>
 
 </LinearLayout>

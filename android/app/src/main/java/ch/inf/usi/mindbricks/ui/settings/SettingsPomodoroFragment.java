@@ -5,26 +5,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.slider.Slider;
-import com.google.android.material.textview.MaterialTextView;
 
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
-import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 public class SettingsPomodoroFragment extends Fragment {
 
-    private MaterialTextView studyDurationText;
+    private TextView studyDurationText;
     private Slider studyDurationSlider;
-    private MaterialTextView pauseDurationText;
+    private TextView pauseDurationText;
     private Slider pauseDurationSlider;
-    private MaterialTextView longPauseDurationText;
+    private TextView longPauseDurationText;
     private Slider longPauseDurationSlider;
 
     private PreferencesManager prefs;
@@ -32,7 +32,7 @@ public class SettingsPomodoroFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_settings_pomodoro, container, false);
+        return inflater.inflate(R.layout.fragment_settings, container, false);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class SettingsPomodoroFragment extends Fragment {
 
     }
 
-    private void updateLabel(MaterialTextView label, int minutes) {
+    private void updateLabel(TextView label, int minutes) {
         label.setText(String.format(Locale.getDefault(), "%d min", minutes));
     }
 }
