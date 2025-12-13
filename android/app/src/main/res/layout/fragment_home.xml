@@ -90,7 +90,8 @@
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tag_spinner"
-        app:layout_constraintVertical_bias="0.522" />
+        app:layout_constraintVertical_bias="0.522"
+        />
 
     <!-- Timer TextView -->
     <TextView

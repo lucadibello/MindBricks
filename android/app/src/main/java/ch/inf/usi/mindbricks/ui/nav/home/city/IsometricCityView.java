@@ -38,26 +38,49 @@ public class IsometricCityView extends View {
 
         if (slots == null || slots.isEmpty()) return;
 
-        // Determine grid size dynamically
+        // Determine grid size
         int maxCol = 0, maxRow = 0;
         for (CitySlot slot : slots) {
             if (slot.getCol() > maxCol) maxCol = slot.getCol();
             if (slot.getRow() > maxRow) maxRow = slot.getRow();
         }
 
-        float slotWidth = (float) getWidth() / (maxCol + 1);
-        float slotHeight = (float) getHeight() / (maxRow + 1);
+        float cellWidth = getWidth() / (float) (maxCol + maxRow + 2);
+        float cellHeight = getHeight() / (float) (maxCol + maxRow + 2);
 
         for (CitySlot slot : slots) {
-            float left = slot.getCol() * slotWidth;
-            float top = slot.getRow() * slotHeight;
-            float right = left + slotWidth;
-            float bottom = top + slotHeight;
+            // Convert grid to isometric coordinates
+            float isoX = (slot.getCol() - slot.getRow()) * cellWidth / 2 + getWidth() / 2f;
+            float isoY = (slot.getCol() + slot.getRow()) * cellHeight / 2;
 
-            // Draw slot fill (green if unlocked, red if locked)
-            canvas.drawRect(left, top, right, bottom, slot.isUnlocked() ? paintUnlocked : paintLocked);
-            // Draw slot outline
-            canvas.drawRect(left, top, right, bottom, paintOutline);
+            // Draw diamond shape
+            float halfWidth = cellWidth / 2f;
+            float halfHeight = cellHeight / 2f;
+
+            float[] points = {
+                    isoX, isoY - halfHeight,      // top
+                    isoX + halfWidth, isoY,       // right
+                    isoX, isoY + halfHeight,      // bottom
+                    isoX - halfWidth, isoY        // left
+            };
+
+            // Fill the diamond
+            Paint paint = slot.isUnlocked() ? paintUnlocked : paintLocked;
+            canvas.drawPath(createDiamondPath(points), paint);
+
+            // Draw outline
+            canvas.drawPath(createDiamondPath(points), paintOutline);
         }
     }
+
+    private android.graphics.Path createDiamondPath(float[] points) {
+        android.graphics.Path path = new android.graphics.Path();
+        path.moveTo(points[0], points[1]);
+        path.lineTo(points[2], points[3]);
+        path.lineTo(points[4], points[5]);
+        path.lineTo(points[6], points[7]);
+        path.close();
+        return path;
+    }
+
 }
