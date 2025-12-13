@@ -113,6 +113,7 @@ public class HomeViewModel extends AndroidViewModel {
         long studyDurationMillis = TimeUnit.MINUTES.toMillis(studyDurationMinutes);
 
         SoundPlayer.playSound(getApplication(), R.raw.start_session);
+        VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_START);
 
         // Save new session (to get its id) + start foreground service
         long startTime = System.currentTimeMillis();
@@ -152,6 +153,7 @@ public class HomeViewModel extends AndroidViewModel {
             @Override
             public void onFinish() {
                 SoundPlayer.playSound(getApplication(), R.raw.end_session);
+                VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_END);
                 // Stop Service and complete Session
                 completeSessionAndStopService();
                 notificationHelper.showNotification("Study Complete!", "Time for a well-deserved break.", 1);
@@ -167,10 +169,6 @@ public class HomeViewModel extends AndroidViewModel {
                 }
             }
         }.start();
-    }
-
-    private void completeSession(long sessionID){
-        showQuestionnaireEvent.postValue(sessionID);
     }
 
     // Starts a pause session
@@ -197,6 +195,7 @@ public class HomeViewModel extends AndroidViewModel {
                 // end the cycle if long pause
                 if (isLongPause) {
                     SoundPlayer.playSound(getApplication(), R.raw.end_cycle);
+                    VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.CYCLE_COMPLETE);
                     notificationHelper.showNotification("Cycle Complete!", "Great work!", 2);
                     stopTimerAndReset();
                 } else {
@@ -271,6 +270,7 @@ public class HomeViewModel extends AndroidViewModel {
             timer.cancel();
             if(currentState.getValue() == PomodoroState.STUDY){
                 SoundPlayer.playSound(getApplication(), R.raw.end_session);
+                VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_CANCELLED);
             }
         }
         completeSessionAndStopService();
