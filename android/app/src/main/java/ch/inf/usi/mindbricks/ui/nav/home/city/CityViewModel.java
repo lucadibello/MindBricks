@@ -4,32 +4,43 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CityViewModel extends ViewModel {
 
-    private final CityRepository repository = new CityRepository();
+    private final List<CitySlot> internalSlots = new ArrayList<>();
     private final MutableLiveData<List<CitySlot>> slotsLiveData = new MutableLiveData<>();
-
-    public CityViewModel() {
-        slotsLiveData.setValue(repository.getSlots());
-    }
 
     public LiveData<List<CitySlot>> getSlots() {
         return slotsLiveData;
     }
 
-    // called from HomeViewModel time updates
-    public void onStudyTimeUpdated(long millisElapsed) {
-        int minutes = (int) (millisElapsed / 60000);
-        int unlockedSlots = minutes / 5;
-
-        repository.unlockSlots(unlockedSlots);
-        slotsLiveData.postValue(repository.getSlots());
+    // Initialize a grid of slots, mark the first one as unlocked
+    public void initializeSlots(int rows, int cols) {
+        internalSlots.clear();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                boolean unlocked = (r == 0 && c == 0); // first slot unlocked
+                internalSlots.add(new CitySlot(r, c, unlocked));
+            }
+        }
+        slotsLiveData.setValue(new ArrayList<>(internalSlots));
     }
 
-    public void placeBuilding(CitySlot slot, int buildingId) {
-        slot.setBuildingId(buildingId);
-        slotsLiveData.postValue(repository.getSlots());
+    // Unlock a random locked slot
+    public void unlockRandomSlot() {
+        List<CitySlot> lockedSlots = new ArrayList<>();
+        for (CitySlot slot : internalSlots) {
+            if (!slot.isUnlocked()) lockedSlots.add(slot);
+        }
+
+        if (!lockedSlots.isEmpty()) {
+            int randomIndex = (int) (Math.random() * lockedSlots.size());
+            lockedSlots.get(randomIndex).setUnlocked(true);
+        }
+
+        // Trigger LiveData observer
+        slotsLiveData.setValue(new ArrayList<>(internalSlots));
     }
 }

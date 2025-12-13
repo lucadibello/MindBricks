@@ -7,7 +7,6 @@
     android:layout_height="match_parent">
 
     <!-- question. testing-->
-
     <Button
         android:id="@+id/test_questionnaire_button"
         android:layout_width="wrap_content"
@@ -62,32 +61,36 @@
         app:layout_constraintStart_toEndOf="@+id/ic_coin_image"
         app:layout_constraintTop_toTopOf="@+id/ic_coin_image" />
 
+
+
     <!-- Tag Spinner -->
     <Spinner
         android:id="@+id/tag_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:layout_marginBottom="8dp"
-        android:minWidth="150dp"
         android:gravity="center"
+        android:minWidth="150dp"
         android:spinnerMode="dropdown"
-        app:layout_constraintBottom_toTopOf="@+id/imageView"
+        app:layout_constraintBottom_toTopOf="@+id/timer_text_view"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.467"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_icon" />
-
+        app:layout_constraintTop_toBottomOf="@+id/settings_icon"
+        app:layout_constraintVertical_bias="0.046" />
 
     <!-- Main Image -->
     <ch.inf.usi.mindbricks.ui.nav.home.city.IsometricCityView
         android:id="@+id/cityView"
-        android:layout_width="320dp"
-        android:layout_height="275dp"
+        android:layout_width="322dp"
+        android:layout_height="283dp"
         android:background="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/timer_text_view"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tag_spinner" />
+        app:layout_constraintTop_toBottomOf="@+id/tag_spinner"
+        app:layout_constraintVertical_bias="0.522" />
 
     <!-- Timer TextView -->
     <TextView

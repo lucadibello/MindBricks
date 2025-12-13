@@ -8,10 +8,17 @@ public class CityRepository {
     private final List<CitySlot> slots = new ArrayList<>();
 
     public CityRepository() {
+        // Initialize a default 5x5 grid
+        initSlots(5, 5);
+    }
+
+    public void initSlots(int rows, int cols) {
+        slots.clear();
         int id = 0;
-        for (int row = 0; row < 5; row++) {
-            for (int col = 0; col < 5; col++) {
-                slots.add(new CitySlot(id++, row, col));
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                boolean unlocked = (id == 0); // base slot always unlocked
+                slots.add(new CitySlot(row, col, unlocked));
             }
         }
     }
@@ -21,10 +28,8 @@ public class CityRepository {
     }
 
     public void unlockSlots(int count) {
-        for (int i = 0; i < slots.size(); i++) {
-            if (i < count) {
-                slots.get(i).unlock();
-            }
+        for (int i = 0; i < slots.size() && i < count; i++) {
+            slots.get(i).setUnlocked(true);
         }
     }
 }

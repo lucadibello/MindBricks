@@ -1,35 +1,19 @@
 package ch.inf.usi.mindbricks.ui.nav.home.city;
 
 public class CitySlot {
-
-    public final int id;
-    public final int row;
-    public final int col;
-
+    private final int row;
+    private final int col;
     private boolean unlocked;
-    private Integer buildingId;
 
-    public CitySlot(int id, int row, int col) {
-        this.id = id;
+    public CitySlot(int row, int col, boolean unlocked) {
         this.row = row;
         this.col = col;
-        this.unlocked = false;
-        this.buildingId = null;
+        this.unlocked = unlocked;
     }
 
-    public boolean isUnlocked() {
-        return unlocked;
-    }
+    public int getRow() { return row; }
+    public int getCol() { return col; }
 
-    public void unlock() {
-        this.unlocked = true;
-    }
-
-    public Integer getBuildingId() {
-        return buildingId;
-    }
-
-    public void setBuildingId(Integer buildingId) {
-        this.buildingId = buildingId;
-    }
+    public boolean isUnlocked() { return unlocked; }
+    public void setUnlocked(boolean unlocked) { this.unlocked = unlocked; }
 }
