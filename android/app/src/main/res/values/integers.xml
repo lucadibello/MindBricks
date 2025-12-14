@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Maximum length for tag names -->
+    <integer name="tag_name_max_length">35</integer>
+</resources>

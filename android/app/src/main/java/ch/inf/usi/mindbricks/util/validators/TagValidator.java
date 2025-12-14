@@ -14,11 +14,6 @@ import ch.inf.usi.mindbricks.util.ValidationResult;
 public final class TagValidator {
 
     /**
-     * Maximum length for tag names.
-     */
-    private static final int MAX_TAG_LENGTH = 35;
-
-    /**
      * The validation pattern for tag names.
      * (Source: <a href="https://stackoverflow.com/questions/888838/regular-expression-for-validating-names-and-surnames">stackoverflow</a>)
      */
@@ -34,10 +29,13 @@ public final class TagValidator {
         if (TextUtils.isEmpty(normalized)) {
             return ValidationResult.error(ctx.getString(R.string.onboarding_error_tag_name_required));
         }
-        if (normalized.length() > MAX_TAG_LENGTH) {
-            // getString(R.string.onboarding_tags_dialog_title, MAX_TAG_LENGTH);
-            return ValidationResult.error(ctx.getString(R.string.validation_error_tag_name_too_long, MAX_TAG_LENGTH));
+
+        // Get max length from shared resource
+        int maxTagLength = ctx.getResources().getInteger(R.integer.tag_name_max_length);
+        if (normalized.length() > maxTagLength) {
+            return ValidationResult.error(ctx.getString(R.string.validation_error_tag_name_too_long, maxTagLength));
         }
+
         if (!TITLE_PATTERN.matcher(normalized).matches()) {
             return ValidationResult.error(ctx.getString(R.string.validation_error_tag_name_format));
         }
