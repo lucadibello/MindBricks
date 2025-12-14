@@ -3,7 +3,6 @@ package ch.inf.usi.mindbricks.ui.nav.home;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -24,12 +23,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.TransitionManager;
 
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -47,9 +40,7 @@ import ch.inf.usi.mindbricks.ui.settings.SettingsActivity;
 import ch.inf.usi.mindbricks.util.PermissionManager;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
-import ch.inf.usi.mindbricks.util.Tags;
-import ch.inf.usi.mindbricks.util.ValidationResult;
-import ch.inf.usi.mindbricks.util.validators.TagValidator;
+import ch.inf.usi.mindbricks.util.TagManager;
 
 public class HomeFragment extends Fragment {
 
@@ -558,93 +549,26 @@ public class HomeFragment extends Fragment {
     }
 
     private void showAddTagDialog() {
-        // FIXME: this is mostly copied from the settings view. We should create a wrapper in order to avoid code duplication!!
+        PreferencesManager prefs = new PreferencesManager(requireContext());
 
-        // load the dialog view
-        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_tag, null);
-        TextInputLayout tagNameLayout = dialogView.findViewById(R.id.layoutTagName);
-        TextInputEditText editTagName = dialogView.findViewById(R.id.editTagName);
-        ChipGroup colorGroup = dialogView.findViewById(R.id.chipTagColors);
-
-        // configure all availble tag colors
-        int[] palette = Tags.getTagColorPalette(requireContext());
-        for (int i = 0; i < palette.length; i++) {
-            Chip chip = (Chip) LayoutInflater.from(requireContext())
-                    .inflate(R.layout.view_color_chip, colorGroup, false);
-            chip.setId(View.generateViewId());
-            chip.setChipBackgroundColor(ColorStateList.valueOf(palette[i]));
-            chip.setCheckable(true);
-            chip.setChecked(i == 0);
-            colorGroup.addView(chip);
-        }
-
-        // build dialog
-        MaterialAlertDialogBuilder builder =
-                new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(R.string.onboarding_tags_dialog_title)
-                        .setView(dialogView)
-                        .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
-                            // reset to previous selection if aborted
-                            tagSpinner.setSelection(1);
-                        })
-                        .setPositiveButton(R.string.onboarding_tags_dialog_add, null);
-
-        // create dialog + set listeners
-        AlertDialog dialog = builder.create();
-
-        // if user creates tag -> update spinner + select new tag
-        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setOnClickListener(v -> {
-                    // validate user input
-                    String title = editTagName.getText() != null ? editTagName.getText().toString().trim() : "";
-                    ValidationResult titleResult = TagValidator.validateTitle(title);
-                    if (!titleResult.isValid()) {
-                        tagNameLayout.setError(getString(titleResult.errorResId()));
-                        return;
-                    }
-                    tagNameLayout.setError(null);
-
-                    // get selected color
-                    int checkedChipId = colorGroup.getCheckedChipId();
-                    if (checkedChipId == View.NO_ID) {
-                        Toast.makeText(requireContext(), R.string.onboarding_error_tag_color_required, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    // if no color selected, assign default one
-                    Chip selected = colorGroup.findViewById(checkedChipId);
-                    ColorStateList chipBgColor = selected.getChipBackgroundColor();
-                    int color = chipBgColor != null ? chipBgColor.getDefaultColor() : android.graphics.Color.BLUE;
-
-                    // Save the new tag inside preferences (name + bg color)
-                    PreferencesManager prefs = new PreferencesManager(requireContext());
-                    List<Tag> currentTags = prefs.getUserTags();
-                    Tag newTag = new Tag(title, color);
-                    currentTags.add(newTag);
-                    prefs.setUserTags(currentTags);
-
+        // build + trigger dialog using TagManager
+        TagManager.showTagCreationDialog(
+                this,
+                prefs,
+                newTag -> {
                     // recreate tag spinner to include new tag
                     setupTagSpinner();
 
                     // Find and select the new tag
                     for (int i = 0; i < tagSpinner.getCount(); i++) {
                         Tag tag = (Tag) tagSpinner.getItemAtPosition(i);
-                        if (tag.title().equals(title) && tag.color() == color) {
+                        if (tag.title().equals(newTag.title()) && tag.color() == newTag.color()) {
                             tagSpinner.setSelection(i);
                             break;
                         }
                     }
-
-                    // close dialog
-                    dialog.dismiss();
-                }));
-
-        // if aborts creation -> reset to previous state
-        dialog.setOnCancelListener(d -> {
-            tagSpinner.setSelection(1); // select "no tag"
-        });
-
-        // show dialog
-        dialog.show();
+                },
+                () -> tagSpinner.setSelection(1) // reset to "no tag" on cancel
+        );
     }
 }

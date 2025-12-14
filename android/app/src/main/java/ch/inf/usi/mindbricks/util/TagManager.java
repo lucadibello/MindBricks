@@ -28,6 +28,13 @@ import ch.inf.usi.mindbricks.util.validators.TagValidator;
  */
 public class TagManager {
 
+    /**
+     * Callback interface for when a tag is created
+     */
+    public interface OnTagCreatedListener {
+        void onTagCreated(Tag tag);
+    }
+
     private final Fragment fragment;
     private final ChipGroup tagChipGroup;
     private final MaterialTextView tagEmptyState;
@@ -97,9 +104,19 @@ public class TagManager {
     }
 
     /**
-     * Shows a dialog to add a new tag
+     * Shows a dialog to add a new tag (with default behavior)
      */
     public void showAddTagDialog() {
+        showAddTagDialog(null, null);
+    }
+
+    /**
+     * Shows a dialog to add a new tag with custom callbacks
+     *
+     * @param onTagCreatedListener Callback invoked when a tag is created (optional)
+     * @param onCancelListener Callback invoked when dialog is cancelled (optional)
+     */
+    public void showAddTagDialog(OnTagCreatedListener onTagCreatedListener, Runnable onCancelListener) {
         // load the dialog view from the layout
         View dialogView = LayoutInflater.from(fragment.requireContext()).inflate(R.layout.dialog_add_tag, null);
 
@@ -124,7 +141,11 @@ public class TagManager {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(fragment.requireContext())
                 .setTitle(R.string.onboarding_tags_dialog_title)
                 .setView(dialogView)
-                .setNegativeButton(android.R.string.cancel, null)
+                .setNegativeButton(android.R.string.cancel, (d, which) -> {
+                    if (onCancelListener != null) {
+                        onCancelListener.run();
+                    }
+                })
                 .setPositiveButton(R.string.onboarding_tags_dialog_add, null);
 
         // show dialog and listen for positive button click
@@ -133,9 +154,9 @@ public class TagManager {
                 .setOnClickListener(v -> {
                     // validate tag name
                     String title = readText(editTagName);
-                    ValidationResult titleResult = TagValidator.validateTitle(title);
+                    ValidationResult titleResult = TagValidator.validateTitle(title, fragment.requireContext());
                     if (!titleResult.isValid()) {
-                        tagNameLayout.setError(fragment.getString(titleResult.errorResId()));
+                        tagNameLayout.setError(titleResult.msg());
                         return;
                     }
                     tagNameLayout.setError(null);
@@ -151,11 +172,115 @@ public class TagManager {
                     int color = chipBgColor.getDefaultColor();
 
                     // create tag and add to list
-                    tags.add(new Tag(title, color));
-                    renderTags();
+                    Tag newTag = new Tag(title, color);
+                    tags.add(newTag);
                     prefs.setUserTags(tags);
+
+                    // call callback if provided, otherwise render tags
+                    if (onTagCreatedListener != null) {
+                        onTagCreatedListener.onTagCreated(newTag);
+                    } else {
+                        renderTags();
+                    }
+
                     dialog.dismiss();
                 }));
+
+        // handle dialog cancellation
+        dialog.setOnCancelListener(d -> {
+            if (onCancelListener != null) {
+                onCancelListener.run();
+            }
+        });
+
+        dialog.show();
+    }
+
+    /**
+     * Static utility method to show tag creation dialog without TagManager instance
+     *
+     * @param fragment The fragment context
+     * @param prefs PreferencesManager instance
+     * @param onTagCreatedListener Callback invoked when a tag is created
+     * @param onCancelListener Callback invoked when dialog is cancelled (optional)
+     */
+    public static void showTagCreationDialog(Fragment fragment, PreferencesManager prefs,
+                                             OnTagCreatedListener onTagCreatedListener,
+                                             Runnable onCancelListener) {
+        // load the dialog view from the layout
+        View dialogView = LayoutInflater.from(fragment.requireContext()).inflate(R.layout.dialog_add_tag, null);
+
+        // extract fields from the view
+        TextInputLayout tagNameLayout = dialogView.findViewById(R.id.layoutTagName);
+        TextInputEditText editTagName = dialogView.findViewById(R.id.editTagName);
+        ChipGroup colorGroup = dialogView.findViewById(R.id.chipTagColors);
+
+        // load tag color selector for each available color
+        int[] palette = Tags.getTagColorPalette(fragment.requireContext());
+        for (int i = 0; i < palette.length; i++) {
+            Chip chip = (Chip) LayoutInflater.from(fragment.requireContext())
+                    .inflate(R.layout.view_color_chip, colorGroup, false);
+            chip.setId(View.generateViewId());
+            chip.setChipBackgroundColor(ColorStateList.valueOf(palette[i]));
+            chip.setCheckable(true);
+            chip.setChecked(i == 0);
+            colorGroup.addView(chip);
+        }
+
+        // create dialog with custom view
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(fragment.requireContext())
+                .setTitle(R.string.onboarding_tags_dialog_title)
+                .setView(dialogView)
+                .setNegativeButton(android.R.string.cancel, (d, which) -> {
+                    if (onCancelListener != null) {
+                        onCancelListener.run();
+                    }
+                })
+                .setPositiveButton(R.string.onboarding_tags_dialog_add, null);
+
+        // show dialog and listen for positive button click
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(d -> dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(v -> {
+                    // validate tag name
+                    String title = editTagName.getText() != null ? editTagName.getText().toString().trim() : "";
+                    ValidationResult titleResult = TagValidator.validateTitle(title, fragment.requireContext());
+                    if (!titleResult.isValid()) {
+                        tagNameLayout.setError(titleResult.msg());
+                        return;
+                    }
+                    tagNameLayout.setError(null);
+
+                    // get the selected color
+                    int checkedChipId = colorGroup.getCheckedChipId();
+                    if (checkedChipId == View.NO_ID) {
+                        Snackbar.make(fragment.requireView(), R.string.onboarding_error_tag_color_required, Snackbar.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Chip selected = colorGroup.findViewById(checkedChipId);
+                    ColorStateList chipBgColor = Objects.requireNonNull(selected.getChipBackgroundColor());
+                    int color = chipBgColor.getDefaultColor();
+
+                    // create tag and save to preferences
+                    Tag newTag = new Tag(title, color);
+                    List<Tag> currentTags = prefs.getUserTags();
+                    currentTags.add(newTag);
+                    prefs.setUserTags(currentTags);
+
+                    // call callback
+                    if (onTagCreatedListener != null) {
+                        onTagCreatedListener.onTagCreated(newTag);
+                    }
+
+                    dialog.dismiss();
+                }));
+
+        // handle dialog cancellation
+        dialog.setOnCancelListener(d -> {
+            if (onCancelListener != null) {
+                onCancelListener.run();
+            }
+        });
 
         dialog.show();
     }
