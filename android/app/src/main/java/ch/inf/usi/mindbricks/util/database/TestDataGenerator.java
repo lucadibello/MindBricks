@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
+import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
 
@@ -32,7 +33,33 @@ public class TestDataGenerator {
             try {
                 Log.d(TAG, "Generating " + numberOfSessions + " test sessions...");
 
-                List<StudySession> sessions = generateTestSessions(numberOfSessions);
+                // Define tag names
+                String[] subjects = {"Mathematics", "Physics", "Chemistry", "History", "English", "Computer Science"};
+
+                // random colors
+                int[] colors = {
+                        Color.rgb(33, 150, 243), // Blue
+                        Color.rgb(76, 175, 80), // Green
+                        Color.rgb(255, 152, 0), // Orange
+                        Color.rgb(156, 39, 176), // Purple
+                        Color.rgb(244, 67, 54), // Red
+                        Color.rgb(0, 150, 136) // Teal
+                };
+
+                long[] tagIds = new long[subjects.length];
+                for (int i = 0; i < subjects.length; i++) {
+                    // Check if tag exists
+                    Tag existingTag = db.tagDao().getTagByTitle(subjects[i]);
+                    if (existingTag != null) {
+                        tagIds[i] = existingTag.getId();
+                    } else {
+                        // Create new tag
+                        Tag tag = new Tag(subjects[i], colors[i]);
+                        tagIds[i] = db.tagDao().insert(tag);
+                    }
+                }
+
+                List<StudySession> sessions = generateTestSessions(numberOfSessions, tagIds);
 
                 // Insert each session and generate fake logs for it
                 for (StudySession session : sessions) {
@@ -82,21 +109,10 @@ public class TestDataGenerator {
     /**
      * Generate realistic test sessions.
      */
-    private static List<StudySession> generateTestSessions(int count) {
+    private static List<StudySession> generateTestSessions(int count, long[] tagIds) {
         List<StudySession> sessions = new ArrayList<>();
         Random random = new Random();
         Calendar calendar = Calendar.getInstance();
-
-        // Subjects for variety
-        String[] subjects = {"Mathematics", "Physics", "Chemistry", "History", "English", "Computer Science"};
-        int[] colors = {
-                Color.rgb(33, 150, 243),   // Blue
-                Color.rgb(76, 175, 80),    // Green
-                Color.rgb(255, 152, 0),    // Orange
-                Color.rgb(156, 39, 176),   // Purple
-                Color.rgb(244, 67, 54),    // Red
-                Color.rgb(0, 150, 136)     // Teal
-        };
 
         // Generate sessions spread over last 30 days
         for (int i = 0; i < count; i++) {
@@ -123,13 +139,11 @@ public class TestDataGenerator {
                 duration = 15 + random.nextInt(30); // 20% short sessions 15-45 min
             }
 
-            // Random subject
-            int subjectIndex = random.nextInt(subjects.length);
-            String subject = subjects[subjectIndex];
-            int color = colors[subjectIndex];
+            // Random tag
+            long tagId = tagIds[random.nextInt(tagIds.length)];
 
             // Create session
-            StudySession session = new StudySession(timestamp, duration, subject, color);
+            StudySession session = new StudySession(timestamp, duration, tagId);
 
             // Add realistic metrics
             // Focus score: generally good (60-95) with some variation
