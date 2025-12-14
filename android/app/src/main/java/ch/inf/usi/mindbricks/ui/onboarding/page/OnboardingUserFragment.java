@@ -136,9 +136,12 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
      * @return true if the name is valid, false otherwise
      */
     private boolean validateNameField() {
-        ValidationResult result = ProfileValidator.validateName(readText(editName));
+        ValidationResult result = ProfileValidator.validateName(
+                readText(editName),
+                requireContext()
+        );
         if (!result.isValid()) {
-            nameLayout.setError(getString(result.errorResId()));
+            nameLayout.setError(result.msg());
             return false;
         }
         nameLayout.setError(null);

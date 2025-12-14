@@ -107,7 +107,7 @@
     <string name="validation_error_name_required">Add your name so we can personalize your coaching.</string>
     <string name="validation_error_name_format">Use a real name (letters, accents, spaces, &amp; allowed).</string>
     <string name="validation_error_tag_name_format">Use letters/numbers with simple punctuation for tag names.</string>
-    <string name="validation_error_tag_name_too_long">Tag name must be 20 characters or less.</string>
+    <string name="validation_error_tag_name_too_long">Tag name must be %d characters or less.</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

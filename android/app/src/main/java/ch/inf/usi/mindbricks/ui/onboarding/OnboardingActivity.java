@@ -150,7 +150,10 @@ public class OnboardingActivity extends AppCompatActivity {
      */
     private boolean canCompleteOnboarding() {
         // ensure user has a valid name
-        ValidationResult nameResult = ProfileValidator.validateName(prefs.getUserName());
+        ValidationResult nameResult = ProfileValidator.validateName(
+                prefs.getUserName(),
+                this
+        );
         if (!nameResult.isValid()) {
             viewPager.setCurrentItem(PAGE_USER, true);
             Snackbar.make(viewPager, R.string.onboarding_error_profile_required, Snackbar.LENGTH_SHORT).show();

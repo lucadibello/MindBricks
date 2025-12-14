@@ -1,16 +1,16 @@
 package ch.inf.usi.mindbricks.util;
 
-import androidx.annotation.StringRes;
+import androidx.annotation.Nullable;
 
 /**
  * Record class that wraps validation results for easier management.
  */
-public record ValidationResult(boolean isValid, @StringRes int errorResId) {
+public record ValidationResult(boolean isValid, @Nullable String msg) {
     public static ValidationResult ok() {
-        return new ValidationResult(true, 0);
+        return new ValidationResult(true, null);
     }
 
-    public static ValidationResult error(@StringRes int errorResId) {
-        return new ValidationResult(false, errorResId);
+    public static ValidationResult error (String msg) {
+        return new ValidationResult(false, msg);
     }
 }
