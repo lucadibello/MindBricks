@@ -24,6 +24,7 @@
     <string name="profile_photo_source_title">Choose photo source</string>
     <string name="profile_photo_camera">Take photo</string>
     <string name="profile_photo_gallery">Choose from gallery</string>
+    <string name="camera_permission_denied">Camera permission is required to take photos</string>
     <string name="onboarding_profile_name_label">What should we call you?</string>
     <string name="onboarding_profile_goal_label">What project or habits do you want to focus on?</string>
     <string name="onboarding_tags_empty_state">Add tags to label each study session (e.g. Algorithms, UX Research, Physics).</string>

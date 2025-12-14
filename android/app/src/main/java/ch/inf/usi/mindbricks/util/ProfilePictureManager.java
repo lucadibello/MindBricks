@@ -1,6 +1,8 @@
 package ch.inf.usi.mindbricks.util;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
@@ -8,10 +10,12 @@ import android.widget.ImageView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +34,7 @@ public class ProfilePictureManager {
     private final PreferencesManager prefs;
     private final ActivityResultLauncher<PickVisualMediaRequest> photoPickerLauncher;
     private final ActivityResultLauncher<Uri> cameraLauncher;
+    private final ActivityResultLauncher<String> cameraPermissionLauncher;
     private Uri pendingCameraUri;
 
     /**
@@ -64,6 +69,22 @@ public class ProfilePictureManager {
                     pendingCameraUri = null;
                 }
         );
+
+        // register permission listener for fragment
+        this.cameraPermissionLauncher = fragment.registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        // permission granted -> launch camera
+                        launchCameraIntent();
+                    } else {
+                        // permission denied -> show message
+                        Snackbar.make(fragment.requireView(),
+                                R.string.camera_permission_denied,
+                                Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 
     /**
@@ -87,9 +108,25 @@ public class ProfilePictureManager {
     }
 
     /**
-     * Launches the device camera to take a photo
+     * Checks camera permission and launches camera if granted
+     * FIXME: we should also show the rationale if the user denied first time
      */
     private void launchCamera() {
+        // check if user granted permission
+        if (ContextCompat.checkSelfPermission(fragment.requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            // if granted -> open camera to take photo
+            launchCameraIntent();
+        } else {
+            // if not granted -> request + listen for result using registered callback
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    /**
+     * Launches the device camera to take a photo
+     */
+    private void launchCameraIntent() {
         try {
             Context context = fragment.requireContext();
             File photoFile = File.createTempFile(
