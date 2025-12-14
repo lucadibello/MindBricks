@@ -61,13 +61,4 @@ public abstract class AppDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
-
-    // WARNING
-    // must call getInstance() before using the database again!!!
-    public static void closeDatabase(){
-        if(INSTANCE != null && INSTANCE.isOpen()){
-            INSTANCE.close();
-            INSTANCE = null;
-        }
-    }
 }
