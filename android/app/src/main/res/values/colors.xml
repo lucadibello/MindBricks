@@ -95,6 +95,12 @@
     <color name="streak_selected">#9D83CE</color>
     <color name="streak_today_border">#6B4FBB</color>
 
+    <!-- PAM Score Colors -->
+    <color name="pam_high">#66BB6A</color>
+    <color name="pam_medium">#A5D6A7</color>
+    <color name="pam_medium_low">#9D83CE</color>
+    <color name="pam_low">#6B4FBB</color>
+
 
     <!-- confidence overlay -->
     <color name="confidence_overlay_low">#40FFFFFF</color>

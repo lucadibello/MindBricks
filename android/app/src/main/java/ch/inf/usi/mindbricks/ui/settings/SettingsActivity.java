@@ -23,7 +23,6 @@ import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.drivers.calendar.CalendarDriver;
 import ch.inf.usi.mindbricks.model.visual.calendar.CalendarSyncService;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
-import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
 
 
 public class SettingsActivity extends AppCompatActivity {

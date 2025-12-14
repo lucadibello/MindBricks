@@ -14,13 +14,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ch.inf.usi.mindbricks.model.visual.AIRecommendation;
 import ch.inf.usi.mindbricks.model.visual.DailyRings;
 import ch.inf.usi.mindbricks.model.visual.DateRange;
-import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
 import ch.inf.usi.mindbricks.model.visual.GoalRing;
 import ch.inf.usi.mindbricks.model.visual.HeatmapCell;
 import ch.inf.usi.mindbricks.model.visual.HourlyQuality;
@@ -30,6 +28,7 @@ import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
 import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
 import ch.inf.usi.mindbricks.repository.StudySessionRepository;
 import ch.inf.usi.mindbricks.util.database.DataProcessor;
+import ch.inf.usi.mindbricks.util.evaluation.RecommendationEngine;
 
 /**
  * ViewModel for Analytics screen.
@@ -47,7 +46,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
     // LiveData for different chart types
     private final MutableLiveData<WeeklyStats> weeklyStats = new MutableLiveData<>();
     private final MutableLiveData<List<TimeSlotStats>> hourlyStats = new MutableLiveData<>();
-    private final MutableLiveData<DailyRecommendation> dailyRecommendation = new MutableLiveData<>();
+    private final MutableLiveData<AIRecommendation> dailyRecommendation = new MutableLiveData<AIRecommendation>();
     private final MutableLiveData<List<StudySessionWithStats>> sessionHistory = new MutableLiveData<>();
     private final MutableLiveData<List<HourlyQuality>> energyCurveData = new MutableLiveData<>();
     private final MutableLiveData<List<HeatmapCell>> heatmapData = new MutableLiveData<>();
@@ -249,8 +248,13 @@ public class AnalyticsViewModel extends AndroidViewModel {
                 List<TimeSlotStats> hourly = DataProcessor.calculateHourlyDistribution(allSessions, dateRange);
                 hourlyStats.postValue(hourly);
 
-                DailyRecommendation recommendation = DataProcessor.generateDailyRecommendation(allSessions, dateRange);
-                dailyRecommendation.postValue(recommendation);
+                RecommendationEngine engine = new RecommendationEngine(getApplication());
+                AIRecommendation adaptiveSchedule = engine.generateAdaptiveSchedule(
+                        allSessions,
+                        System.currentTimeMillis()
+                );
+
+                dailyRecommendation.postValue(adaptiveSchedule);
                 Log.d(TAG, "Recommendations computed");
 
 
@@ -339,7 +343,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
         return hourlyStats;
     }
 
-    public LiveData<DailyRecommendation> getDailyRecommendation() {
+    public LiveData<AIRecommendation> getDailyRecommendation() {
         return dailyRecommendation;
     }
 

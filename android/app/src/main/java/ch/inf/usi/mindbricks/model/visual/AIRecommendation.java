@@ -7,7 +7,7 @@ import java.util.List;
 
 import ch.inf.usi.mindbricks.R;
 
-public class AIRecommendation {
+public class AIRecommendation extends DailyRecommendation{
 
     public enum ActivityType {
         DEEP_STUDY("Deep Study", R.color.activity_deep_study),

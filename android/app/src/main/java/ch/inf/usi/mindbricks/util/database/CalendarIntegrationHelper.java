@@ -134,4 +134,5 @@ public class CalendarIntegrationHelper {
     public List<CalendarEvent> getEventsInRange(long startTime, long endTime) {
         return repository.getEventsInRangeSync(startTime, endTime);
     }
+
 }

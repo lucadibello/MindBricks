@@ -1,23 +1,30 @@
 package ch.inf.usi.mindbricks.ui.nav.home;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.CountDownTimer;
+import android.util.Log;
+import android.widget.Toast;
+
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.model.evaluation.PAMScore;
+import ch.inf.usi.mindbricks.model.evaluation.UserPreferences;
 import ch.inf.usi.mindbricks.util.NotificationHelper;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
+import ch.inf.usi.mindbricks.util.UserPreferencesManager;
 import ch.inf.usi.mindbricks.util.VibrationHelper;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
@@ -25,6 +32,10 @@ import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
 import ch.inf.usi.mindbricks.service.SensorService;
+import ch.inf.usi.mindbricks.util.evaluation.BreakManager;
+import ch.inf.usi.mindbricks.util.evaluation.CueManager;
+import ch.inf.usi.mindbricks.util.evaluation.FeedbackManager;
+import ch.inf.usi.mindbricks.util.evaluation.TaskDifficultyRecommender;
 
 public class HomeViewModel extends AndroidViewModel {
 
@@ -172,15 +183,27 @@ public class HomeViewModel extends AndroidViewModel {
     // Starts a pause session
     // help source: https://www.reddit.com/r/developersIndia/comments/v5b06t/i_built_a_pomodoro_timer_to_demonstrate_how_a/
     private void startPauseSession(boolean isLongPause, int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes) {
-        long pauseDurationMillis;
-        if (isLongPause) {
-            currentState.setValue(PomodoroState.LONG_PAUSE);
-            pauseDurationMillis = TimeUnit.MINUTES.toMillis(longPauseDurationMinutes);
-        } else {
-            currentState.setValue(PomodoroState.PAUSE);
-            pauseDurationMillis = TimeUnit.MINUTES.toMillis(pauseDurationMinutes);
-        }
+        int baseBreakMinutes = isLongPause ? longPauseDurationMinutes : pauseDurationMinutes;
 
+        PAMScore lastPAM = AppDatabase.getInstance(getApplication())
+                .pamScoreDao()
+                .getLatestScore();
+
+        BreakManager breakManager = new BreakManager(getApplication());
+        int adaptedBreakMinutes = breakManager.calculateAdaptiveBreakDuration(
+                lastPAM, baseBreakMinutes, isLongPause
+        );
+
+        long pauseDurationMillis = TimeUnit.MINUTES.toMillis(adaptedBreakMinutes);
+
+        // Show explanation if break was adjusted
+        if (adaptedBreakMinutes != baseBreakMinutes) {
+            String explanation = breakManager.getBreakDurationExplanation(
+                    lastPAM, baseBreakMinutes, adaptedBreakMinutes
+            );
+
+            Toast.makeText(getApplication(), explanation, Toast.LENGTH_LONG).show();
+        }
         timer = new CountDownTimer(pauseDurationMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -329,6 +352,73 @@ public class HomeViewModel extends AndroidViewModel {
 
     public int getSessionCounter() {
         return sessionCounter;
+    }
+
+    public void onQuestionnaireCompleted(SessionQuestionnaire questionnaire) {
+        PAMScore pamScore = PAMScore.fromQuestionnaire(questionnaire);
+
+        PAMScore previousPAM = AppDatabase.getInstance(getApplication())
+                .pamScoreDao()
+                .getLatestScore();
+
+        if (previousPAM != null) {
+            pamScore.setPreviousTotalScore(previousPAM.getTotalScore());
+        }
+
+        new Thread(() -> {
+            long pamId = AppDatabase.getInstance(getApplication())
+                    .pamScoreDao()
+                    .insert(pamScore);
+        }).start();
+
+        CueManager envManager = new CueManager(getApplication());
+        envManager.applyCues(pamScore);
+
+        UserPreferencesManager prefsManager = new UserPreferencesManager(getApplication());
+        UserPreferences.PAMThresholds thresholds = prefsManager.getPAMThresholds();
+
+        FeedbackManager.FeedbackIntervention intervention =
+                FeedbackManager.detectAndRecommend(previousPAM, pamScore, thresholds);
+
+
+        List<PAMScore> last5Scores = AppDatabase.getInstance(getApplication())
+                .pamScoreDao()
+                .getLastNScores(5);
+
+        TaskDifficultyRecommender.TaskRecommendation taskRec =
+                TaskDifficultyRecommender.analyzeRecentSessions(last5Scores, thresholds);
+
+        if (taskRec.getAction() != TaskDifficultyRecommender.RecommendationAction.MAINTAIN_CURRENT) {
+            showTaskRecommendationDialog(taskRec);
+        }
+    }
+
+    private void showAffectiveInterventionDialog(FeedbackManager.FeedbackIntervention intervention) {
+
+        // Example using AlertDialog:
+        new AlertDialog.Builder(getApplication().getApplicationContext())
+                .setTitle(intervention.getTitle())
+                .setMessage(intervention.getMessage())
+                .setPositiveButton(intervention.getActionButton(), (dialog, which) -> {
+                    if (intervention.getType() == FeedbackManager.InterventionType.BREATHING_EXERCISE) {
+                        FeedbackManager.getBreathingExerciseSteps();
+                    }
+                })
+                .setNegativeButton("Later", null)
+                .show();
+    }
+
+    private void showTaskRecommendationDialog(TaskDifficultyRecommender.TaskRecommendation taskRec) {
+        StringBuilder message = new StringBuilder(taskRec.getReason() + "\n\nSuggestions:\n");
+        for (String suggestion : taskRec.getSpecificSuggestions()) {
+            message.append("• ").append(suggestion).append("\n");
+        }
+
+        new AlertDialog.Builder(getApplication().getApplicationContext())
+                .setTitle("Adjustment Recommended")
+                .setMessage(message.toString())
+                .setPositiveButton("Got it", null)
+                .show();
     }
 
     @Override

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.model.visual.AIRecommendation;
 import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
 
 /**
@@ -48,7 +49,7 @@ public class DailyTimelineChartView extends LinearLayout {
         slotsContainer = findViewById(R.id.dailyTimelineSlotsContainer);
     }
 
-    public void setData(DailyRecommendation recommendation) {
+    public void setData(AIRecommendation recommendation) {
         if (recommendation == null) {
             summaryText.setText("No recommendations available");
             summaryText.setTextColor(ContextCompat.getColor(getContext(), R.color.empty_state_text));

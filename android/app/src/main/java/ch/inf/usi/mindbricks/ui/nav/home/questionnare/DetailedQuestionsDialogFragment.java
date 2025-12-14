@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.util.FocusScoreCalculator;
 
 public class DetailedQuestionsDialogFragment extends DialogFragment {
 

@@ -9,12 +9,13 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import ch.inf.usi.mindbricks.model.Tag;
+import ch.inf.usi.mindbricks.model.evaluation.PAMScore;
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
 import ch.inf.usi.mindbricks.util.database.DatabaseSeeder;
 import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
-
+import ch.inf.usi.mindbricks.database.dao.PAMScoreDao;
 
 /**
  * Room database for MindBricks app
@@ -24,10 +25,11 @@ import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
         SessionSensorLog.class,
         SessionQuestionnaire.class,
         CalendarEvent.class,
-        Tag.class
+        Tag.class,
+        PAMScore.class
         },
-        version = 6,
-        exportSchema = false
+        version = 7,
+        exportSchema = true
 )
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -39,6 +41,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract SessionSensorLogDao sessionSensorLogDao();
     public abstract SessionQuestionnaireDao sessionQuestionnaireDao();
     public abstract CalendarEventDao calendarEventDao();
+    public abstract PAMScoreDao pamScoreDao();
 
     private static final RoomDatabase.Callback DB_CALLBACK = new RoomDatabase.Callback(){
         // called on the database thread -> safe
