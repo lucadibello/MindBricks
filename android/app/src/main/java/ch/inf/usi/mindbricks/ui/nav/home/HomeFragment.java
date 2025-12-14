@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
@@ -519,35 +520,54 @@ public class HomeFragment extends Fragment {
 
     private void setupTagSpinner() {
         PreferencesManager prefs = new PreferencesManager(requireContext());
-        List<Tag> tags = prefs.getUserTags();
 
-        // add default tag "No tag" (user doesn't have to create one for everything)
-        tags.add(0, new Tag("No tag", android.graphics.Color.GRAY));
+        // Load tags on background thread
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getInstance(requireContext());
 
-        // Add special "Create New Tag" option (last)
-        tags.add(new Tag("+ Create New Tag", getResources().getColor(R.color.analytics_accent_green, null)));
-
-        // setup spinner items - one component for each tag
-        TagSpinnerAdapter adapter = new TagSpinnerAdapter(requireContext(), tags);
-        tagSpinner.setAdapter(adapter);
-        tagSpinner.setSelection(0, false); // select "No tag" by default
-
-        // Handle tag selection
-        tagSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                Tag selectedTag = (Tag) parent.getItemAtPosition(position);
-                // Check if user selected "Create New Tag"
-                if (selectedTag.title().equals("+ Create New Tag")) {
-                    showAddTagDialog();
-                }
+            // Ensure default "No tag" exists
+            Tag defaultTag = db.tagDao().getTagByTitle("No tag");
+            if (defaultTag == null) {
+                defaultTag = new Tag("No tag", android.graphics.Color.GRAY);
+                long defaultTagId = db.tagDao().insert(defaultTag);
+                defaultTag.setId(defaultTagId);
             }
 
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {
-                // Do nothing
-            }
-        });
+            // Load user tags from preferences (will eventually migrate to database)
+            List<Tag> tags = new ArrayList<>(prefs.getUserTags());
+
+            // Add default tag at the beginning
+            Tag finalDefaultTag = defaultTag;
+            requireActivity().runOnUiThread(() -> {
+                tags.add(0, finalDefaultTag);
+
+                // Add special "Create New Tag" option (last)
+                Tag createNewTag = new Tag("+ Create New Tag", getResources().getColor(R.color.analytics_accent_green, null));
+                tags.add(createNewTag);
+
+                // setup spinner items - one component for each tag
+                TagSpinnerAdapter adapter = new TagSpinnerAdapter(requireContext(), tags);
+                tagSpinner.setAdapter(adapter);
+                tagSpinner.setSelection(0, false); // select "No tag" by default
+
+                // Handle tag selection
+                tagSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                        Tag selectedTag = (Tag) parent.getItemAtPosition(position);
+                        // Check if user selected "Create New Tag"
+                        if (selectedTag.getTitle().equals("+ Create New Tag")) {
+                            showAddTagDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                        // Do nothing
+                    }
+                });
+            });
+        }).start();
     }
 
     private void showAddTagDialog() {
@@ -564,7 +584,7 @@ public class HomeFragment extends Fragment {
                     // Find and select the new tag
                     for (int i = 0; i < tagSpinner.getCount(); i++) {
                         Tag tag = (Tag) tagSpinner.getItemAtPosition(i);
-                        if (tag.title().equals(newTag.title()) && tag.color() == newTag.color()) {
+                        if (tag.getTitle().equals(newTag.getTitle()) && tag.getColor() == newTag.getColor()) {
                             tagSpinner.setSelection(i);
                             break;
                         }

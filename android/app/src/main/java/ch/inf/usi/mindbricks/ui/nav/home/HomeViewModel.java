@@ -119,10 +119,9 @@ public class HomeViewModel extends AndroidViewModel {
         VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_START);
 
         long startTime = System.currentTimeMillis();
-        String tagName = (currentSessionTag != null) ? currentSessionTag.title() : "General";
-        int tagColor = (currentSessionTag != null) ? currentSessionTag.color() : Color.GRAY;
+        Long tagId = (currentSessionTag != null) ? currentSessionTag.getId() : null;
 
-        StudySession session = new StudySession(startTime, studyDurationMinutes, tagName, tagColor);
+        StudySession session = new StudySession(startTime, studyDurationMinutes, tagId);
 
         dbExecutor.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(getApplication());

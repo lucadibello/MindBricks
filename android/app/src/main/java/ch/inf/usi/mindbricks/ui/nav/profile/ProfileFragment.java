@@ -185,8 +185,8 @@ public class ProfileFragment extends Fragment {
             binding.profileTagsChipGroup.setVisibility(View.VISIBLE);
             for (Tag tag : tags) {
                 Chip chip = new Chip(requireContext());
-                chip.setText(tag.title());
-                chip.setChipBackgroundColor(ColorStateList.valueOf(tag.color()));
+                chip.setText(tag.getTitle());
+                chip.setChipBackgroundColor(ColorStateList.valueOf(tag.getColor()));
                 binding.profileTagsChipGroup.addView(chip);
             }
         }

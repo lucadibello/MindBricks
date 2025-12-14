@@ -90,10 +90,10 @@ public class TagManager {
         for (Tag tag : tags) {
             Chip chip = (Chip) LayoutInflater.from(fragment.requireContext())
                     .inflate(R.layout.view_tag_chip, tagChipGroup, false);
-            chip.setText(tag.title());
+            chip.setText(tag.getTitle());
             chip.setTextColor(fragment.requireContext().getColor(R.color.black));
-            chip.setChipBackgroundColor(ColorStateList.valueOf(tag.color()));
-            chip.setChipIconTint(ColorStateList.valueOf(tag.color()));
+            chip.setChipBackgroundColor(ColorStateList.valueOf(tag.getColor()));
+            chip.setChipIconTint(ColorStateList.valueOf(tag.getColor()));
             chip.setOnCloseIconClickListener(v -> {
                 tags.remove(tag);
                 renderTags();

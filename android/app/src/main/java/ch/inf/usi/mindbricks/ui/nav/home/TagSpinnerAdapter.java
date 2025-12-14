@@ -46,8 +46,8 @@ class TagSpinnerAdapter extends ArrayAdapter<Tag> {
             TextView tagName = convertView.findViewById(R.id.tag_name_text);
             ImageView tagColor = convertView.findViewById(R.id.tag_color_circle);
 
-            tagName.setText(tag.title());
-            tagColor.setColorFilter(tag.color(), PorterDuff.Mode.SRC_IN);
+            tagName.setText(tag.getTitle());
+            tagColor.setColorFilter(tag.getColor(), PorterDuff.Mode.SRC_IN);
         }
 
         // return filled component
