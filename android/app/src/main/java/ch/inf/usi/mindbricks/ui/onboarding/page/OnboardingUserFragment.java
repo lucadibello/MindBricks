@@ -48,9 +48,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     private TextInputLayout nameLayout;
     private TextInputEditText editName;
     private ChipGroup tagChipGroup;
-    private MaterialButton addTagButton;
     private MaterialTextView tagEmptyState;
-    private FloatingActionButton reloadAvatarButton;
     private PreferencesManager prefs;
     private ActivityResultLauncher<PickVisualMediaRequest> photoPickerLauncher;
 
@@ -91,9 +89,9 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
         // tag management
         tagChipGroup = view.findViewById(R.id.chipGroupTags);
-        addTagButton = view.findViewById(R.id.buttonAddTag);
+        MaterialButton addTagButton = view.findViewById(R.id.buttonAddTag);
         tagEmptyState = view.findViewById(R.id.textTagsEmptyState);
-        reloadAvatarButton = view.findViewById(R.id.buttonReloadAvatar);
+        FloatingActionButton reloadAvatarButton = view.findViewById(R.id.buttonReloadAvatar);
 
         // set handler to pick photo
         MaterialButton choosePhoto = view.findViewById(R.id.buttonChoosePhoto);
