@@ -2,6 +2,7 @@ package ch.inf.usi.mindbricks.ui.onboarding;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -168,6 +169,13 @@ public class OnboardingActivity extends AppCompatActivity {
     private void finishOnboarding() {
         // toggle flag + go to main activity
         prefs.setOnboardingComplete();
+
+        // give some initial coins to the user to start with (ensure that this is done only once)
+        if (prefs.getBalance() == 0) {
+            int initialCoins = getResources().getInteger(R.integer.starting_coins);
+            Log.i("OnboardingActivity", "Giving user initial coins: " + initialCoins);
+            prefs.setBalance(initialCoins);
+        }
 
         // go to main activity
         Intent intent = new Intent(this, MainActivity.class);

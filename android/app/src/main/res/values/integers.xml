@@ -2,4 +2,7 @@
 <resources>
     <!-- Maximum length for tag names -->
     <integer name="tag_name_max_length">35</integer>
+
+    <!-- Start coins for new users -->
+    <integer name="starting_coins">50</integer>
 </resources>
