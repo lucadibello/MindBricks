@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.database.dao;
+package ch.inf.usi.mindbricks.database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -24,6 +24,11 @@ public interface PAMScoreDao {
     @Query("SELECT * FROM pam_scores ORDER BY timestamp DESC LIMIT :n")
     List<PAMScore> getLastNScores(int n);
 
+    @Query("SELECT * FROM pam_scores WHERE questionnaireId = :questionnaireId LIMIT 1")
+    PAMScore getPAMScoreByQuestionnaireId(long questionnaireId);
+
+    @Query("SELECT * FROM pam_scores WHERE timestamp BETWEEN :startTime AND :endTime ORDER BY timestamp ASC")
+    List<PAMScore> getPAMScoresInRange(long startTime, long endTime);
 
     @Query("SELECT * FROM pam_scores WHERE sessionId = :sessionId")
     List<PAMScore> getScoresForSession(long sessionId);

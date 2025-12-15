@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.visual.AIRecommendation;
 import ch.inf.usi.mindbricks.model.visual.DailyRings;
 import ch.inf.usi.mindbricks.model.visual.DateRange;
@@ -27,6 +28,7 @@ import ch.inf.usi.mindbricks.model.visual.HeatmapCell;
 import ch.inf.usi.mindbricks.model.visual.HourlyQuality;
 import ch.inf.usi.mindbricks.model.visual.StreakDay;
 import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
+import ch.inf.usi.mindbricks.model.visual.TagUsage;
 import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
 import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
 import ch.inf.usi.mindbricks.repository.StudySessionRepository;
@@ -63,7 +65,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
     private final MutableLiveData<List<GoalRing>> goalRingsData = new MutableLiveData<>();
     private MutableLiveData<List<DailyRings>> dailyRingsHistory = new MutableLiveData<>();
     private MutableLiveData<Boolean> isRingsExpanded = new MutableLiveData<>(false);
-
+    private final MutableLiveData<List<TagUsage>> tagUsageData = new MutableLiveData<>();
     private final MutableLiveData<List<AIRecommendation>> aiRecommendations = new MutableLiveData<>();
 
     private List<StudySessionWithStats> allSessions;
@@ -89,6 +91,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
         List<DailyRings> dailyRings;
         List<AIRecommendation> aiRecommendations;
         List<StudySessionWithStats> filteredSessions;
+        List<TagUsage> tagUsage;
 
         ResultCache(List<StudySessionWithStats> sessions, DateRange range) {
             this.sessionsHash = sessions.hashCode();
@@ -333,6 +336,8 @@ public class AnalyticsViewModel extends AndroidViewModel {
                 dailyRingsHistory.postValue(resultCache.dailyRings);
                 aiRecommendations.postValue(resultCache.aiRecommendations);
                 sessionHistory.postValue(resultCache.filteredSessions);
+                tagUsageData.postValue(resultCache.tagUsage);
+
                 viewState.postValue(ViewState.SUCCESS);
 
                 if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] <<< processAllDataInBackground END (cached)");
@@ -418,6 +423,12 @@ public class AnalyticsViewModel extends AndroidViewModel {
                 historyToShow = sortedSessions.subList(0, MAX_HISTORY_ITEMS);
             }
 
+            // Tag Usage
+            if (VERBOSE_LOGGING)
+                Log.d(TAG, "    [BG] Computing tag usage...");
+            List<TagUsage> tagUsage = DataProcessor.calculateTagUsage(allSessions, dateRange, 20);
+            tagUsageData.postValue(tagUsage);
+
             // Store complete filtered list for pagination
             allFilteredSessions = new ArrayList<>(filteredSessions);
             Collections.sort(allFilteredSessions, (a, b) -> Long.compare(b.getTimestamp(), a.getTimestamp()));
@@ -439,6 +450,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
             resultCache.dailyRings = history;
             resultCache.aiRecommendations = recommendations;
             resultCache.filteredSessions = filteredSessions;
+            resultCache.tagUsage = tagUsage;
 
             if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Posting SUCCESS state");
             viewState.postValue(ViewState.SUCCESS);
@@ -452,34 +464,6 @@ public class AnalyticsViewModel extends AndroidViewModel {
         }
     }
 
-    public void loadMoreHistory() {
-        if (allFilteredSessions == null) return;
-
-        historyCurrentPage++;
-        int endIndex = Math.min(historyCurrentPage * historyPageSize, allFilteredSessions.size());
-
-        List<StudySessionWithStats> paginatedHistory = allFilteredSessions.subList(0, endIndex);
-        sessionHistory.postValue(paginatedHistory);
-    }
-
-    public boolean hasMoreHistory() {
-        return allFilteredSessions != null &&
-                historyCurrentPage * historyPageSize < allFilteredSessions.size();
-    }
-
-    public List<StudySessionWithStats> getAllSessionsForCalendar() {
-        if (allHistoricalSessions != null && !allHistoricalSessions.isEmpty()) {
-            return allHistoricalSessions;
-        }
-
-        if (allSessions != null && !allSessions.isEmpty()) {
-            return allSessions;
-        }
-
-        Log.w(TAG, "getAllSessionsForCalendar: No sessions available");
-        return new ArrayList<>();
-    }
-
     public void deleteSession(StudySessionWithStats session) {
         repository.deleteSession(session.session, this::refreshData);
     }
@@ -488,10 +472,6 @@ public class AnalyticsViewModel extends AndroidViewModel {
         Log.d(TAG, "Refreshing data (cache invalidated)");
         cachedSessions = null;
         resultCache = null;
-    }
-
-    public void setRingsExpanded(boolean expanded) {
-        isRingsExpanded.setValue(expanded);
     }
 
     // getters
@@ -554,6 +534,10 @@ public class AnalyticsViewModel extends AndroidViewModel {
 
     public LiveData<String> getErrorMessage() {
         return errorMessage;
+    }
+
+    public LiveData<List<TagUsage>> getTagUsageData() {
+        return tagUsageData;
     }
 
     public enum ViewState {

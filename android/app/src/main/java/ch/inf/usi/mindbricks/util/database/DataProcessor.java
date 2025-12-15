@@ -1,8 +1,6 @@
 package ch.inf.usi.mindbricks.util.database;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 
 import java.time.LocalDate;
@@ -14,13 +12,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.database.AppDatabase;
+import ch.inf.usi.mindbricks.model.evaluation.PAMScore;
+import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.model.visual.DailyRings;
 import ch.inf.usi.mindbricks.model.visual.DateRange;
 import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
 import ch.inf.usi.mindbricks.model.visual.HeatmapCell;
 import ch.inf.usi.mindbricks.model.visual.HourlyQuality;
 import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
+import ch.inf.usi.mindbricks.model.visual.TagUsage;
 import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
 import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
 import ch.inf.usi.mindbricks.model.visual.AIRecommendation;
@@ -612,6 +613,78 @@ public class DataProcessor {
         return rings;
     }
 
+    public static List<TagUsage> calculateTagUsage(List<StudySessionWithStats> allSessions,
+                                                       DateRange dateRange,
+                                                       int topN) {
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
+
+        if (sessions.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Count sessions per tag
+        Map<String, TagInfo> tagStats = new HashMap<>();
+        int totalSessions = 0;
+
+        for (StudySessionWithStats session : sessions) {
+            String tagTitle = session.getTagTitle();
+            if (tagTitle == null || tagTitle.isEmpty()) {
+                tagTitle = "No tag";
+            }
+
+            TagInfo info = tagStats.get(tagTitle);
+            if (info == null) {
+                info = new TagInfo(tagTitle, session.getTagColor());
+                tagStats.put(tagTitle, info);
+            }
+
+            info.sessionCount++;
+            info.totalMinutes += session.getDurationMinutes();
+            totalSessions++;
+        }
+
+        // Convert to list and sort
+        List<TagUsage> usageList = new ArrayList<>();
+        for (TagInfo info : tagStats.values()) {
+            float percentage = (float) info.sessionCount / totalSessions * 100f;
+            usageList.add(new TagUsage(
+                    info.title,
+                    info.color,
+                    info.sessionCount,
+                    info.totalMinutes,
+                    percentage
+            ));
+        }
+
+        Collections.sort(usageList);
+
+        // Keep top N, group rest as "Other"
+        if (usageList.size() > topN) {
+            List<TagUsage> topTags = new ArrayList<>(usageList.subList(0, topN));
+
+            int otherCount = 0;
+            int otherMinutes = 0;
+            for (int i = topN; i < usageList.size(); i++) {
+                TagUsage data = usageList.get(i);
+                otherCount += data.getSessionCount();
+                otherMinutes += data.getTotalMinutes();
+            }
+
+            float otherPercentage = (float) otherCount / totalSessions * 100f;
+            topTags.add(new TagUsage(
+                    "Other",
+                    0xFF808080, // Gray
+                    otherCount,
+                    otherMinutes,
+                    otherPercentage
+            ));
+
+            return topTags;
+        }
+
+        return usageList;
+    }
+
     //"ai" generation
     public static AIRecommendation generateAIRecommendations(
             List<StudySessionWithStats> allSessions, Context context, DateRange dateRange) {
@@ -908,97 +981,6 @@ public class DataProcessor {
         return filtered;
     }
 
-    public static int calculateTotalMinutes(List<StudySessionWithStats> allSessions, DateRange dateRange) {
-        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
-
-        int total = 0;
-        for (StudySessionWithStats session : sessions) {
-            total += session.getDurationMinutes();
-        }
-
-        return total;
-    }
-
-    public static float calculateAverageFocusScore(List<StudySessionWithStats> allSessions,
-                                                   DateRange dateRange) {
-        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
-
-        if (sessions.isEmpty()) {
-            return 0;
-        }
-
-        float sum = 0;
-        for (StudySessionWithStats session : sessions) {
-            sum += session.getFocusScore();
-        }
-
-        return sum / sessions.size();
-    }
-
-    public static Map<String, List<StudySessionWithStats>> groupSessionsByTag(List<StudySessionWithStats> allSessions,
-                                                                     DateRange dateRange) {
-        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
-        Map<String, List<StudySessionWithStats>> grouped = new HashMap<>();
-
-        for (StudySessionWithStats session : sessions) {
-            String tag = session.getTagTitle();
-            if (tag == null || tag.isEmpty()) {
-                tag = "Untagged";
-            }
-
-            if (!grouped.containsKey(tag)) {
-                grouped.put(tag, new ArrayList<>());
-            }
-            grouped.get(tag).add(session);
-        }
-
-        return grouped;
-    }
-
-    public static int calculateLongestStreak(List<StudySessionWithStats> allSessions, DateRange dateRange) {
-        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
-
-        if (sessions.isEmpty()) {
-            return 0;
-        }
-
-        List<StudySessionWithStats> sortedSessions = new ArrayList<>(sessions);
-        Collections.sort(sortedSessions, (a, b) ->
-                Long.compare(a.getTimestamp(), b.getTimestamp()));
-
-        int longestStreak = 1;
-        int currentStreak = 1;
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(sortedSessions.get(0).getTimestamp());
-        int lastDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-        int lastYear = cal.get(Calendar.YEAR);
-
-        for (int i = 1; i < sortedSessions.size(); i++) {
-            cal.setTimeInMillis(sortedSessions.get(i).getTimestamp());
-            int currentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-            int currentYear = cal.get(Calendar.YEAR);
-
-            if (currentYear == lastYear && currentDayOfYear == lastDayOfYear + 1) {
-                currentStreak++;
-                longestStreak = Math.max(longestStreak, currentStreak);
-            } else if (currentYear == lastYear + 1 && currentDayOfYear == 1 &&
-                    lastDayOfYear == 365) {
-                // Year boundary case (Dec 31 -> Jan 1)
-                currentStreak++;
-                longestStreak = Math.max(longestStreak, currentStreak);
-            } else if (currentDayOfYear != lastDayOfYear) {
-                // Streak broken
-                currentStreak = 1;
-            }
-
-            lastDayOfYear = currentDayOfYear;
-            lastYear = currentYear;
-        }
-
-        return longestStreak;
-    }
-
     // ---> Helper methods
     private static int convertCalendarDayToIndex(int calendarDay) {
         switch (calendarDay) {
@@ -1060,5 +1042,17 @@ public class DataProcessor {
         }
     }
 
+    private static class TagInfo {
+        String title;
+        int color;
+        int sessionCount;
+        int totalMinutes;
 
+        TagInfo(String title, int color) {
+            this.title = title;
+            this.color = color;
+            this.sessionCount = 0;
+            this.totalMinutes = 0;
+        }
+    }
 }
