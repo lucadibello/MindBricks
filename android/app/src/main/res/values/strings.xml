@@ -12,11 +12,15 @@
     <string name="onboarding_next">Next</string>
     <string name="onboarding_start">Start</string>
 
-    <string name="onboarding_intro_title">Welcome to MindBricks</string>
-    <string name="onboarding_intro_body">We use mindful Pomodoro cycles, gentle cues, and environmental sensing to keep your focus energy high.</string>
-    <string name="onboarding_intro_card_title">Meet your focus coach</string>
-    <string name="onboarding_intro_card_body">INSERT TEXT HERE</string>
-
+    <string name="onboarding_intro_title">Welcome to <b>MindBricks</b></string>
+    <string name="onboarding_intro_body">
+    Build focus through timed study sessions
+    </string>
+    <string name="onboarding_intro_card_title"></string>
+    <string name="onboarding_intro_card_body">
+    Start a study session, remain focused, and watch your <b>city</b> come to life. Distractions can slow your study and building process down.</string>
+    <string name="onboarding_intro_final_title">Sensors</string>
+    <string name="onboarding_intro_final_body">MindBricks uses sensors to understand your study environment. Over time, this data helps you discover the best places and moments to study like you never could!</string>
     <string name="onboarding_profile_title">Let\'s personalize your coaching</string>
     <string name="onboarding_profile_subtitle">Add a friendly face and a few focus goals so we can cheer you on.</string>
     <string name="onboarding_profile_upload_photo">Add profile picture</string>
