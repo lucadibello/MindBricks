@@ -80,9 +80,7 @@
 % --- QUESTION 11 ---
 \textbf{11. Which type of data visualization your app offers and why. If you answered no to question 11, explain why data visualization is not necessary for your app.} (Max. 650 characters)
 
-\AnswerBoxXLarge{The app is designed to offer various data visualizations to help users understand and optimize their study habits. These include: (a) \textbf{weekly focus chart} (show study minutes and focus score across the week) (b) \textbf{hourly distribution chart} (hourly productivity and focus patterns) (c) \textbf{quality heatmap} (study quality by day and hour) (d) \textbf{Streak calendar} (track consistent study efforts) (e) \textbf{daily goal rings} (visualize daily progress towards study time and focus targets) (f) \textbf{Recommendation card} (generated optimal daily schedule.
-
-\textcolor{red}{NOTE: We might need to add some visualizations here.}
+\AnswerBoxXLarge{Our app performs time-series analysis on sensor data (noise, light, motion) from study sessions. To which we added a user-filled questionnaire regarding the details of their previous study session. Due to that, we can learn about it and optimize their predicted study schedule. The core of our processing is computing the focus score. It is designed to offer various data visualizations to help users understand and optimize their study habits. These visualizations transform raw session data into actionable insights, helping students identify peak performance times, maintain motivation through progress tracking, and optimize study schedules based on data-driven patterns rather than guessing.
 }
 
 % --- QUESTION 12 ---
@@ -97,12 +95,15 @@
 % --- QUESTION 13 ---
 \textbf{13. If you answered yes to question 12 explain which type of data processing your app performs on the collected data and why. If you answered no to question 12 explain why data processing is not necessary for your app.} (Max. 650 characters)
 
-\AnswerBoxXLarge{Our app performs time-series analysis on sensor data (noise, light, motion) from study sessions. The core of our processing is a "focus score" algorithm that is intended to quantify user focus. This score would then be used for statistical analysis, pattern recognition, and recommendation generation to help users optimize their study habits. For example, we identify optimal study times by finding the hours with the highest historical focus scores. \textcolor{red}{NOTE: The focus score algorithm is not yet implemented, so these advanced processing features are currently only available with test data.}}
+\AnswerBoxXLarge{Our app performs time-series analysis on sensor data (noise, light, motion) from study sessions. To which we added a user-filled questionnaire regarding the details of their previous study session. Due to that, we can learn about it and optimize their predicted study schedule. The core of our processing is computing focus score.This score would then be used for statistical analysis, pattern recognition, and recommendation generation to help users optimize their study habits. We identify optimal study times by finding the hours with the highest historical focus scores. 
+We perform several real-time data processing including: Statistical Aggregation, Predictive Analytics, Performance Metrics, and Pattern Recognition.
+}
 
 % --- QUESTION 14 ---
 \textbf{14. How do you evaluate whether your app performs correctly and achieves its goal (i.e., solves the problem described in question 2)?} (Max. 650 characters)
 
-\AnswerBoxXLarge{ }
+\AnswerBoxXLarge{During the development, we reviewed existing literature on sustained attention, gamified learning, and time-management approaches, with particular emphasis on the Pomodoro technique. Findings from this review were used primarily to design the recommendation system and the accompanying questionnaire. These components analyze users’ past study sessions and self-reported preferences in order to provide personalized study recommendations. 
+The remaining features of the application focus on user engagement through gamification, progress visualization, and in-session encouragements, which together aim to support motivation and sustained concentration during study sessions, which is as well backed by previously read research. }
 
 % --- QUESTION 15 ---
 \textbf{15. Which permissions does your app require to be granted by the user?} (Max. 200 characters)
@@ -130,7 +131,7 @@
 	Wrote the sensor drivers (microphone, light, motion), the database logic for storing sensor data, and the focus score estimation. Also handled user onboarding, settings, and data validation. Implemented the current version of the gamification of the app with the city personalization. \\
 
 	\textbf{Marta Šafářová} (UI \& Data Visualization):
-	Focused on data visualization and user feedback. She created the perceived productivity questionnaire, implemented the analytics visuals, and developed the interactive study timeline recommendation. \\
+	Focused on data visualization and user feedback. She created the perceived productivity questionnaire based on research papers, implemented the analytics visuals, and developed the interactive study timeline recommendation. \\
 
 	\textbf{Luca Beltrami} (UI \& Gamification):
 	Handled the core app experience and gamification. He implemented the Pomodoro timer logic, notifications, sound effects, and started the gamification animations and structure.
