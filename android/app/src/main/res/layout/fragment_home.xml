@@ -53,51 +53,55 @@
         android:id="@+id/tag_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:gravity="center"
-        android:minWidth="100dp"
+        android:minWidth="150dp"
         android:spinnerMode="dropdown"
+        app:layout_constraintBottom_toTopOf="@+id/timer_text_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/coin_balance_text"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <!-- Timer TextView -->
     <TextView
         android:id="@+id/timer_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/start_timer_digits"
-        android:textSize="60sp"
-        android:textStyle="bold"
         android:layout_marginBottom="8dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/start_timer_digits"
+        android:textSize="80sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/state_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tag_spinner" />
 
     <!-- State Label -->
     <TextView
         android:id="@+id/state_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="16sp"
-        android:textStyle="bold"
         android:layout_marginBottom="16dp"
+        android:text=""
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/session_dots_layout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timer_text_view" />
 
     <!-- Dots layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/session_dots_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toTopOf="@+id/start_stop_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/state_label">
 
         <!-- Dot 1 -->
         <ImageView
@@ -159,10 +163,10 @@
         android:id="@+id/start_stop_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="104dp"
         android:text="@string/start_session"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/session_dots_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
