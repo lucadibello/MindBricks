@@ -2,21 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
-
-    <!-- Development only: test questionnaire button -->
-    <Button
-        android:id="@+id/test_questionnaire_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="44dp"
-        android:text="Test Questionnaire"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Profile Avatar Icon-->
     <ImageView
@@ -34,13 +23,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Coin Balance TextView -->
-
     <ImageView
         android:id="@+id/ic_coin_image"
         android:layout_width="33dp"
         android:layout_height="35dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="16dp"
         android:src="@drawable/ic_coin_icon"
         app:layout_constraintEnd_toStartOf="@+id/coin_balance_text"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -60,12 +48,7 @@
         app:layout_constraintStart_toEndOf="@+id/ic_coin_image"
         app:layout_constraintTop_toTopOf="@+id/ic_coin_image" />
 
-
-
-    <!-- Tag Spinner -->
-
-    <!-- Main Image -->
-
+    <!-- Tag spinner -->
     <Spinner
         android:id="@+id/tag_spinner"
         android:layout_width="wrap_content"
@@ -73,25 +56,8 @@
         android:gravity="center"
         android:minWidth="150dp"
         android:spinnerMode="dropdown"
-        app:layout_constraintBottom_toTopOf="@+id/timer_text_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.467"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.218" />
-
-    <ch.inf.usi.mindbricks.ui.nav.home.city.IsometricCityView
-        android:id="@+id/cityView"
-        android:layout_width="321dp"
-        android:layout_height="316dp"
-        app:layout_constraintBottom_toTopOf="@+id/timer_text_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tag_spinner"
-        app:layout_constraintVertical_bias="0.522"
-
-        />
+        tools:layout_editor_absoluteX="131dp" />
 
     <!-- Timer TextView -->
     <TextView
