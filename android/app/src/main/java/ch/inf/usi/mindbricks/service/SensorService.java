@@ -19,6 +19,7 @@ import androidx.core.app.NotificationCompat;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.MainActivity;
 import ch.inf.usi.mindbricks.R;
@@ -102,12 +103,20 @@ public class SensorService extends Service {
     private void startSession(long sessionId) {
         if (isRunning) {
             Log.w(TAG, "Session already running, ignoring start request");
+            sendSessionErrorBroadcast("Session already in progress");
+            return;
+        }
+
+
+        if (sessionId <= 0) {
+            Log.e(TAG, "Invalid session ID: " + sessionId);
+            sendSessionErrorBroadcast("Invalid session ID");
+            stopSelf();
             return;
         }
 
         Log.d(TAG, "Starting session: " + sessionId);
         currentSessionId = sessionId;
-        isRunning = true;
 
         // Start Foreground Service
         createNotificationChannel();
@@ -137,10 +146,35 @@ public class SensorService extends Service {
         }
 
         // Start Sensors
-        startSensors();
+        try {
+            startSensors();
+            isRunning = true;
+            sensorHandler.post(logRunnable);
 
-        // Start Logging Loop
-        sensorHandler.post(logRunnable);
+            Log.d(TAG, "Session started successfully");
+
+        } catch (SecurityException e) {
+            Log.e(TAG, "Failed to start sensors - missing permissions", e);
+            isRunning = false;
+            currentSessionId = -1;
+            stopForeground(true);
+            stopSelf();
+            sendSessionErrorBroadcast("Missing sensor permissions: " + e.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, "Unexpected error starting sensors", e);
+            isRunning = false;
+            currentSessionId = -1;
+            stopForeground(true);
+            stopSelf();
+            sendSessionErrorBroadcast("Failed to start session: " + e.getMessage());
+        }
+    }
+
+    private void sendSessionErrorBroadcast(String errorMessage) {
+        Intent errorIntent = new Intent("ch.inf.usi.mindbricks.SESSION_ERROR");
+        errorIntent.putExtra("error_message", errorMessage);
+        errorIntent.putExtra("session_id", currentSessionId);
+        sendBroadcast(errorIntent);
     }
 
     private void stopSession() {
@@ -202,7 +236,10 @@ public class SensorService extends Service {
     private final Runnable logRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!isRunning) return;
+            if (!isRunning || currentSessionId <= 0) {
+                Log.w(TAG, "Log runnable stopped: isRunning=" + isRunning + ", sessionId=" + currentSessionId);
+                return;
+            }
 
             try {
                 // Sample collected data
@@ -272,10 +309,32 @@ public class SensorService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "Service onDestroy called");
+
         stopSession(); // Ensure everything is stopped
+
+        // Gracefully shutdown executor with timeout
+        dbExecutor.shutdown();
+        try {
+            if (!dbExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                Log.w(TAG, "Executor didn't terminate in time, forcing shutdown");
+            }
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted during executor shutdown", e);
+            dbExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        // Shutdown handler thread with timeout
         if (sensorHandlerThread != null) {
             sensorHandlerThread.quitSafely();
+            try {
+                sensorHandlerThread.join(3000); // Wait max 3 seconds
+                Log.d(TAG, "Handler thread terminated successfully");
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Interrupted waiting for handler thread", e);
+                Thread.currentThread().interrupt();
+            }
         }
-        dbExecutor.shutdown();
     }
 }

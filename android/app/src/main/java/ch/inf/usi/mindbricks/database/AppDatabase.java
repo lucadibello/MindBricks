@@ -9,16 +9,28 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import ch.inf.usi.mindbricks.model.Tag;
+import ch.inf.usi.mindbricks.model.evaluation.PAMScore;
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
 import ch.inf.usi.mindbricks.util.database.DatabaseSeeder;
-
+import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
+import ch.inf.usi.mindbricks.database.dao.PAMScoreDao;
 
 /**
  * Room database for MindBricks app
  */
-@Database(entities = {Tag.class, StudySession.class, SessionSensorLog.class, SessionQuestionnaire.class}, version = 5, exportSchema = false)
+@Database(entities = {
+        StudySession.class,
+        SessionSensorLog.class,
+        SessionQuestionnaire.class,
+        CalendarEvent.class,
+        Tag.class,
+        PAMScore.class
+        },
+        version = 7,
+        exportSchema = true
+)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
@@ -28,6 +40,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract StudySessionDao studySessionDao();
     public abstract SessionSensorLogDao sessionSensorLogDao();
     public abstract SessionQuestionnaireDao sessionQuestionnaireDao();
+    public abstract CalendarEventDao calendarEventDao();
+    public abstract PAMScoreDao pamScoreDao();
 
     private static final RoomDatabase.Callback DB_CALLBACK = new RoomDatabase.Callback(){
         // called on the database thread -> safe
@@ -57,6 +71,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     )
                     .addCallback(DB_CALLBACK)
                     .fallbackToDestructiveMigrationOnDowngrade(true)
+                    .fallbackToDestructiveMigration()
                     .build();
         }
         return INSTANCE;

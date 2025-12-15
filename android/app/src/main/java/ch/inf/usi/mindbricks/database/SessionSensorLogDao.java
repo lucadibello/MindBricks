@@ -24,9 +24,7 @@ public interface SessionSensorLogDao {
     @Insert
     void insert(SessionSensorLog log);
 
-    /**
-     * Load all logs for a session, ordered by timestamp (noise returned as RMS amplitude).
-     */
+
     @Query("SELECT * FROM session_sensor_logs WHERE sessionId = :sessionId ORDER BY timestamp ASC")
     LiveData<List<SessionSensorLog>> getLogsForSession(long sessionId);
 
@@ -40,4 +38,13 @@ public interface SessionSensorLogDao {
 
     @Query("SELECT COUNT(*) FROM session_sensor_logs WHERE sessionId = :sessionId AND motionDetected = 1")
     int getMotionCount(long sessionId);
+
+    @Query("DELETE FROM session_sensor_logs WHERE timestamp < :cutoffTime")
+    int deleteLogsOlderThan(long cutoffTime);
+
+    @Query("SELECT COUNT(*) FROM session_sensor_logs")
+    int getTotalLogCount();
+
+    @Query("SELECT MIN(timestamp) FROM session_sensor_logs")
+    Long getOldestLogTimestamp();
 }

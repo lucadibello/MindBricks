@@ -238,6 +238,8 @@ public class AIRecommendationCardView extends View {
                 return R.drawable.ic_pause;
             case SLEEP:
                 return R.drawable.ic_bed;
+            case CALENDAR_EVENT:
+                return R.drawable.ic_event;
             default:
                 return android.R.drawable.ic_menu_info_details;
         }

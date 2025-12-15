@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.util;
+package ch.inf.usi.mindbricks.util.evaluation;
 
 /**
  * Utility class for calculating focus score based on questionnaire answers.

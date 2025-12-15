@@ -1,0 +1,132 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-01-15T10:00:00Z",
+
+  "sleepSchedule": {
+    "bedtime": {
+      "hour": 23,
+      "minute": 0,
+      "description": "Preferred bedtime (24-hour format)"
+    },
+    "wakeupTime": {
+      "hour": 6,
+      "minute": 0,
+      "description": "Preferred wake-up time"
+    },
+    "targetSleepHours": 7.5,
+    "allowFlexibility": true,
+    "flexibilityMinutes": 30
+  },
+
+  "mealTimes": {
+    "breakfast": {
+      "hour": 7,
+      "minute": 30,
+      "duration": 30,
+      "enabled": true
+    },
+    "lunch": {
+      "hour": 12,
+      "minute": 30,
+      "duration": 45,
+      "enabled": true
+    },
+    "dinner": {
+      "hour": 19,
+      "minute": 0,
+      "duration": 45,
+      "enabled": true
+    },
+    "snacks": {
+      "enabled": false,
+      "preferredTimes": [10, 15, 21]
+    }
+  },
+
+  "workSchedule": {
+    "enabled": true,
+    "workDays": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+    "startTime": {
+      "hour": 9,
+      "minute": 0
+    },
+    "endTime": {
+      "hour": 17,
+      "minute": 0
+    },
+    "lunchBreakIncluded": true,
+    "allowStudyDuringWork": false
+  },
+
+  "studyPreferences": {
+    "preferredStudyTimes": {
+      "morning": {
+        "enabled": true,
+        "startHour": 8,
+        "endHour": 12,
+        "energyLevel": "high"
+      },
+      "afternoon": {
+        "enabled": true,
+        "startHour": 14,
+        "endHour": 18,
+        "energyLevel": "medium"
+      },
+      "evening": {
+        "enabled": false,
+        "startHour": 19,
+        "endHour": 22,
+        "energyLevel": "low"
+      }
+    },
+    "maxDailyStudyHours": 6,
+    "minBreakBetweenSessions": 5,
+    "preferredSessionLength": 25,
+    "deepWorkPreference": "morning"
+  },
+
+  "breakPreferences": {
+    "shortBreakDuration": 5,
+    "longBreakDuration": 15,
+    "allowAdaptiveBreaks": true,
+    "maxBreakExtension": 5,
+    "preferredBreakActivities": ["walk", "stretch", "meditation"]
+  },
+
+  "exerciseSchedule": {
+    "enabled": true,
+    "preferredTimes": [
+      {
+        "hour": 6,
+        "minute": 30,
+        "duration": 45,
+        "type": "morning_workout"
+      }
+    ],
+    "minWeeklyHours": 3,
+    "flexibleScheduling": true
+  },
+
+  "socialTime": {
+    "enabled": true,
+    "preferredDays": ["FRIDAY", "SATURDAY"],
+    "preferredHours": [18, 19, 20, 21, 22],
+    "protectFromStudy": true
+  },
+
+  "calendarIntegration": {
+    "enabled": true,
+    "respectCalendarEvents": true,
+    "bufferBeforeEvent": 15,
+    "bufferAfterEvent": 10,
+    "autoBlockExams": true,
+    "autoBlockMeetings": true
+  },
+
+  "personalGoals": {
+    "dailyStudyMinutes": 120,
+    "weeklyStudySessions": 20,
+    "maintainMinPAM": 25,
+    "targetFocusScore": 70
+  }
+}

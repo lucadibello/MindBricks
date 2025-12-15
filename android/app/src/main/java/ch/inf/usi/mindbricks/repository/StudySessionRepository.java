@@ -60,20 +60,11 @@ public class StudySessionRepository {
         return studySessionDao.observeSessionsSince(startTime);
     }
     public LiveData<List<StudySessionWithStats>> getSessionsInRange(long startTime, long endTime){
-        return Transformations.map(studySessionDao.observeSessionsSince(startTime), allSessions -> {
-            if (allSessions == null) {
-                return Collections.emptyList();
-            }
+        return studySessionDao.observeSessionsInRange(startTime, endTime);
+    }
 
-            List<StudySessionWithStats> filteredSessions = new ArrayList<>();
-            for (StudySessionWithStats session : allSessions) {
-                if (session.getTimestamp() >= startTime && session.getTimestamp() <= endTime) {
-                    filteredSessions.add(session);
-                }
-            }
-
-            return filteredSessions;
-        });
+    public List<StudySessionWithStats> getSessionsInRangeSync(long startTime, long endTime) {
+        return studySessionDao.getSessionsInRangeSync(startTime, endTime);
     }
 
     public LiveData<List<SessionSensorLog>> getSensorLogsForSession(long sessionId) {
@@ -125,6 +116,19 @@ public class StudySessionRepository {
     }
 
     public List<StudySessionWithStats> getRecentSessionsSync(int limit) {
+        if (limit == Integer.MAX_VALUE) {
+            Log.d("StudySessionRepository", "Loading ALL sessions (no limit)");
+            return studySessionDao.getRecentSessions(10000);
+        }
+
+        if (limit > 500) {
+            Log.w("StudySessionRepository", "Requested limit " + limit + " exceeds maximum 500, capping");
+            limit = 500;
+        }
+        if (limit < 1) {
+            Log.w("StudySessionRepository", "Invalid limit " + limit + ", using default 50");
+            limit = 50;
+        }
         return studySessionDao.getRecentSessions(limit);
     }
 

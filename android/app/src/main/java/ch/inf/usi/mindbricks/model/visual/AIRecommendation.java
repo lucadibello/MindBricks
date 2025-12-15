@@ -7,7 +7,7 @@ import java.util.List;
 
 import ch.inf.usi.mindbricks.R;
 
-public class AIRecommendation {
+public class AIRecommendation extends DailyRecommendation{
 
     public enum ActivityType {
         DEEP_STUDY("Deep Study", R.color.activity_deep_study),
@@ -17,7 +17,8 @@ public class AIRecommendation {
         SOCIAL("Social Time", R.color.activity_social),
         MEALS("Meals", R.color.activity_meals),
         BREAKS("Short Breaks", R.color.activity_breaks),
-        SLEEP("Sleep", R.color.activity_sleep);
+        SLEEP("Sleep", R.color.activity_sleep),
+        CALENDAR_EVENT("Calendar Event", R.color.activity_calendar);
 
         private final String displayName;
         private final int colorResId;
@@ -35,6 +36,10 @@ public class AIRecommendation {
             int color = ctx.getColor(colorResId);
             return String.format("#%06X", (0xFFFFFF & color));
         }
+
+        public boolean isProtected() {
+            return this == CALENDAR_EVENT || this == SLEEP;
+        }
     }
 
 
@@ -45,6 +50,8 @@ public class AIRecommendation {
         private int confidenceScore;
         private String reason;
 
+        private String eventTitle;
+
         public ActivityBlock(ActivityType type, int startHour, int endHour,
                              int confidence, String reason) {
             this.activityType = type;
@@ -52,6 +59,16 @@ public class AIRecommendation {
             this.endHour = endHour;
             this.confidenceScore = confidence;
             this.reason = reason;
+        }
+
+        public ActivityBlock(ActivityType type, int startHour, int endHour,
+                             String eventTitle, String reason) {
+            this.activityType = type;
+            this.startHour = startHour;
+            this.endHour = endHour;
+            this.eventTitle = eventTitle;
+            this.reason = reason;
+            this.confidenceScore = 100;
         }
 
         public ActivityType getActivityType() {
@@ -88,12 +105,20 @@ public class AIRecommendation {
             if (hour == 12) return "12 PM";
             return (hour - 12) + " PM";
         }
+
+        public String getDisplayName() {
+            if (activityType == ActivityType.CALENDAR_EVENT && eventTitle != null) {
+                return eventTitle;
+            }
+            return activityType.getDisplayName();
+        }
     }
 
     private List<ActivityBlock> activityBlocks;
     private int totalSessions;
     private float averageProductivity;
     private String summaryMessage;
+    private int calendarBlockedHours;
 
     public AIRecommendation() {
         this.activityBlocks = new ArrayList<>();
@@ -103,6 +128,10 @@ public class AIRecommendation {
 
     public void addActivityBlock(ActivityBlock block) {
         activityBlocks.add(block);
+
+        if (block.getActivityType() == ActivityType.CALENDAR_EVENT) {
+            calendarBlockedHours += block.getDurationHours();
+        }
     }
 
     public List<ActivityBlock> getActivityBlocks() {
@@ -132,5 +161,20 @@ public class AIRecommendation {
 
     public void setSummaryMessage(String message) {
         this.summaryMessage = message;
+    }
+
+    public int getCalendarBlockedHours() {
+        return calendarBlockedHours;
+    }
+
+    public int getAvailableHours() {
+        int totalBlocked = 0;
+        for (ActivityBlock block : activityBlocks) {
+            ActivityType type = block.getActivityType();
+            if (type == ActivityType.SLEEP || type == ActivityType.CALENDAR_EVENT) {
+                totalBlocked += block.getDurationHours();
+            }
+        }
+        return 24 - totalBlocked;
     }
 }

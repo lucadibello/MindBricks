@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "448943310700",
+    "project_id": "mindbricks-779a5",
+    "storage_bucket": "mindbricks-779a5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:448943310700:android:240aacbedc2952b5eb5549",
+        "android_client_info": {
+          "package_name": "ch.inf.usi.mindbricks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMQnqpTc7z5S2NGMwKCxPIY7dzjcXGjO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

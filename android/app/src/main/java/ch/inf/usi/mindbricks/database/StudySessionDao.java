@@ -59,17 +59,45 @@ public interface StudySessionDao {
     List<StudySessionWithStats> getSessionsSince(long startTime);
 
     @Query("SELECT s.*, " +
-           "COALESCE(AVG(l.noiseLevel), 0) as avgNoiseLevel, " +
-           "COALESCE(AVG(l.lightLevel), 0) as avgLightLevel, " +
-           "COALESCE(SUM(CASE WHEN l.motionDetected THEN 1 ELSE 0 END), 0) as phonePickupCount, " +
-           "t.title as tagTitle, " +
-           "COALESCE(t.color, 0) as tagColor " +
-           "FROM study_sessions s " +
-           "LEFT JOIN session_sensor_logs l ON s.id = l.sessionId " +
-           "LEFT JOIN tags t ON s.tagId = t.id " +
-           "WHERE s.timestamp >= :startTime " +
-           "GROUP BY s.id " +
-           "ORDER BY s.timestamp DESC")
+            "COALESCE(AVG(l.noiseLevel), 0) as avgNoiseLevel, " +
+            "COALESCE(AVG(l.lightLevel), 0) as avgLightLevel, " +
+            "COALESCE(SUM(CASE WHEN l.motionDetected THEN 1 ELSE 0 END), 0) as phonePickupCount, " +
+            "t.title as tagTitle, " +
+            "COALESCE(t.color, 0) as tagColor " +
+            "FROM study_sessions s " +
+            "LEFT JOIN session_sensor_logs l ON s.id = l.sessionId " +
+            "LEFT JOIN tags t ON s.tagId = t.id " +
+            "WHERE s.timestamp BETWEEN :startTime AND :endTime " +
+            "GROUP BY s.id " +
+            "ORDER BY s.timestamp DESC")
+    LiveData<List<StudySessionWithStats>> observeSessionsInRange(long startTime, long endTime);
+
+    @Query("SELECT s.*, " +
+            "COALESCE(AVG(l.noiseLevel), 0) as avgNoiseLevel, " +
+            "COALESCE(AVG(l.lightLevel), 0) as avgLightLevel, " +
+            "COALESCE(SUM(CASE WHEN l.motionDetected THEN 1 ELSE 0 END), 0) as phonePickupCount, " +
+            "t.title as tagTitle, " +
+            "COALESCE(t.color, 0) as tagColor " +
+            "FROM study_sessions s " +
+            "LEFT JOIN session_sensor_logs l ON s.id = l.sessionId " +
+            "LEFT JOIN tags t ON s.tagId = t.id " +
+            "WHERE s.timestamp BETWEEN :startTime AND :endTime " +
+            "GROUP BY s.id " +
+            "ORDER BY s.timestamp DESC")
+    List<StudySessionWithStats> getSessionsInRangeSync(long startTime, long endTime);
+
+    @Query("SELECT s.*, " +
+            "COALESCE(AVG(l.noiseLevel), 0) as avgNoiseLevel, " +
+            "COALESCE(AVG(l.lightLevel), 0) as avgLightLevel, " +
+            "COALESCE(SUM(CASE WHEN l.motionDetected THEN 1 ELSE 0 END), 0) as phonePickupCount, " +
+            "t.title as tagTitle, " +
+            "COALESCE(t.color, 0) as tagColor " +
+            "FROM study_sessions s " +
+            "LEFT JOIN session_sensor_logs l ON s.id = l.sessionId " +
+            "LEFT JOIN tags t ON s.tagId = t.id " +
+            "WHERE s.timestamp >= :startTime " +
+            "GROUP BY s.id " +
+            "ORDER BY s.timestamp DESC")
     LiveData<List<StudySessionWithStats>> observeSessionsSince(long startTime);
 
     @Query("SELECT s.*, " +

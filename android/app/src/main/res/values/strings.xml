@@ -255,6 +255,59 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
 
+    <string name="settings_tab_debug">Debug</string>
+
+    <!-- Calendar Sync -->
+    <!-- Settings Tab -->
+    <string name="settings_tab_calendar">Calendar</string>
+
+    <!-- Calendar Settings Header -->
+    <string name="settings_calendar_header">Connected Calendars</string>
+    <string name="settings_calendar_description">Connect your calendars to block time in your study schedule.</string>
+
+    <!-- Calendar Sources -->
+    <string name="settings_calendar_device">Device Calendar</string>
+    <string name="settings_calendar_google">Google Calendar</string>
+    <string name="settings_calendar_outlook">Outlook Calendar</string>
+
+    <!-- Connection Status -->
+    <string name="settings_calendar_not_connected">Not connected</string>
+    <string name="settings_calendar_connected">Connected</string>
+    <string name="settings_calendar_connect">Connect</string>
+    <string name="settings_calendar_disconnect">Disconnect</string>
+
+    <!-- Connection Messages -->
+    <string name="settings_calendar_device_connected">Device Calendar connected!</string>
+    <string name="settings_calendar_google_connected">Google Calendar connected!</string>
+    <string name="settings_calendar_outlook_connected">Outlook Calendar connected!</string>
+    <string name="settings_calendar_disconnected">%1$s disconnected</string>
+    <string name="settings_calendar_connect_failed">Connection failed: %1$s</string>
+    <string name="settings_calendar_permission_denied">Calendar permission denied. Please enable in Settings.</string>
+    <string name="settings_calendar_google_not_available">Google Calendar is not available</string>
+
+    <!-- Disconnect Dialog -->
+    <string name="settings_calendar_disconnect_title">Disconnect Calendar</string>
+    <string name="settings_calendar_disconnect_message">Are you sure you want to disconnect %1$s? Your synced events will be removed.</string>
+
+    <!-- Sync Section -->
+    <string name="settings_calendar_sync_title">Sync Status</string>
+    <string name="settings_calendar_events_synced">Events synced</string>
+    <string name="settings_calendar_sync_now">Sync Now</string>
+    <string name="settings_calendar_last_sync">Last sync: %1$s</string>
+    <string name="settings_calendar_last_sync_never">Never synced</string>
+    <string name="settings_calendar_no_calendars">No calendars connected</string>
+    <string name="settings_calendar_sync_success">Synced %1$d events</string>
+    <string name="settings_calendar_sync_partial">Synced %1$d events with %2$d errors</string>
+
+    <!-- Time Formatting -->
+    <string name="settings_calendar_just_now">Just now</string>
+    <string name="settings_calendar_minutes_ago">%1$d min ago</string>
+    <string name="settings_calendar_hours_ago">%1$d hr ago</string>
+    <string name="settings_calendar_days_ago">%1$d days ago</string>
+
+    <!-- Info Card -->
+    <string name="settings_calendar_info">Calendar events will be shown as blocked time in your AI-generated study schedule. This helps avoid scheduling study sessions during meetings and appointments.</string>
+
     <!-- Profile -->
     <string name="profile">Profile</string>
     <string name="username">Username</string>
@@ -263,5 +316,43 @@
     <string name="no_tags_defined">No tags defined</string>
     <string name="my_items_label">My Items</string>
     <string name="no_items_purchased">No items purchased yet</string>
-    <string name="onboarding_sensors_pickup_fallback_in_use">fallback in use</string>
+    <string name="onboarding_sensors_pickup_fallback_in_use">
+        fallback in use
+    </string>
+
+    <!-- Calendar Permission Dialog -->
+
+    <!-- Device Calendar -->
+    <string name="permission_calendar_device_title">Connect Device Calendar</string>
+    <string name="permission_calendar_device_description">Allow MindBricks to access your device calendar to create a smarter study schedule.</string>
+
+    <!-- Google Calendar -->
+    <string name="permission_calendar_google_title">Connect Google Calendar</string>
+    <string name="permission_calendar_google_description">Sign in with Google to sync your calendar events and optimize your study schedule.</string>
+
+    <!-- Outlook Calendar -->
+    <string name="permission_calendar_outlook_title">Connect Outlook Calendar</string>
+    <string name="permission_calendar_outlook_description">Sign in with Microsoft to sync your Outlook calendar and balance work with study.</string>
+
+    <!-- Benefits -->
+    <string name="permission_calendar_benefit_schedule">See your calendar events in your daily schedule</string>
+    <string name="permission_calendar_benefit_conflicts">Avoid scheduling study sessions during meetings</string>
+    <string name="permission_calendar_benefit_smart">Get smarter AI recommendations based on your availability</string>
+    <string name="permission_calendar_benefit_sync">Keep your events in sync automatically</string>
+    <string name="permission_calendar_benefit_work">Balance work meetings with study time</string>
+
+    <!-- Privacy -->
+    <string name="permission_calendar_privacy">Your calendar data stays on your device and is never shared.</string>
+
+    <!-- Buttons -->
+    <string name="permission_calendar_allow">Allow Access</string>
+    <string name="permission_calendar_decline">Not Now</string>
+
+    <!-- Permission Declined Message -->
+    <string name="permission_calendar_declined_message">You can connect your calendar later from Settings.</string>
+    <string name="permission_settings_title">Permission Required</string>
+    <string name="permission_settings_message">Calendar permission was denied. To connect your calendar, please enable the Calendar permission in the app settings.</string>
+    <string name="permission_settings_button">Open Settings</string>
+
+
 </resources>

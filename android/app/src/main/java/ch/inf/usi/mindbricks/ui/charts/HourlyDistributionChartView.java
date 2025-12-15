@@ -2,7 +2,6 @@ package ch.inf.usi.mindbricks.ui.charts;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.service.autofill.Dataset;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -26,7 +25,6 @@ import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
-import ch.inf.usi.mindbricks.util.visual.ChartStyleUtil;
 
 /**
  * Custom view that displays hourly study distribution.

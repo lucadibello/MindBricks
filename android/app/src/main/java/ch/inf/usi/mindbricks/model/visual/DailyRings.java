@@ -28,7 +28,6 @@ public class DailyRings {
         this.isEmpty = this.rings.isEmpty() || getTotalMinutes() == 0;
         formatDisplayDate();
     }
-
     private void formatDisplayDate() {
         if (date == null) {
             displayDate = "";

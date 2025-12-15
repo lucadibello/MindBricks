@@ -1,6 +1,8 @@
 package ch.inf.usi.mindbricks;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
@@ -12,11 +14,18 @@ import androidx.navigation.ui.NavigationUI;
 import ch.inf.usi.mindbricks.databinding.ActivityMainBinding;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
 
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import java.util.concurrent.TimeUnit;
+import ch.inf.usi.mindbricks.database.DatabaseCleanupWorker;
+
 public class MainActivity extends AppCompatActivity implements NavigationLocker {
 
     private ActivityMainBinding binding;
     private boolean isNavigationEnabled = true;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements NavigationLocker 
             }
             return false;
         });
+
+        schedulePeriodicCleanup();
+
     }
 
     @Override
@@ -51,5 +63,20 @@ public class MainActivity extends AppCompatActivity implements NavigationLocker 
             binding.navView.setElevation(enabled ?
                     getResources().getDimension(R.dimen.bottom_nav_elevation) : 0f);
         }
+    }
+
+    private void schedulePeriodicCleanup() {
+        PeriodicWorkRequest cleanupWork = new PeriodicWorkRequest.Builder(
+                DatabaseCleanupWorker.class,
+                7, TimeUnit.DAYS  // Run weekly
+        ).build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "database_cleanup",
+                ExistingPeriodicWorkPolicy.KEEP,
+                cleanupWork
+        );
+
+        Log.d("MainActivity", "Database cleanup worker scheduled");
     }
 }

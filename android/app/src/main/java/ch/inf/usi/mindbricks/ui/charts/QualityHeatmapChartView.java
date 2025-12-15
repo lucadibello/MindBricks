@@ -150,7 +150,7 @@ public class QualityHeatmapChartView extends View {
     private void drawHeatmap(Canvas canvas) {
         for (HeatmapCell cell : cells) {
             int dayIndex = cell.getDayOfMonth() - getMinDay();
-            int hourIndex = cell.getHour();
+            int hourIndex = cell.getHourOfDay();
 
             float x = padding + (dayIndex * (cellSize + cellSpacing));
             float y = topPadding + (hourIndex * (cellSize + cellSpacing));

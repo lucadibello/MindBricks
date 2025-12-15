@@ -51,20 +51,26 @@ android {
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
+
     implementation(libs.constraintlayout)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.lifecycle.viewmodel)
+
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
     // room runtime + compiler
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
     // charts
     implementation(libs.mpandroidchart)
+    implementation("androidx.work:work-runtime:2.11.0")
+    
     // http image component + caching
     implementation(libs.glide.runtime)
     annotationProcessor(libs.glide.compiler)

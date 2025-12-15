@@ -42,7 +42,7 @@ import ch.inf.usi.mindbricks.ui.nav.home.city.IsometricCityView;
 import ch.inf.usi.mindbricks.ui.nav.home.questionnare.DetailedQuestionsDialogFragment;
 import ch.inf.usi.mindbricks.ui.nav.home.questionnare.EmotionSelectDialogFragment;
 import ch.inf.usi.mindbricks.ui.settings.SettingsActivity;
-import ch.inf.usi.mindbricks.util.FocusScoreCalculator;
+import ch.inf.usi.mindbricks.util.evaluation.FocusScoreCalculator;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.TagManager;

@@ -63,6 +63,7 @@ public class AnalyticsFragment extends Fragment {
 
     // ViewModel
     private AnalyticsViewModel viewModel;
+    private List<StudySessionWithStats> calendarSessionsCache = new ArrayList<>();
 
     // Chart views
     private WeeklyFocusChartView weeklyFocusChart;
@@ -135,8 +136,15 @@ public class AnalyticsFragment extends Fragment {
         // Observe ViewModel LiveData
         observeViewModel();
 
+        Calendar cal = Calendar.getInstance();
+        int currentMonth = cal.get(Calendar.MONTH);
+        int currentYear = cal.get(Calendar.YEAR);
+
+        Log.d(TAG, "Initial calendar load for current month: " + currentMonth + "/" + currentYear);
+        loadStreakDataForMonth(currentMonth, currentYear);
+
         // Generate test data if database is empty
-        generateTestDataIfNeeded();
+        //generateTestDataIfNeeded(); -> can use debug tools
 
         // Daily rings
         setupDailyRingsRecyclerView(view);
@@ -387,16 +395,11 @@ public class AnalyticsFragment extends Fragment {
             }
         });
 
-        // Observe streak calendar
-        viewModel.getStreakData().observe(getViewLifecycleOwner(), data -> {
-            if (data != null && streakCalendarView != null) {
-                // Initial data load
-                streakCalendarView.setData(data);
-                // Set click listener
-                streakCalendarView.setOnDayClickListener(this::showSessionsForDay);
-                streakCalendarView.setOnMonthChangeListener(this::loadStreakDataForMonth);
-            }
-        });
+        if (streakCalendarView != null) {
+            streakCalendarView.setOnDayClickListener(this::showSessionsForDay);
+            streakCalendarView.setOnMonthChangeListener(this::loadStreakDataForMonth);
+            Log.d(TAG, "Calendar listeners configured");
+        }
 
         // Observe goal rings
         viewModel.getDailyRingsHistory().observe(getViewLifecycleOwner(), this::updateDailyRingsDisplay);
@@ -418,41 +421,26 @@ public class AnalyticsFragment extends Fragment {
         // Observe session history
         viewModel.getSessionHistory().observe(getViewLifecycleOwner(), sessions -> {
             Log.d(TAG, "Session history received: " + (sessions != null ? sessions.size() + " items" : "null"));
-            if (sessions != null) {
-                // for large datasets, update UI asynchronously to prevent blocking
-                // NOTE: this is done to avoid showing the spinner for a fraction of a second
-                if (sessions.size() > 100) {
-                    // Show progress bar for large datasets
-                    if (progressBar != null && historyContainer.getVisibility() == View.VISIBLE) {
-                        progressBar.setVisibility(View.VISIBLE);
+
+            if (sessions == null) return;
+
+            new Handler(Looper.getMainLooper()).post(() -> {
+                sessionHistoryAdapter.setData(sessions);
+
+                if (sessionCountText != null) {
+                    String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
+
+                    // Show if data is truncated
+                    DateRange currentRange = viewModel.getCurrentDateRange();
+                    if (currentRange != null &&
+                            currentRange.getRangeType() == DateRange.RangeType.ALL_TIME &&
+                            sessions.size() >= 200) {
+                        countText += " (showing most recent)";
                     }
 
-                    // Use handler to avoid blocking main thread
-                    new Handler(Looper.getMainLooper()).post(() -> {
-                        sessionHistoryAdapter.setData(sessions);
-
-                        // Update session count display
-                        if (sessionCountText != null) {
-                            String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
-                            sessionCountText.setText(countText);
-                        }
-
-                        // Hide progress indicator
-                        if (progressBar != null) {
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    });
-                } else {
-                    // For small datasets, update immediately
-                    sessionHistoryAdapter.setData(sessions);
-
-                    // Update session count display
-                    if (sessionCountText != null) {
-                        String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
-                        sessionCountText.setText(countText);
-                    }
+                    sessionCountText.setText(countText);
                 }
-            }
+            });
         });
 
         Log.d(TAG, "=== All observers registered ===");
@@ -893,20 +881,6 @@ public class AnalyticsFragment extends Fragment {
                 .show();
     }
 
-    private void generateTestDataIfNeeded() {
-        viewModel.getSessionHistory().observe(getViewLifecycleOwner(), sessions -> {
-            if (sessions != null && sessions.isEmpty()) {
-                Log.d(TAG, "No sessions found, generating test data...");
-                TestDataGenerator.addTestSessions(requireContext(), TEST_DATA_COUNT);
-
-                // Wait for insertion, then reload
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    viewModel.refreshData();
-                }, 2000);
-            }
-        });
-    }
-
     /**
      * Format duration in human-readable format.
      *
@@ -926,13 +900,47 @@ public class AnalyticsFragment extends Fragment {
     }
 
     private void loadStreakDataForMonth(int month, int year) {
-        List<StudySessionWithStats> allSessions = viewModel.getSessionHistory().getValue();
+        Log.d(TAG, "=== LOADING CALENDAR: " + month + "/" + year + " ===");
 
-        if (allSessions == null) {
-            Log.w(TAG, "No sessions available for streak calendar");
+        // If we have cached calendar data, use it immediately
+        if (!calendarSessionsCache.isEmpty()) {
+            Log.d(TAG, "Using cached calendar data: " + calendarSessionsCache.size() + " sessions");
+            computeAndDisplayCalendar(calendarSessionsCache, month, year);
             return;
         }
 
+        // Otherwise, load ALL sessions from database
+        Log.d(TAG, "Loading ALL sessions from database for calendar...");
+        viewModel.loadAllSessionsForCalendar(allSessions -> {
+            Log.d(TAG, "Calendar data received: " + allSessions.size() + " total sessions");
+
+            // Cache for future month navigation
+            calendarSessionsCache = allSessions;
+
+            // Compute and display
+            computeAndDisplayCalendar(allSessions, month, year);
+        });
+    }
+
+    /**
+     * Compute calendar data and update the view
+     */
+    private void computeAndDisplayCalendar(List<StudySessionWithStats> allSessions, int month, int year) {
+        // Count sessions in this specific month (for logging)
+        int sessionsInMonth = 0;
+        Calendar cal = Calendar.getInstance();
+        for (StudySessionWithStats session : allSessions) {
+            cal.setTimeInMillis(session.getTimestamp());
+            if (cal.get(Calendar.MONTH) == month && cal.get(Calendar.YEAR) == year) {
+                sessionsInMonth++;
+            }
+        }
+
+        Log.d(TAG, "Computing calendar:");
+        Log.d(TAG, "  Total sessions: " + allSessions.size());
+        Log.d(TAG, "  Sessions in " + month + "/" + year + ": " + sessionsInMonth);
+
+        // Compute streak data
         List<StreakDay> monthData = DataProcessor.calculateStreakCalendar(
                 allSessions,
                 60,
@@ -940,10 +948,17 @@ public class AnalyticsFragment extends Fragment {
                 year
         );
 
+        Log.d(TAG, "  Streak days computed: " + monthData.size());
+
+        // Update calendar view
         if (streakCalendarView != null) {
             streakCalendarView.setData(monthData);
+            Log.d(TAG, "Calendar updated successfully");
+        } else {
+            Log.e(TAG, "Calendar view is null!");
         }
     }
+
 
     private int dpToPx(int dp) {
         return (int) TypedValue.applyDimension(
@@ -957,8 +972,19 @@ public class AnalyticsFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        // Refresh data when returning to fragment -> ended session in between etc.
+        Log.d(TAG, "Fragment resumed - refreshing data");
+
         viewModel.refreshData();
+        calendarSessionsCache.clear();
+
+        if (streakCalendarView != null) {
+            Calendar cal = Calendar.getInstance();
+            int currentMonth = cal.get(Calendar.MONTH);
+            int currentYear = cal.get(Calendar.YEAR);
+
+            Log.d(TAG, "Reloading calendar for current month");
+            loadStreakDataForMonth(currentMonth, currentYear);
+        }
     }
 
     @Override

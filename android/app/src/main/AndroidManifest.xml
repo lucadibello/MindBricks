@@ -10,7 +10,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Vibration: needed for haptic feedback during key moments -->
     <uses-permission android:name="android.permission.VIBRATE" />
-    
+    <!-- Calendar: needed to read events -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
     <!-- Service Permissions -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />

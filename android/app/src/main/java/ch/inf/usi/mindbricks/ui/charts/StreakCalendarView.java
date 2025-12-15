@@ -412,5 +412,12 @@ public class StreakCalendarView extends View {
         void onDayClick(StreakDay day);
     }
 
+    public OnDayClickListener getOnDayClickListener() {
+        return dayClickListener;
+    }
+
+    public OnMonthChangeListener getOnMonthChangeListener() {
+        return monthChangeListener;
+    }
 
 }

@@ -54,6 +54,7 @@
     <color name="activity_meals">#F4C542</color>
     <color name="activity_breaks">#7ED6E5</color>
     <color name="activity_sleep">#8E9CB8</color>
+    <color name="activity_calendar">#FF9800</color>
 
     <!-- Type Colors (muted alternatives) -->
     <color name="activity_deep_study_muted">#A08DC9</color>
@@ -64,6 +65,8 @@
     <color name="activity_meals_muted">#F8DA8B</color>
     <color name="activity_breaks_muted">#B3E8EF</color>
     <color name="activity_sleep_muted">#BAC4D6</color>
+    <color name="activity_calendar_muted">#FF9800</color>
+
 
     <!-- Sequential Color Scale -> for heatmaps, gradients -->
     <color name="chart_scale_0">#F5F3F7</color>
@@ -91,6 +94,12 @@
     <color name="streak_outstanding">#66BB6A</color>
     <color name="streak_selected">#9D83CE</color>
     <color name="streak_today_border">#6B4FBB</color>
+
+    <!-- PAM Score Colors -->
+    <color name="pam_high">#66BB6A</color>
+    <color name="pam_medium">#A5D6A7</color>
+    <color name="pam_medium_low">#9D83CE</color>
+    <color name="pam_low">#6B4FBB</color>
 
 
     <!-- confidence overlay -->
