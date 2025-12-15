@@ -18,8 +18,8 @@ public enum PreferencesKey {
     TIMER_SHORT_PAUSE_DURATION("timer_short_pause_duration"),
     TIMER_LONG_PAUSE_DURATION("timer_long_pause_duration"),
     USER_AVATAR_URI("user_avatar_uri"),
-
-    IS_FIRST_SESSION("is_first_session");
+    IS_FIRST_SESSION("is_first_session"),
+    COIN_BALANCE("coin_balance");
 
     private final String name;
 

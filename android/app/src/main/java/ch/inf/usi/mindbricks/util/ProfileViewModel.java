@@ -6,13 +6,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import ch.inf.usi.mindbricks.R;
+
 public class ProfileViewModel extends AndroidViewModel {
 
-    // Using SharedPreferences to save coins even when the app is closed.
-    private static final String PREFS_NAME = "user_profile";
-    private static final String COINS_KEY = "coin_balance";
-
-    private final android.content.SharedPreferences sharedPreferences;
+    private final PreferencesManager preferencesManager;
 
     // _coins is the private mutable LiveData
     private final MutableLiveData<Integer> _coins = new MutableLiveData<>();
@@ -21,9 +19,15 @@ public class ProfileViewModel extends AndroidViewModel {
 
     public ProfileViewModel(Application application) {
         super(application);
-        sharedPreferences = application.getSharedPreferences(PREFS_NAME, android.content.Context.MODE_PRIVATE);
+        preferencesManager = new PreferencesManager(application);
+
         // Load the saved coin balance when the ViewModel is created
-        _coins.setValue(sharedPreferences.getInt(COINS_KEY, 0)); // Default to 0
+        int saved = preferencesManager.getBalance();
+        if (saved == 0) {
+            int initialCoins = application.getResources().getInteger(R.integer.starting_coins);
+            saveCoins(initialCoins);
+        }
+        _coins.setValue(saved);
     }
 
     public void addCoins(int amount) {
@@ -46,6 +50,6 @@ public class ProfileViewModel extends AndroidViewModel {
     }
 
     private void saveCoins(int balance) {
-        sharedPreferences.edit().putInt(COINS_KEY, balance).apply();
+        preferencesManager.setBalance(balance);
     }
 }

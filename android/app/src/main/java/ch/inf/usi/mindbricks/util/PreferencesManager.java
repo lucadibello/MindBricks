@@ -149,4 +149,13 @@ public class PreferencesManager {
     public void setFirstSession(boolean isFirst) {
         preferences.edit().putBoolean(PreferencesKey.IS_FIRST_SESSION.getName(), isFirst).apply();
     }
+
+    // -- Coin Balance --
+    public int getBalance() {
+        return preferences.getInt(PreferencesKey.COIN_BALANCE.getName(), 0);
+    }
+
+    public void setBalance(int balance) {
+        preferences.edit().putInt(PreferencesKey.COIN_BALANCE.getName(), balance).apply();
+    }
 }
