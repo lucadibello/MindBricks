@@ -90,7 +90,7 @@ public class IsometricCityView extends View {
      * Current scale factor for zooming.
      * Default increased to start more zoomed-in for better view of multi-cell buildings.
      */
-    private float scaleFactor = MAX_SCALE;
+    private float scaleFactor = (MAX_SCALE - MIN_SCALE) * 0.5f;
 
     /**
      * Minimum allowed scale factor.
@@ -101,12 +101,12 @@ public class IsometricCityView extends View {
     /**
      * Maximum allowed scale factor.
      */
-    private static final float MAX_SCALE = 4f;
+    private static final float MAX_SCALE = 10f;
 
     /**
      * Multiplicative factory for zoom sensitivity (lower = less)
      */
-    private static final float ZOOM_SENSITIVITY_FACTOR = 0.2f;
+    private static final float ZOOM_SENSITIVITY_FACTOR = 1f;
 
     /**
      * Margin for clamping pan to prevent the map from going too far off-screen.
@@ -168,11 +168,25 @@ public class IsometricCityView extends View {
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             @Override
             public boolean onScale(@NonNull ScaleGestureDetector detector) {
+                float oldScale = scaleFactor;
+                float focusX = detector.getFocusX();
+                float focusY = detector.getFocusY();
+
                 // update scale factor based on gesture + apply sensitivity
                 float scaleFactorChange = 1.0f + (detector.getScaleFactor() - 1.0f) * ZOOM_SENSITIVITY_FACTOR;
-                scaleFactor *= scaleFactorChange;
+                float newScale = oldScale * scaleFactorChange;
+
                 // clamp scale factor to min/max limits
-                scaleFactor = Math.max(MIN_SCALE, Math.min(scaleFactor, MAX_SCALE));
+                newScale = Math.max(MIN_SCALE, Math.min(newScale, MAX_SCALE));
+
+                // Apply new scale
+                scaleFactor = newScale;
+
+                // Adjust pan to zoom towards the focus point
+                // Logic: (focusX - panX) / oldScale == (focusX - newPanX) / newScale
+                float scaleRatio = newScale / oldScale;
+                panX = focusX - (focusX - panX) * scaleRatio;
+                panY = focusY - (focusY - panY) * scaleRatio;
                 
                 // Constrain panning after zoom
                 clampPan();
@@ -453,30 +467,63 @@ public class IsometricCityView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         scaleGestureDetector.onTouchEvent(event);
-        // handle panning
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN: // keep track of last touch position
-                lastTouchX = event.getX();
-                lastTouchY = event.getY();
+
+        // get action
+        final int action = event.getActionMasked();
+
+        // detect if a finger is lifted while dragging
+        int pointerIndex = -1;
+        if (action == MotionEvent.ACTION_POINTER_UP) {
+            pointerIndex = event.getActionIndex(); // get index of lifting finger
+        }
+
+        // Calculate the center point of all fingers
+        float sumX = 0, sumY = 0;
+        int count = 0;
+        for (int i = 0; i < event.getPointerCount(); i++) {
+            // skip lifting finger
+            if (i == pointerIndex) continue;
+
+            // get position of finger (x,y) for all fingers
+            sumX += event.getX(i);
+            sumY += event.getY(i);
+            count++;
+        }
+
+        // compute centroid of zoom (focusX, focusY) as the mean position of all fingers
+        final float focusX = count > 0 ? sumX / count : 0;
+        final float focusY = count > 0 ? sumY / count : 0;
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_POINTER_DOWN:
+            case MotionEvent.ACTION_POINTER_UP:
+                // reset anchor to current focus point to avoid jumping around
+                lastTouchX = focusX;
+                lastTouchY = focusY;
                 break;
-            case MotionEvent.ACTION_MOVE: // compute delta and update pan offsets
+
+            case MotionEvent.ACTION_MOVE:
+                // Only pan if not zooming
                 if (!scaleGestureDetector.isInProgress()) {
                     // compute delta
-                    float dx = event.getX() - lastTouchX;
-                    float dy = event.getY() - lastTouchY;
-                    // update pan offsets
+                    final float dx = focusX - lastTouchX;
+                    final float dy = focusY - lastTouchY;
+
+                    // apply delta to pan
                     panX += dx;
                     panY += dy;
-                    
-                    // Constrain panning
+
+                    // clamp panning to avoid going off screen
                     clampPan();
 
                     // force redraw
                     invalidate();
-                    // update last touch position
-                    lastTouchX = event.getX();
-                    lastTouchY = event.getY();
                 }
+
+                // Always update last touch
+                lastTouchX = focusX;
+                lastTouchY = focusY;
                 break;
             default:
                 break;
