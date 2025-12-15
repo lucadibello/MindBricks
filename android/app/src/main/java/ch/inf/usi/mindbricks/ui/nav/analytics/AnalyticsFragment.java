@@ -920,7 +920,6 @@ public class AnalyticsFragment extends Fragment {
 
     private void navigateToPreferences() {
         Intent intent = new Intent(requireContext(), SettingsActivity.class);
-        intent.putExtra(SettingsActivity.EXTRA_TAB_INDEX, 1);
         startActivity(intent);
     }
 

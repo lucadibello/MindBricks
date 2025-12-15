@@ -351,7 +351,6 @@
     <string name="permission_settings_title">Permission Required</string>
     <string name="permission_settings_message">Calendar permission was denied. To connect your calendar, please enable the Calendar permission in the app settings.</string>
     <string name="permission_settings_button">Open Settings</string>
-    <string name="app_name">MindBricks</string>
 
 
 </resources>
