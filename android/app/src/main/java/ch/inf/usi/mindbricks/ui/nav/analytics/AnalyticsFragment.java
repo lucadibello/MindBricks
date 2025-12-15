@@ -91,7 +91,7 @@ public class AnalyticsFragment extends Fragment {
     private RecyclerView dailyRingsRecyclerView;
     private DailyRingsAdapter dailyRingsAdapter;
     private MaterialButton expandRingsButton;
-    private boolean isHistoryExpanded = true;
+    private boolean isHistoryExpanded = false;
 
 
     // Session history
