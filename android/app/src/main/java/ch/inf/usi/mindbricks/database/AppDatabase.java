@@ -15,7 +15,7 @@ import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
 import ch.inf.usi.mindbricks.util.database.DatabaseSeeder;
 import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
-import ch.inf.usi.mindbricks.database.dao.PAMScoreDao;
+import ch.inf.usi.mindbricks.database.PAMScoreDao;
 
 /**
  * Room database for MindBricks app

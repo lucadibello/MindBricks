@@ -49,9 +49,9 @@ import ch.inf.usi.mindbricks.ui.charts.HourlyDistributionChartView;
 import ch.inf.usi.mindbricks.ui.charts.QualityHeatmapChartView;
 import ch.inf.usi.mindbricks.ui.charts.SessionHistoryAdapter;
 import ch.inf.usi.mindbricks.ui.charts.StreakCalendarView;
+import ch.inf.usi.mindbricks.ui.charts.TagUsageChartView;
 import ch.inf.usi.mindbricks.ui.charts.WeeklyFocusChartView;
 import ch.inf.usi.mindbricks.util.database.DataProcessor;
-import ch.inf.usi.mindbricks.util.database.TestDataGenerator;
 
 /**
  * Fragment that displays analytics and visualizations of study sessions.
@@ -74,6 +74,8 @@ public class AnalyticsFragment extends Fragment {
     private GoalRingsView goalRingsView;
     private AIRecommendationCardView aiRecommendationView;
     private LinearLayout aiLegendContainer;
+    private TagUsageChartView tagUsagePieChart;
+
 
     // rings
     private View todayRingCard;
@@ -216,6 +218,7 @@ public class AnalyticsFragment extends Fragment {
         goalRingsView = view.findViewById(R.id.goalRingsView);
         aiRecommendationView = view.findViewById(R.id.aiRecommendationView);
         aiLegendContainer = view.findViewById(R.id.legendContainer);
+        tagUsagePieChart = view.findViewById(R.id.tagUsageChart);
 
         // History
         sessionHistoryRecycler = view.findViewById(R.id.sessionHistoryRecycler);
@@ -415,6 +418,13 @@ public class AnalyticsFragment extends Fragment {
             } else {
                 Log.w(TAG, "Cannot update AI recommendation: recommendation=" +
                         (recommendation != null) + ", view=" + (aiRecommendationView != null));
+            }
+        });
+
+        // Observe tag usage data
+        viewModel.getTagUsageData().observe(getViewLifecycleOwner(), data -> {
+            if (data != null && tagUsagePieChart != null) {
+                tagUsagePieChart.setData(data);
             }
         });
 

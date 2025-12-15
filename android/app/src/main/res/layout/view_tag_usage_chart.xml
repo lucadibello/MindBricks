@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Summary text -->
+    <TextView
+        android:id="@+id/tagUsageSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tag usage distribution"
+        android:textSize="14sp"
+        android:textColor="@color/analytics_text_secondary"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Pie Chart -->
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/tagUsagePieChart"
+        android:layout_width="match_parent"
+        android:layout_height="400dp" />
+
+</LinearLayout>

@@ -23,6 +23,12 @@ public interface SessionQuestionnaireDao {
     @Delete
     void delete(SessionQuestionnaire questionnaire);
 
+    @Query("SELECT * FROM session_questionnaires WHERE sessionId = :sessionId LIMIT 1")
+    SessionQuestionnaire getQuestionnaireBySessionId(long sessionId);
+
+    @Query("SELECT * FROM session_questionnaires WHERE timestamp BETWEEN :startTime AND :endTime ORDER BY timestamp ASC")
+    List<SessionQuestionnaire> getQuestionnairesInRange(long startTime, long endTime);
+
     @Query("SELECT * FROM session_questionnaires WHERE sessionId = :sessionId")
     SessionQuestionnaire getQuestionnaireForSession(long sessionId);
 
