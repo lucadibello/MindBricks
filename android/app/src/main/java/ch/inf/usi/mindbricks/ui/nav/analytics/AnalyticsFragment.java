@@ -91,7 +91,7 @@ public class AnalyticsFragment extends Fragment {
     private RecyclerView dailyRingsRecyclerView;
     private DailyRingsAdapter dailyRingsAdapter;
     private MaterialButton expandRingsButton;
-    private boolean isHistoryExpanded = false;
+    private boolean isHistoryExpanded = true;
 
 
     // Session history
@@ -115,6 +115,8 @@ public class AnalyticsFragment extends Fragment {
     // Date formatters
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
+
+    private boolean isRefreshing = false;
 
     @Nullable
     @Override
@@ -240,7 +242,10 @@ public class AnalyticsFragment extends Fragment {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
 
         // Setup swipe to refresh
-        swipeRefreshLayout.setOnRefreshListener(() -> viewModel.refreshData());
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            Log.d(TAG, "Swipe refresh triggered");
+            viewModel.refreshData();
+        });
 
         // Daily Rings
         RecyclerView dailyRingsRecyclerView = view.findViewById(R.id.dailyRingsRecyclerView);
@@ -375,9 +380,7 @@ public class AnalyticsFragment extends Fragment {
         });
 
         // Observe view state for loading/error/success
-        viewModel.getViewState().observe(getViewLifecycleOwner(), state -> {
-            updateUIState(state);
-        });
+        viewModel.getViewState().observe(getViewLifecycleOwner(), this::updateUIState);
 
         // Observe weekly stats
         viewModel.getWeeklyStats().observe(getViewLifecycleOwner(), stats -> {
@@ -920,6 +923,7 @@ public class AnalyticsFragment extends Fragment {
 
     private void navigateToPreferences() {
         Intent intent = new Intent(requireContext(), SettingsActivity.class);
+        intent.putExtra("fragment_set", 1);
         startActivity(intent);
     }
 
@@ -996,12 +1000,10 @@ public class AnalyticsFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        Log.d(TAG, "Fragment resumed - refreshing data");
+        Log.d(TAG, "Fragment resumed");
 
-        viewModel.refreshData();
-        calendarSessionsCache.clear();
-
-        if (streakCalendarView != null) {
+        // Only reload calendar if it was previously cleared
+        if (calendarSessionsCache.isEmpty() && streakCalendarView != null) {
             Calendar cal = Calendar.getInstance();
             int currentMonth = cal.get(Calendar.MONTH);
             int currentYear = cal.get(Calendar.YEAR);
@@ -1014,6 +1016,11 @@ public class AnalyticsFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
         Log.d(TAG, "onDestroyView");
     }
 }

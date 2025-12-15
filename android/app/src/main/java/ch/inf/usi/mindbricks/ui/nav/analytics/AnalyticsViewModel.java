@@ -76,6 +76,8 @@ public class AnalyticsViewModel extends AndroidViewModel {
     private final MutableLiveData<ViewState> viewState = new MutableLiveData<>(ViewState.LOADING);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
+    private boolean isRefreshing = false;
+
     // Optimized caching system
     private static class ResultCache {
         final int sessionsHash;
@@ -187,7 +189,6 @@ public class AnalyticsViewModel extends AndroidViewModel {
         }
 
         sessionsSource = repository.getSessionsSince(queryStartTime);
-
         sessionsSource.observeForever(sessionsObserver);
     }
 
@@ -402,7 +403,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
                     allSessions,
                     ringsDateRange,
                     dailyMinutesTarget,
-                    5
+                    1
             );
             dailyRingsHistory.postValue(history);
 
@@ -462,9 +463,31 @@ public class AnalyticsViewModel extends AndroidViewModel {
     }
 
     public void refreshData() {
+        if (isRefreshing) {
+            Log.d(TAG, "Refresh already in progress, skipping");
+            return;
+        }
+
         Log.d(TAG, "Refreshing data (cache invalidated)");
+        isRefreshing = true;
+
         cachedSessions = null;
         resultCache = null;
+
+        if (sessionsSource != null) {
+            sessionsSource.removeObserver(sessionsObserver);
+            sessionsSource = null;
+        }
+
+        if (currentDateRange != null) {
+            // Force reload by temporarily clearing currentDateRange
+            DateRange rangeToReload = currentDateRange;
+            currentDateRange = null;  // This will allow loadDataForRange to proceed
+            loadDataForRange(rangeToReload);
+        }
+
+        // Reset flag after a short delay
+        debounceHandler.postDelayed(() -> isRefreshing = false, 1000);
     }
 
     // getters

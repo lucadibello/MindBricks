@@ -141,7 +141,7 @@ public class GoalRingsView extends View {
         ringPaint.setStrokeWidth(strokeWidth);
         backgroundPaint.setStrokeWidth(strokeWidth);
 
-        float offset = isCompactView ? 20 : 120;
+        float offset = isCompactView ? 20 : 180f;
 
         for (int i = 0; i < rings.size(); i++) {
             GoalRing ring = rings.get(i);
@@ -190,7 +190,7 @@ public class GoalRingsView extends View {
     private void drawCenterText(Canvas canvas, float textSize) {
         if (rings.isEmpty()) return;
 
-        float offset = isCompactView ? 10 : 120;
+        float offset = isCompactView ? 10 : 180;
 
         // Calculate overall completion
         float totalProgress = 0;
@@ -209,7 +209,7 @@ public class GoalRingsView extends View {
             Paint subtitlePaint = new Paint(textPaint);
             subtitlePaint.setTextSize(textSize / 2);
             subtitlePaint.setColor(colorTextSecondary);
-            canvas.drawText("Complete", centerX, centerY - 60, subtitlePaint);
+            canvas.drawText("Complete", centerX, centerY - 130, subtitlePaint);
         }
     }
 
@@ -217,7 +217,7 @@ public class GoalRingsView extends View {
         if (isCompactView)
             return;
 
-        float startY = centerY + 210f;
+        float startY = centerY + 150f;
         float lineHeight = 110f;
 
         for (int i = 0; i < rings.size(); i++) {
