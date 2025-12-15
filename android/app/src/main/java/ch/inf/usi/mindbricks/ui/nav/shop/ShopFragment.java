@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -159,10 +160,12 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
      * Setup the bottom sheet behavior for the shop UI.
      */
     private void setupBottomSheet() {
-        // FIXME: maybe this can be done in XML directly?
+        // create bottom sheet
         BottomSheetBehavior<MaterialCardView> bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet);
         bottomSheetBehavior.setPeekHeight(dpToPx(250));
         bottomSheetBehavior.setDraggable(true);
+        bottomSheetBehavior.setFitToContents(false);
+        bottomSheetBehavior.setExpandedOffset(dpToPx(100)); // avoid hiding entire view
 
         // Add callback to update exclusion zone when bottom sheet moves
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
