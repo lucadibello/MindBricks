@@ -400,7 +400,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
 
             List<DailyRings> history = DataProcessor.calculateDailyRingsHistory(
                     getApplication(),
-                    allSessions,
+                    filteredSessions,
                     ringsDateRange,
                     dailyMinutesTarget,
                     1

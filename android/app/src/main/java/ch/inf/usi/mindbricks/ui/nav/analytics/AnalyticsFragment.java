@@ -187,6 +187,27 @@ public class AnalyticsFragment extends Fragment {
             isHistoryExpanded = !isHistoryExpanded;
             updateHistoryVisibility();
         });
+
+        dailyRingsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                // Update scrolling state
+                isScrolling = (newState != RecyclerView.SCROLL_STATE_IDLE);
+
+                Log.d(TAG, "Daily rings scroll state: " +
+                        (isScrolling ? "SCROLLING" : "IDLE"));
+            }
+        });
+
+        dailyRingsAdapter.setOnDayClickListener((position, data) -> {
+            if (isScrolling) {
+                Log.d(TAG, "Click ignored - currently scrolling");
+                return; // Ignore clicks while scrolling
+            }
+            Toast.makeText(getContext(), "Clicked: " + data.getDisplayDate(), Toast.LENGTH_SHORT).show();
+        });
     }
 
 
@@ -327,11 +348,11 @@ public class AnalyticsFragment extends Fragment {
         }
     }
 
+    private boolean isScrolling = false;
     /**
      * Setup RecyclerView with adapter and layout manager.
      */
     private void setupRecyclerView() {
-        // Create adapter with click listener
         sessionHistoryAdapter = new SessionHistoryAdapter(new SessionHistoryAdapter.OnSessionClickListener() {
             @Override
             public void onSessionClick(StudySessionWithStats session) {
@@ -342,6 +363,7 @@ public class AnalyticsFragment extends Fragment {
             public void onSessionLongClick(StudySessionWithStats session) {
                 showSessionOptionsDialog(session);
             }
+
         });
 
         // Set layout manager
@@ -358,6 +380,41 @@ public class AnalyticsFragment extends Fragment {
                         layoutManager.getOrientation()
                 )
         );
+
+        sessionHistoryRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                // Update scrolling state
+                isScrolling = (newState != RecyclerView.SCROLL_STATE_IDLE);
+
+                Log.d(TAG, "Session history scroll state: " +
+                        (isScrolling ? "SCROLLING" : "IDLE"));
+            }
+        });
+
+        sessionHistoryAdapter = new SessionHistoryAdapter(new SessionHistoryAdapter.OnSessionClickListener() {
+            @Override
+            public void onSessionClick(StudySessionWithStats session) {
+                if (isScrolling) {
+                    Log.d(TAG, "Click ignored - currently scrolling");
+                    return;
+                }
+                showSessionDetails(session);
+            }
+
+            @Override
+            public void onSessionLongClick(StudySessionWithStats session) {
+                if (isScrolling) {
+                    Log.d(TAG, "Long click ignored - currently scrolling");
+                    return;
+                }
+                showSessionOptionsDialog(session);
+            }
+        });
+
+        Log.d(TAG, "RecyclerView setup complete");
 
         Log.d(TAG, "RecyclerView setup complete");
     }
