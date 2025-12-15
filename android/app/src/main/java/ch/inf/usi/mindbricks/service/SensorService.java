@@ -125,7 +125,7 @@ public class SensorService extends Service {
                 PendingIntent.FLAG_IMMUTABLE);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(getString(R.string.app_name))
+                .setContentTitle(getString(R.string.app_title))
                 .setContentText("Monitoring focus session...")
                 .setSmallIcon(R.mipmap.ic_launcher_round) // FIXME: use app icon once created
                 .setContentIntent(pendingIntent)
