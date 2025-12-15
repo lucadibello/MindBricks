@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.nav.shop.ShopFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -118,7 +119,7 @@
                     android:id="@+id/inventory_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="185dp"
+                    android:minHeight="160dp"
                     android:layout_marginTop="8dp"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
