@@ -35,12 +35,14 @@ import ch.inf.usi.mindbricks.game.TileAsset;
 import ch.inf.usi.mindbricks.game.TileAssetLoader;
 import ch.inf.usi.mindbricks.game.TileBitmapLoader;
 import ch.inf.usi.mindbricks.game.TileGameViewModel;
+import ch.inf.usi.mindbricks.game.TilePlacement;
 import ch.inf.usi.mindbricks.game.TileType;
+import ch.inf.usi.mindbricks.ui.nav.home.city.IsometricCityView;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
 import ch.inf.usi.mindbricks.util.VibrationHelper;
 
-public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyClickListener {
+public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyClickListener, IsometricCityView.OnBuildingClickListener {
 
     /**
      * View binding for the fragment layout.
@@ -331,6 +333,30 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
     private void setupCityView() {
         binding.cityView.setTileAssets(assetIndex, bitmapLoader);
         binding.cityView.setOnTileDropListener(this::handleTilePlacement);
+        binding.cityView.setOnBuildingClickListener(this);
+    }
+
+    /**
+     * Handle building click events to remove buildings.
+     *
+     * @param placement The placement object associated with the clicked building
+     */
+    @Override
+    public void onBuildingClick(TilePlacement placement) {
+        TileAsset asset = assetIndex.get(placement.getTileId());
+        String name = asset != null ? asset.displayName() : "Building";
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Remove " + name + "?")
+                .setMessage("Are you sure you want to remove this building? You won't get a refund.")
+                .setPositiveButton("Remove", (dialog, which) -> {
+                    tileGameViewModel.removePlacement(placement);
+                    VibrationHelper.vibrate(requireContext(), VibrationHelper.VibrationType.DESTROY_TILE);
+                    SoundPlayer.playSound(requireContext(), R.raw.purchase);
+                    Toast.makeText(getContext(), name + " removed.", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     /**

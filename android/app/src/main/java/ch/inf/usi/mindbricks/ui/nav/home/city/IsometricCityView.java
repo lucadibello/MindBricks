@@ -9,6 +9,7 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -138,6 +139,27 @@ public class IsometricCityView extends View {
      */
     private final ScaleGestureDetector scaleGestureDetector;
 
+    /**
+     * Gesture detector for handling tap events.
+     */
+    private final GestureDetector gestureDetector;
+
+    /**
+     * Listener for building click events.
+     */
+    private OnBuildingClickListener onBuildingClickListener;
+
+    /**
+     * Interface for listening to building click events.
+     */
+    public interface OnBuildingClickListener {
+        /**
+         * Called when a building is clicked.
+         * @param placement The placement object associated with the clicked building.
+         */
+        void onBuildingClick(TilePlacement placement);
+    }
+
     // Drag state tracking
     private String draggingTileId = null;
     private int draggingRow = -1;
@@ -197,8 +219,39 @@ public class IsometricCityView extends View {
             }
         });
 
+        // create gesture detector for single taps
+        gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(@NonNull MotionEvent e) {
+                if (worldState == null || onBuildingClickListener == null) return false;
+
+                // Convert screen coordinates to grid coordinates
+                int[] grid = screenToGrid(e.getX(), e.getY());
+                if (grid == null) return false;
+
+                int r = grid[0];
+                int c = grid[1];
+
+                // Check if there is a placement at this location
+                TilePlacement placement = worldState.getPlacementAt(r, c);
+                if (placement != null) {
+                    onBuildingClickListener.onBuildingClick(placement);
+                    return true;
+                }
+                return false;
+            }
+        });
+
         // set drag listener for tile dropping
         setOnDragListener(this::handleDrag);
+    }
+
+    /**
+     * Set the listener for building click events.
+     * @param listener The listener to notify on building clicks
+     */
+    public void setOnBuildingClickListener(OnBuildingClickListener listener) {
+        this.onBuildingClickListener = listener;
     }
 
     public void setTileAssets(Map<String, TileAsset> assetIndex, TileBitmapLoader loader) {
@@ -467,11 +520,11 @@ public class IsometricCityView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         scaleGestureDetector.onTouchEvent(event);
+        gestureDetector.onTouchEvent(event);
 
-        // get action
         final int action = event.getActionMasked();
 
-        // detect if a finger is lifted while dragging
+        // Handle pointer up (ignore the pointer that is lifting)
         int pointerIndex = -1;
         if (action == MotionEvent.ACTION_POINTER_UP) {
             pointerIndex = event.getActionIndex(); // get index of lifting finger

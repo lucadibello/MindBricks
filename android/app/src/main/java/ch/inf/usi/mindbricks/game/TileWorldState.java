@@ -153,7 +153,6 @@ public class TileWorldState {
         Map<String, TilePlacement> placementCopy = new HashMap<>(getPlacements());
 
         // place the tile
-        // FIXME: this is sussss
         TilePlacement placement = new TilePlacement(tileId, width, height, row, col);
         for (int r = row; r < row + height; r++) {
             for (int c = col; c < col + width; c++) {
@@ -269,6 +268,31 @@ public class TileWorldState {
             for (int c = col; c < col + width; c++) {
                 tilesCopy.put(key(r, c), tileId);
                 placementCopy.put(key(r, c), placement);
+            }
+        }
+
+        // Return new state
+        return new TileWorldState(rows, cols, baseTileId, tilesCopy, placementCopy);
+    }
+
+    /**
+     * Return a new TileWorldState with the specified placement removed.
+     *
+     * @param placement The placement to remove
+     * @return New TileWorldState with the placement removed
+     */
+    public TileWorldState withRemoval(TilePlacement placement) {
+        if (placement == null) return this;
+
+        // Copy existing maps
+        Map<String, String> tilesCopy = new HashMap<>(getPlacedTiles());
+        Map<String, TilePlacement> placementCopy = new HashMap<>(getPlacements());
+
+        // Remove all cells occupied by the placement
+        for (int r = placement.getAnchorRow(); r < placement.getAnchorRow() + placement.getHeight(); r++) {
+            for (int c = placement.getAnchorCol(); c < placement.getAnchorCol() + placement.getWidth(); c++) {
+                tilesCopy.remove(key(r, c));
+                placementCopy.remove(key(r, c));
             }
         }
 

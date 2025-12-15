@@ -224,4 +224,18 @@ public class TileGameViewModel extends AndroidViewModel {
 
         return true;
     }
+
+    /**
+     * Remove a placement from the world
+     *
+     * @param placement The placement to remove
+     */
+    public void removePlacement(TilePlacement placement) {
+        TileWorldState state = worldState.getValue();
+        if (state == null || placement == null) return;
+
+        TileWorldState updated = state.withRemoval(placement);
+        worldState.setValue(updated);
+        worldRepository.saveWorld(updated);
+    }
 }
