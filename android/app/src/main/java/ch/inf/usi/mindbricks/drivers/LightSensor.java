@@ -16,8 +16,9 @@ public class LightSensor extends BaseSensor implements SensorEventListener {
     private final SensorManager sensorManager;
 
     private final AccelerometerSensor accelerometerSensor;
-    private boolean isFaceUp = false;
+    private boolean isFaceUp = true;
     private float currentLightLevel = 0;
+    private float lastSeenLightLevel = 0;
 
     private LightSensorListener listener;
 
@@ -53,6 +54,9 @@ public class LightSensor extends BaseSensor implements SensorEventListener {
             accelerometerSensor.startOrientationMonitoring(isFaceUp -> {
                 // on orientation change: update internal flag + notify listener
                 this.isFaceUp = isFaceUp;
+                if (isFaceUp) {
+                    currentLightLevel = lastSeenLightLevel;
+                }
                 notifyListener();
             });
         }
@@ -78,6 +82,8 @@ public class LightSensor extends BaseSensor implements SensorEventListener {
         float maxRange = getSensor().getMaximumRange();
         if (maxRange == 0) maxRange = 40000f; // Safety fallback
         float normalizedLight = Math.min(100f, (rawLightLevel / maxRange) * 100f);
+
+        lastSeenLightLevel = normalizedLight;
 
         // Logic: record light state only when screen is facing upwards.
         if (isFaceUp) {
