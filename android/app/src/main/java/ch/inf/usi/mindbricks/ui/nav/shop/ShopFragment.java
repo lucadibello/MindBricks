@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +36,7 @@ import ch.inf.usi.mindbricks.game.TileBitmapLoader;
 import ch.inf.usi.mindbricks.game.TileGameViewModel;
 import ch.inf.usi.mindbricks.game.TilePlacement;
 import ch.inf.usi.mindbricks.game.TileType;
-import ch.inf.usi.mindbricks.ui.nav.home.city.IsometricCityView;
+import ch.inf.usi.mindbricks.ui.nav.shop.city.IsometricCityView;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
 import ch.inf.usi.mindbricks.util.VibrationHelper;

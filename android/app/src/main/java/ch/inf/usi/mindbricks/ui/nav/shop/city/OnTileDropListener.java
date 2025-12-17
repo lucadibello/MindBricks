@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.ui.nav.home.city;
+package ch.inf.usi.mindbricks.ui.nav.shop.city;
 
 /**
  * Listener interface for handling tile drop events on the city grid.

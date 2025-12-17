@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.ui.nav.home.city;
+package ch.inf.usi.mindbricks.ui.nav.shop.city;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -219,7 +219,7 @@ public class IsometricCityView extends View {
             }
         });
 
-        // create gesture detector for single taps
+        // create gesture detector for single taps (delete a structure)
         gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(@NonNull MotionEvent e) {
@@ -254,6 +254,12 @@ public class IsometricCityView extends View {
         this.onBuildingClickListener = listener;
     }
 
+    /**
+     * Set the index of available tile assets and the loader for tile bitmaps.
+     *
+     * @param assetIndex Index of available tile assets by their IDs
+     * @param loader Loader for tile bitmaps
+     */
     public void setTileAssets(Map<String, TileAsset> assetIndex, TileBitmapLoader loader) {
         if (assetIndex != null) this.assetIndex = assetIndex;
         this.bitmapLoader = loader;
@@ -737,6 +743,9 @@ public class IsometricCityView extends View {
         }
     }
 
+    /**
+     * Reset the drag state to default values.
+     */
     private void resetDragState() {
         draggingTileId = null;
         draggingRow = -1;
