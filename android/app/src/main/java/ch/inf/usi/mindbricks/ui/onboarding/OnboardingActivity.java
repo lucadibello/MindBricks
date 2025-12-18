@@ -18,16 +18,46 @@ import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.ValidationResult;
 import ch.inf.usi.mindbricks.util.validators.ProfileValidator;
 
+/**
+ * Activity for the onboarding process.
+ *
+ * @author Luca Di Bello
+ */
 public class OnboardingActivity extends AppCompatActivity {
 
-    private static final int PAGE_USER = 1;
-
+    /**
+     * View pager for the onboarding process.
+     */
     private ViewPager2 viewPager;
+
+    /**
+     * Skip button for the onboarding process.
+     */
     private MaterialButton buttonSkip;
+
+    /**
+     * Next button for the onboarding process.
+     */
     private MaterialButton buttonNext;
+
+    /**
+     * Preferences manager for the app.
+     */
     private PreferencesManager prefs;
+
+    /**
+     * Pager adapter for the onboarding process.
+     */
     private OnboardingPagerAdapter pagerAdapter;
+
+    /**
+     * Index of the current page.
+     */
     private int currentPage = 0;
+
+    /**
+     * Flag to suppress page change callback.
+     */
     private boolean suppressPageChangeCallback = false;
 
     @Override
@@ -149,14 +179,24 @@ public class OnboardingActivity extends AppCompatActivity {
      * @return true if user has completed the onboarding, false otherwise
      */
     private boolean canCompleteOnboarding() {
-        // ensure user has a valid name
-        ValidationResult nameResult = ProfileValidator.validateName(
-                prefs.getUserName(),
-                this
-        );
-        if (!nameResult.isValid()) {
-            viewPager.setCurrentItem(PAGE_USER, true);
-            Snackbar.make(viewPager, R.string.onboarding_error_profile_required, Snackbar.LENGTH_SHORT).show();
+        // validate all steps
+        boolean isValid = true;
+        int step = -1;
+
+        for (int i = 0; i < pagerAdapter.getItemCount(); i++) {
+            if (!validateStepAtPosition(i)) {
+                isValid = false;
+                step = i;
+                break;
+            }
+        }
+
+        // if not valid,
+        if (!isValid) {
+            //noinspection ConstantConditions
+            assert step >= 0; // NOTE: when not valid, we know that step is valid
+            viewPager.setCurrentItem(step, true);
+            Snackbar.make(viewPager, R.string.onboarding_validation_error, Snackbar.LENGTH_SHORT).show();
             return false;
         }
 

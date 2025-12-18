@@ -140,7 +140,7 @@ public class SettingsCalendarFragment extends Fragment {
     private void handleDeviceCalendarClick() {
         if (syncService.isDriverAuthenticated("device")) {
             // Already connected - show disconnect dialog
-            showDisconnectDialog("device", getString(R.string.settings_calendar_device));
+            showDisconnectDialog("device", getString(R.string.settings_calendar_card_header));
         } else if (hasCalendarPermission()) {
             // Permission already granted
             onDeviceCalendarConnected();
@@ -209,9 +209,9 @@ public class SettingsCalendarFragment extends Fragment {
 
     private void showDisconnectDialog(String sourceName, String displayName) {
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.settings_calendar_disconnect_title)
-                .setMessage(getString(R.string.settings_calendar_disconnect_message, displayName))
-                .setPositiveButton(R.string.settings_calendar_disconnect, (dialog, which) -> {
+                .setTitle(R.string.settings_calendar_disconnect_dialog_title)
+                .setMessage(getString(R.string.settings_calendar_disconnect_dialog_message, displayName))
+                .setPositiveButton(R.string.settings_calendar_card_button_disconnect_title, (dialog, which) -> {
                     syncService.disconnectDriver(sourceName);
                     Toast.makeText(requireContext(),
                             getString(R.string.settings_calendar_disconnected, displayName),
@@ -290,7 +290,7 @@ public class SettingsCalendarFragment extends Fragment {
                 if (info.isConnected) {
                     // Connected state
                     String statusStr;
-                    statusStr = getString(R.string.settings_calendar_connected);
+                    statusStr = getString(R.string.settings_calendar_card_status_disconnected);
 
                     if (info.lastSyncTime > 0) {
                         statusStr += " • " + info.getLastSyncTimeString();
@@ -299,13 +299,13 @@ public class SettingsCalendarFragment extends Fragment {
                     statusText.setText(statusStr);
                     statusText.setTextColor(ContextCompat.getColor(requireContext(),
                             R.color.analytics_text_primary));
-                    button.setText(R.string.settings_calendar_disconnect);
+                    button.setText(R.string.settings_calendar_card_button_disconnect_title);
                 } else {
                     // Not connected state
-                    statusText.setText(R.string.settings_calendar_not_connected);
+                    statusText.setText(R.string.settings_calendar_card_status_connected);
                     statusText.setTextColor(ContextCompat.getColor(requireContext(),
                             android.R.color.darker_gray));
-                    button.setText(R.string.settings_calendar_connect);
+                    button.setText(R.string.settings_calendar_card_button_connect_title);
                 }
                 break;
             }

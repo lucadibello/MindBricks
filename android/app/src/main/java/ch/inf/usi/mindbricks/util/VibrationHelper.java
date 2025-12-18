@@ -3,12 +3,24 @@ package ch.inf.usi.mindbricks.util;
 import android.content.Context;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 
+/**
+ * Helper class for handling vibration effects.
+ *
+ * @author Luca Di Bello
+ */
 public final class VibrationHelper {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private VibrationHelper() {
     }
 
+    /**
+     * Types of vibration effects available.
+     */
     public enum VibrationType {
         SESSION_START,
         SESSION_END,
@@ -18,6 +30,12 @@ public final class VibrationHelper {
         PLACE_TILE
     }
 
+    /**
+     * Activates the selected vibration effect.
+     *
+     * @param context the application context
+     * @param type    the type of vibration effect to activate
+     */
     public static void vibrate(Context context, VibrationType type) {
         if (context == null) {
             return;
@@ -35,10 +53,16 @@ public final class VibrationHelper {
             vibrator.vibrate(effect);
         } catch (Exception e) {
             // FIXME: for debugging, we need to remove this later on
-            e.printStackTrace();
+            Log.e("VibrationHelper", "Error while vibrating", e);
         }
     }
 
+    /**
+     * Returns the appropriate vibration effect based on the provided type.
+     *
+     * @param type the type of vibration effect
+     * @return the corresponding VibrationEffect
+     */
     private static VibrationEffect getVibrationEffect(VibrationType type) {
         return switch (type) {
             case SESSION_START ->

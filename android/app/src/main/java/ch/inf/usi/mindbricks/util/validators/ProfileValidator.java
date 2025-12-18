@@ -34,12 +34,12 @@ public final class ProfileValidator {
      */
     public static ValidationResult validateName(String name, Context ctx) {
         if (TextUtils.isEmpty(name == null ? "" : name.trim())) {
-            return ValidationResult.error(ctx.getString(R.string.validation_error_name_required));
+            return ValidationResult.error(ctx.getString(R.string.onboarding_profile_validation_error_name_required));
         }
         assert name != null; // after the previous check -> this is enforced!
         String normalized = name.trim();
         if (!NAME_PATTERN.matcher(normalized).matches()) {
-            return ValidationResult.error(ctx.getString(R.string.validation_error_name_format));
+            return ValidationResult.error(ctx.getString(R.string.profile_name_validation_error_message));
         }
         return ValidationResult.ok();
     }

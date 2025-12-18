@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,8 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.TransitionManager;
 
 import java.util.ArrayList;
@@ -32,22 +29,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import ch.inf.usi.mindbricks.BuildConfig;
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.Tag;
-import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
-import ch.inf.usi.mindbricks.ui.nav.home.questionnare.DetailedQuestionsDialogFragment;
-import ch.inf.usi.mindbricks.ui.nav.home.questionnare.EmotionSelectDialogFragment;
+import ch.inf.usi.mindbricks.ui.nav.home.helper.HomeFragmentHelper;
 import ch.inf.usi.mindbricks.ui.settings.SettingsActivity;
-import ch.inf.usi.mindbricks.util.evaluation.FocusScoreCalculator;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
-import ch.inf.usi.mindbricks.util.ProfilePictureManager;
-import ch.inf.usi.mindbricks.util.ProfileViewModel;
-import ch.inf.usi.mindbricks.util.TagManager;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends HomeFragmentHelper {
 
     private TextView timerTextView;
     private TextView stateLabel;
@@ -55,13 +44,7 @@ public class HomeFragment extends Fragment {
     private Button startSessionButton;
     private TextView coinBalanceTextView;
     private ImageView settingsIcon;
-
-    private HomeViewModel homeViewModel;
-    private ProfileViewModel profileViewModel;
-    private ProfilePictureManager profilePictureManager;
-
     private NavigationLocker navigationLocker;
-
     private List<ImageView> sessionDots;
     private ConstraintLayout sessionDotsLayout;
 
@@ -84,46 +67,16 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // Register motion permission launcher
-        // Starts session regardless of outcome (not granted = no sensor data won't be collected)
         motionPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> startDefaultSession()
         );
 
         // Register audio permission launcher
-        // (After audio permission, request motion permission)
         audioPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> motionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
         );
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // If idle, refresh timer display in case settings changed
-        if (homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE &&
-                homeViewModel.currentTime.getValue() == 0L) {
-            PreferencesManager prefs = new PreferencesManager(requireContext());
-            updateTimerUI(TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
-        }
-        // Reload avatar in case it changed
-        if (profilePictureManager != null) {
-            profilePictureManager.loadProfilePicture();
-        }
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        homeViewModel = new ViewModelProvider(this,
-                ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().getApplication()))
-                .get(HomeViewModel.class);
-
-        // Initialize the shared ViewModel for the user's profile data.
-        profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
-
-        return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
     @Override
@@ -136,11 +89,10 @@ public class HomeFragment extends Fragment {
         startSessionButton = view.findViewById(R.id.start_stop_button);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
         settingsIcon = view.findViewById(R.id.settings_icon);
-
-        setupTagSpinner();
-
-        // Find the container for the dots
         sessionDotsLayout = view.findViewById(R.id.session_dots_layout);
+
+        // setup tag selector
+        setupTagSpinner(tagSpinner);
 
         // Initialize the list of session dot ImageViews
         sessionDots = new ArrayList<>();
@@ -149,16 +101,10 @@ public class HomeFragment extends Fragment {
         sessionDots.add(view.findViewById(R.id.dot3));
         sessionDots.add(view.findViewById(R.id.dot4));
 
-        // Initialize profile picture manager
-        PreferencesManager prefs = new PreferencesManager(requireContext());
-        profilePictureManager = new ProfilePictureManager(this, settingsIcon, prefs);
-
         // Click listener to open profile/settings
         settingsIcon.setOnClickListener(v -> {
-            // Only open profile if enabled (not during focus session)
             if (settingsIcon.isEnabled()) {
                 Intent intent = new Intent(requireContext(), SettingsActivity.class);
-                // Open profile tab
                 startActivity(intent);
             }
         });
@@ -167,7 +113,10 @@ public class HomeFragment extends Fragment {
         profilePictureManager.loadProfilePicture();
 
         int defaultStudyDurationMinutes = prefs.getTimerStudyDuration();
-        updateTimerUI(TimeUnit.MINUTES.toMillis(defaultStudyDurationMinutes));
+        updateTimerText(
+                timerTextView,
+                TimeUnit.MINUTES.toMillis(defaultStudyDurationMinutes)
+        );
 
         setupObservers();
 
@@ -213,6 +162,22 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // If idle, refresh timer display in case settings changed
+        if (homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
+            // NOTE: on first load, timerTextView is still null
+            if (timerTextView != null) updateTimerText(timerTextView, TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
+        }
+
+        // Reload avatar in case it changed
+        if (profilePictureManager != null) {
+            profilePictureManager.loadProfilePicture();
+        }
+    }
+
     private void setupObservers() {
         homeViewModel.currentState.observe(getViewLifecycleOwner(), state -> {
             boolean isRunning = state != HomeViewModel.PomodoroState.IDLE;
@@ -254,11 +219,13 @@ public class HomeFragment extends Fragment {
         });
 
         homeViewModel.currentTime.observe(getViewLifecycleOwner(), millis -> {
-            if (millis == 0L && homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
-                PreferencesManager prefs = new PreferencesManager(requireContext());
-                updateTimerUI(TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
-            } else {
-                updateTimerUI(millis);
+            // if idle -> show text
+            if (homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
+                updateTimerText(timerTextView, TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
+            }
+            // if running -> show remaining millis
+            else {
+                updateTimerText(timerTextView, millis);
             }
         });
 
@@ -267,15 +234,14 @@ public class HomeFragment extends Fragment {
         });
 
         homeViewModel.showQuestionnaireEvent.observe(getViewLifecycleOwner(), sessionId -> {
-            if (sessionId != null && sessionId > 0) {
-                showEmotionDialog(sessionId);
+            if (sessionId != null) {
+                showQuestionnaires(sessionId);
                 homeViewModel.showQuestionnaireEvent.setValue(null);
             }
         });
     }
 
     private void startDefaultSession() {
-        PreferencesManager prefs = new PreferencesManager(requireContext());
         int studyDuration = prefs.getTimerStudyDuration();
         int shortPauseDuration = prefs.getTimerShortPauseDuration();
         int longPauseDuration = prefs.getTimerLongPauseDuration();
@@ -437,147 +403,9 @@ public class HomeFragment extends Fragment {
         builder.show();
     }
 
-    private void updateTimerUI(long millisUntilFinished) {
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(minutes);
-        timerTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
-    }
-
     private void earnCoin(int amount) {
         if (profileViewModel != null) profileViewModel.addCoins(amount);
         String message = (amount == 1) ? "+1 Coin!" : String.format(Locale.getDefault(), "+%d Coins!", amount);
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void showEmotionDialog(long sessionId) {
-        EmotionSelectDialogFragment dialog = new EmotionSelectDialogFragment();
-        dialog.setListener((emotionIndex, wantsDetailedQuestions) -> {
-            if (wantsDetailedQuestions) showDetailedQuestionnaire(sessionId, emotionIndex);
-            else saveQuickQuestionnaire(sessionId, emotionIndex);
-        });
-        dialog.show(getChildFragmentManager(), "emotion_dialog");
-    }
-
-    private void showDetailedQuestionnaire(long sessionId, int emotionIndex) {
-        DetailedQuestionsDialogFragment dialog = DetailedQuestionsDialogFragment.newInstance(emotionIndex);
-        dialog.setListener(new DetailedQuestionsDialogFragment.OnQuestionnaireCompleteListener() {
-            @Override
-            public void onQuestionnaireComplete(int emotion, int enthusiasm, int energy,
-                                                int engagement, int satisfaction, int anticipation) {
-                saveDetailedQuestionnaire(sessionId, emotion, enthusiasm, energy,
-                        engagement, satisfaction, anticipation);
-            }
-
-            @Override
-            public void onQuestionnaireSkipped(int emotionIndex) {
-                saveQuickQuestionnaire(sessionId, emotionIndex);
-            }
-        });
-        dialog.show(getChildFragmentManager(), "detailed_questionnaire");
-    }
-
-    private void saveQuickQuestionnaire(long sessionId, int emotionIndex) {
-        SessionQuestionnaire questionnaire = new SessionQuestionnaire();
-        questionnaire.setSessionId(sessionId);
-        questionnaire.setTimeStamp(System.currentTimeMillis());
-        questionnaire.setInitialEmotion(emotionIndex);
-        questionnaire.setAnsweredDetailedQuestions(false);
-        homeViewModel.saveQuestionnaireResponse(questionnaire);
-    }
-
-    private void saveDetailedQuestionnaire(long sessionId, int emotionIndex,
-                                           int enthusiasm, int energy, int engagement, int satisfaction, int anticipation) {
-        SessionQuestionnaire questionnaire = new SessionQuestionnaire();
-        questionnaire.setSessionId(sessionId);
-        questionnaire.setTimeStamp(System.currentTimeMillis());
-        questionnaire.setInitialEmotion(emotionIndex);
-        questionnaire.setAnsweredDetailedQuestions(true);
-        questionnaire.setEnthusiasmRating(enthusiasm);
-        questionnaire.setEnergyRating(energy);
-        questionnaire.setEngagementRating(engagement);
-        questionnaire.setSatisfactionRating(satisfaction);
-        questionnaire.setAnticipationRating(anticipation);
-
-        // Calculate focus score based on questionnaire responses
-        float focusScore = FocusScoreCalculator.calculate(enthusiasm, energy, engagement, satisfaction, anticipation);
-
-        // Save questionnaire and update session focus score
-        homeViewModel.saveQuestionnaireResponse(questionnaire, sessionId, focusScore);
-    }
-
-    private void setupTagSpinner() {
-        PreferencesManager prefs = new PreferencesManager(requireContext());
-
-        // Load tags on background thread
-        new Thread(() -> {
-            AppDatabase db = AppDatabase.getInstance(requireContext());
-
-            // Ensure default "No tag" exists
-            Tag defaultTag = db.tagDao().getTagByTitle("No tag");
-            if (defaultTag == null) {
-                defaultTag = new Tag("No tag", android.graphics.Color.GRAY);
-                long defaultTagId = db.tagDao().insert(defaultTag);
-                defaultTag.setId(defaultTagId);
-            }
-
-            // Load user tags from preferences (will eventually migrate to database)
-            List<Tag> tags = new ArrayList<>(prefs.getUserTags());
-
-            // Add default tag at the beginning
-            Tag finalDefaultTag = defaultTag;
-            requireActivity().runOnUiThread(() -> {
-                tags.add(0, finalDefaultTag);
-
-                // Add special "Create New Tag" option (last)
-                Tag createNewTag = new Tag("+ Create New Tag", getResources().getColor(R.color.analytics_accent_green, null));
-                tags.add(createNewTag);
-
-                // setup spinner items - one component for each tag
-                TagSpinnerAdapter adapter = new TagSpinnerAdapter(requireContext(), tags);
-                tagSpinner.setAdapter(adapter);
-                tagSpinner.setSelection(0, false); // select "No tag" by default
-
-                // Handle tag selection
-                tagSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                        Tag selectedTag = (Tag) parent.getItemAtPosition(position);
-                        // Check if user selected "Create New Tag"
-                        if (selectedTag.getTitle().equals("+ Create New Tag")) {
-                            showAddTagDialog();
-                        }
-                    }
-
-                    @Override
-                    public void onNothingSelected(android.widget.AdapterView<?> parent) {
-                        // Do nothing
-                    }
-                });
-            });
-        }).start();
-    }
-
-    private void showAddTagDialog() {
-        PreferencesManager prefs = new PreferencesManager(requireContext());
-
-        // build + trigger dialog using TagManager
-        TagManager.showTagCreationDialog(
-                this,
-                prefs,
-                newTag -> {
-                    // recreate tag spinner to include new tag
-                    setupTagSpinner();
-
-                    // Find and select the new tag
-                    for (int i = 0; i < tagSpinner.getCount(); i++) {
-                        Tag tag = (Tag) tagSpinner.getItemAtPosition(i);
-                        if (tag.getTitle().equals(newTag.getTitle()) && tag.getColor() == newTag.getColor()) {
-                            tagSpinner.setSelection(i);
-                            break;
-                        }
-                    }
-                },
-                () -> tagSpinner.setSelection(1) // reset to "no tag" on cancel
-        );
     }
 }

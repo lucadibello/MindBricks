@@ -46,9 +46,6 @@ public class MainActivity extends AppCompatActivity implements NavigationLocker 
             }
             return false;
         });
-
-        schedulePeriodicCleanup();
-
     }
 
     @Override
@@ -63,20 +60,5 @@ public class MainActivity extends AppCompatActivity implements NavigationLocker 
             binding.navView.setElevation(enabled ?
                     getResources().getDimension(R.dimen.bottom_nav_elevation) : 0f);
         }
-    }
-
-    private void schedulePeriodicCleanup() {
-        PeriodicWorkRequest cleanupWork = new PeriodicWorkRequest.Builder(
-                DatabaseCleanupWorker.class,
-                7, TimeUnit.DAYS  // Run weekly
-        ).build();
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "database_cleanup",
-                ExistingPeriodicWorkPolicy.KEEP,
-                cleanupWork
-        );
-
-        Log.d("MainActivity", "Database cleanup worker scheduled");
     }
 }

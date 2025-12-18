@@ -20,7 +20,7 @@ public class EmotionSelectDialogFragment extends DialogFragment {
     private OnEmotionSelectedListener listener;
 
     public interface OnEmotionSelectedListener {
-        void onEmotionSelected(int emotionIndex, boolean wantsDetailedQuestions);
+        void onEmotionSelected(int emotionIndex);
     }
 
     private final int[] emotionImages = {
@@ -83,7 +83,7 @@ public class EmotionSelectDialogFragment extends DialogFragment {
 
     private void onEmotionClicked(int emotionIndex) {
         if (listener != null) {
-            listener.onEmotionSelected(emotionIndex, true);
+            listener.onEmotionSelected(emotionIndex);
         }
         dismiss();
     }
@@ -113,11 +113,11 @@ public class EmotionSelectDialogFragment extends DialogFragment {
         return emotionView;
     }
 
-    public void setListener(OnEmotionSelectedListener listener) {
+    public void setOnEmotionSelectedListener(OnEmotionSelectedListener listener) {
         this.listener = listener;
     }
 
-    public OnEmotionSelectedListener getListener() {
+    public OnEmotionSelectedListener getOnEmotionSelectedListener() {
         return listener;
     }
 }

@@ -18,10 +18,6 @@
     <!-- Env colors -->
     <color name="md_theme_error">#BA1A1A</color>
     <color name="empty_state_text">#79747E</color>
-    <color name="empty_state_icon">#CAC4D0</color>
-    <color name="loading_spinner">#9D83CE</color>
-    <color name="error_background">#FEF7FF</color>
-    <color name="success_background">#F0FDF4</color>
 
     <!-- Analytics colours -->
 
@@ -57,25 +53,14 @@
     <color name="activity_calendar">#FF9800</color>
 
     <!-- Type Colors (muted alternatives) -->
-    <color name="activity_deep_study_muted">#A08DC9</color>
-    <color name="activity_light_study_muted">#BFB3DB</color>
-    <color name="activity_work_muted">#91AEF0</color>
-    <color name="activity_exercise_muted">#8DD9BA</color>
-    <color name="activity_social_muted">#F7BE95</color>
-    <color name="activity_meals_muted">#F8DA8B</color>
-    <color name="activity_breaks_muted">#B3E8EF</color>
-    <color name="activity_sleep_muted">#BAC4D6</color>
-    <color name="activity_calendar_muted">#FF9800</color>
 
 
     <!-- Sequential Color Scale -> for heatmaps, gradients -->
     <color name="chart_scale_0">#F5F3F7</color>
-    <color name="chart_scale_1">#E8E0F5</color>
     <color name="chart_scale_2">#D4C5EC</color>
     <color name="chart_scale_3">#C0AAE3</color>
     <color name="chart_scale_4">#AC8FDA</color>
     <color name="chart_scale_5">#9874D1</color>
-    <color name="chart_scale_6">#8459C8</color>
     <color name="chart_scale_7">#6B4FBB</color>
 
     <!-- goal ring -->
@@ -86,14 +71,6 @@
 
 
     <!-- calendar -->
-    <color name="streak_no_data">#F5F5F5</color>
-    <color name="streak_missed">#FFCDD2</color>
-    <color name="streak_partial">#FFF9C4</color>
-    <color name="streak_achieved">#C8E6C9</color>
-    <color name="streak_exceeded">#A5D6A7</color>
-    <color name="streak_outstanding">#66BB6A</color>
-    <color name="streak_selected">#9D83CE</color>
-    <color name="streak_today_border">#6B4FBB</color>
 
     <!-- PAM Score Colors -->
     <color name="pam_high">#66BB6A</color>
@@ -103,9 +80,6 @@
 
 
     <!-- confidence overlay -->
-    <color name="confidence_overlay_low">#40FFFFFF</color>
-    <color name="confidence_overlay_medium">#30FFFFFF</color>
-    <color name="confidence_overlay_high">#10FFFFFF</color>
 
 
 </resources>

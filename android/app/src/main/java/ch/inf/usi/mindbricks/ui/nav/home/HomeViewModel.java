@@ -174,11 +174,8 @@ public class HomeViewModel extends AndroidViewModel {
                 notificationHelper.showNotification("Study Complete!", "Time for a well-deserved break.", 1);
                 earnedCoinsEvent.postValue(3);
 
-                if (sessionCounter < 4) {
-                    startPauseSession(false, studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
-                } else {
-                    startPauseSession(true, studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
-                }
+                // start pause (long pause if >= 4 sessions)
+                startPauseSession(sessionCounter >= 4, studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
             }
         }.start();
     }
@@ -309,22 +306,15 @@ public class HomeViewModel extends AndroidViewModel {
 
     public void saveQuestionnaireResponse(SessionQuestionnaire questionnaire) {
         dbExecutor.execute(() -> {
-            AppDatabase db = AppDatabase.getInstance(getApplication());
-            long id = db.sessionQuestionnaireDao().insert(questionnaire);
-            android.util.Log.d("HomeViewModel", "Questionnaire saved with ID: " + id);
-        });
-    }
-
-    public void saveQuestionnaireResponse(SessionQuestionnaire questionnaire, long sessionId, float focusScore) {
-        dbExecutor.execute(() -> {
-            AppDatabase db = AppDatabase.getInstance(getApplication());
-            // Save questionnaire
-            long id = db.sessionQuestionnaireDao().insert(questionnaire);
-            android.util.Log.d("HomeViewModel", "Questionnaire saved with ID: " + id + ", Focus Score: " + focusScore);
+            // store the session inside the DB
+            // FIXME: now we need to use a repository!
+            // long id = db.sessionQuestionnaireDao().insert(questionnaire);
+            // Log.d("HomeViewModel", "Questionnaire saved with ID: " + id);
+            Log.d("HomeViewModel", "Questionnaire saved");
 
             // Update session with calculated focus score
-            db.studySessionDao().updateFocusScore(sessionId, focusScore);
-            android.util.Log.d("HomeViewModel", "Session " + sessionId + " updated with focus score: " + focusScore);
+            // db.studySessionDao().updateFocusScore(sessionId, focusScore);
+            // Log.d("HomeViewModel", "Session " + sessionId + " updated with focus score: " + focusScore);
         });
     }
 
@@ -372,6 +362,7 @@ public class HomeViewModel extends AndroidViewModel {
         return sessionCounter;
     }
 
+    // FIXME: unused somehow
     public void onQuestionnaireCompleted(SessionQuestionnaire questionnaire) {
         dbExecutor.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(getApplication());
@@ -404,21 +395,6 @@ public class HomeViewModel extends AndroidViewModel {
                 }
             });
         });
-    }
-
-    private void showAffectiveInterventionDialog(FeedbackManager.FeedbackIntervention intervention) {
-
-        // Example using AlertDialog:
-        new AlertDialog.Builder(getApplication().getApplicationContext())
-                .setTitle(intervention.getTitle())
-                .setMessage(intervention.getMessage())
-                .setPositiveButton(intervention.getActionButton(), (dialog, which) -> {
-                    if (intervention.getType() == FeedbackManager.InterventionType.BREATHING_EXERCISE) {
-                        FeedbackManager.getBreathingExerciseSteps();
-                    }
-                })
-                .setNegativeButton("Later", null)
-                .show();
     }
 
     private void showTaskRecommendationDialog(TaskDifficultyRecommender.TaskRecommendation taskRec) {

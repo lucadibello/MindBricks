@@ -94,10 +94,10 @@ public class ProfilePictureManager {
      */
     public void showPhotoSourceDialog() {
         new MaterialAlertDialogBuilder(fragment.requireContext())
-                .setTitle(R.string.profile_photo_source_title)
+                .setTitle(R.string.profile_add_picture_dialog_title)
                 .setItems(new String[]{
-                        fragment.getString(R.string.profile_photo_camera),
-                        fragment.getString(R.string.profile_photo_gallery)
+                        fragment.getString(R.string.profile_add_picture_dialog_camera_option_title),
+                        fragment.getString(R.string.profile_add_picture_dialog_camera_option_gallery)
                 }, (dialog, which) -> {
                     if (which == 0) {
                         launchCamera();
@@ -136,9 +136,9 @@ public class ProfilePictureManager {
      */
     private void showPermissionRationale() {
         new MaterialAlertDialogBuilder(fragment.requireContext())
-                .setTitle(R.string.camera_permission_rationale_title)
-                .setMessage(R.string.camera_permission_rationale_message)
-                .setPositiveButton(R.string.camera_permission_grant, (dialog, which) -> {
+                .setTitle(R.string.profile_add_picture_camera_permission_rationale_dialog_title)
+                .setMessage(R.string.profile_add_picture_camera_permission_rationale_message)
+                .setPositiveButton(R.string.profile_add_picture_camera_permission_grant_button_title, (dialog, which) -> {
                     // user wants to give permission now -> retry
                     cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
                 })
@@ -158,7 +158,7 @@ public class ProfilePictureManager {
         } else {
             // simple denial - show message
             Snackbar.make(fragment.requireView(),
-                    R.string.camera_permission_denied,
+                    R.string.profile_add_picture_camera_permission_denied_first_time_message,
                     Snackbar.LENGTH_SHORT).show();
         }
     }
@@ -168,9 +168,9 @@ public class ProfilePictureManager {
      */
     private void showSettingsDialog() {
         new MaterialAlertDialogBuilder(fragment.requireContext())
-                .setTitle(R.string.camera_permission_required_title)
-                .setMessage(R.string.camera_permission_settings_message)
-                .setPositiveButton(R.string.camera_permission_open_settings, (dialog, which) -> {
+                .setTitle(R.string.profile_add_picture_camera_permission_required_title)
+                .setMessage(R.string.profile_add_picture_camera_permission_denied_second_time_message)
+                .setPositiveButton(R.string.profile_add_picture_camera_permission_denied_second_time_message, (dialog, which) -> {
                     // open app settings -> let user change permissions manually
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                     Uri uri = Uri.fromParts("package", fragment.requireContext().getPackageName(), null);

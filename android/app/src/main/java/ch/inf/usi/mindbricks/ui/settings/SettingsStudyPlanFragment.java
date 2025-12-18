@@ -50,13 +50,13 @@ public class SettingsStudyPlanFragment extends Fragment {
     }
 
     private void bindDayRows(View view) {
-        dayRows.add(bindDayRow(view, R.id.dayMonday, R.string.onboarding_study_plan_day_monday, "monday"));
-        dayRows.add(bindDayRow(view, R.id.dayTuesday, R.string.onboarding_study_plan_day_tuesday, "tuesday"));
-        dayRows.add(bindDayRow(view, R.id.dayWednesday, R.string.onboarding_study_plan_day_wednesday, "wednesday"));
-        dayRows.add(bindDayRow(view, R.id.dayThursday, R.string.onboarding_study_plan_day_thursday, "thursday"));
-        dayRows.add(bindDayRow(view, R.id.dayFriday, R.string.onboarding_study_plan_day_friday, "friday"));
-        dayRows.add(bindDayRow(view, R.id.daySaturday, R.string.onboarding_study_plan_day_saturday, "saturday"));
-        dayRows.add(bindDayRow(view, R.id.daySunday, R.string.onboarding_study_plan_day_sunday, "sunday"));
+        dayRows.add(bindDayRow(view, R.id.dayMonday, R.string.weekday_monday, "monday"));
+        dayRows.add(bindDayRow(view, R.id.dayTuesday, R.string.weekday_tuesday, "tuesday"));
+        dayRows.add(bindDayRow(view, R.id.dayWednesday, R.string.weekday_wednesday, "wednesday"));
+        dayRows.add(bindDayRow(view, R.id.dayThursday, R.string.weekday_thursday, "thursday"));
+        dayRows.add(bindDayRow(view, R.id.dayFriday, R.string.weekday_friday, "friday"));
+        dayRows.add(bindDayRow(view, R.id.daySaturday, R.string.weekday_saturday, "saturday"));
+        dayRows.add(bindDayRow(view, R.id.daySunday, R.string.weekday_sunday, "sunday"));
     }
 
     private DayRow bindDayRow(View root, int containerId, int labelRes, String dayKey) {
@@ -132,7 +132,7 @@ public class SettingsStudyPlanFragment extends Fragment {
     }
 
     private void updateHoursLabel(MaterialTextView label, float hours) {
-        label.setText(getString(R.string.onboarding_study_plan_hours_label) + ": " + Hours.formatHours(hours));
+        label.setText(getString(R.string.settings_plan_day_hours_count_label) + ": " + Hours.formatHours(hours));
     }
 
     private void updateWeeklyTotal() {
@@ -143,6 +143,6 @@ public class SettingsStudyPlanFragment extends Fragment {
                 total += row.slider().getValue();
             }
         }
-        weeklyTotal.setText(getString(R.string.onboarding_study_plan_total_placeholder, Hours.formatHours(total)));
+        weeklyTotal.setText(getString(R.string.settings_plan_weekly_total_label, Hours.formatHours(total)));
     }
 }

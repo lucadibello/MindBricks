@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Button to add profile picture -->
+    <string name="profile_add_picture_button">Add profile picture</string>
+    <string name="profile_add_picture_notice_message">Don\'t have the right photo yet? You can always update it later.</string>
+
+    <!-- Dialog to choose profile picture source -->
+    <string name="profile_add_picture_dialog_title">Choose photo source</string>
+    <string name="profile_add_picture_dialog_camera_option_title">Take photo</string>
+    <string name="profile_add_picture_dialog_camera_option_gallery">Choose from gallery</string>
+
+    <!-- Camera option - Permission handling -->
+    <string name="profile_add_picture_camera_permission_rationale_dialog_title">Camera Access Needed</string>
+    <string name="profile_add_picture_camera_permission_rationale_message">MindBricks needs camera access to take your profile picture. This helps personalize your experience.</string>
+    <string name="profile_add_picture_camera_permission_grant_button_title">Grant Permission</string>
+    <string name="profile_add_picture_camera_permission_required_title">Camera Permission Required</string>
+    <string name="profile_add_picture_camera_permission_denied_first_time_message">Camera permission is required to take photos</string>
+    <string name="profile_add_picture_camera_permission_denied_second_time_message">Camera permission was denied. To take photos, please enable camera access in Settings.</string>
+
+    <!-- User name field -->
+    <string name="profile_name_field_title">What should we call you?</string>
+    <string name="profile_name_validation_error_message">Use a real name (letters, accents, spaces, &amp; allowed).</string>
+
+    <!-- Tags -->
+    <string name="profile_tags_title">What project or habits do you want to focus on?</string>
+    <string name="profile_tags_empty_message">Add tags to label each study session (e.g. Algorithms, UX Research, Physics).</string>
+    <string name="profile_tags_add_button_title">Add a tag</string>
+
+</resources>

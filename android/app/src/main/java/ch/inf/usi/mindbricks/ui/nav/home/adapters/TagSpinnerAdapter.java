@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.ui.nav.home;
+package ch.inf.usi.mindbricks.ui.nav.home.adapters;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
@@ -17,8 +17,19 @@ import java.util.List;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.Tag;
 
-class TagSpinnerAdapter extends ArrayAdapter<Tag> {
+/**
+ * Spinner adapter for tags.
+ *
+ * @author Luca Di Bello
+ */
+public class TagSpinnerAdapter extends ArrayAdapter<Tag> {
 
+    /**
+     * Constructor for the adapter.
+     *
+     * @param context context of the activity
+     * @param tags list of tags to display
+     */
     public TagSpinnerAdapter(Context context, List<Tag> tags) {
         super(context, 0, tags);
     }
@@ -34,6 +45,15 @@ class TagSpinnerAdapter extends ArrayAdapter<Tag> {
         return createView(position, convertView, parent);
     }
 
+    /**
+     * Creates a view for a given tag.
+     *
+     * @param position index of the tag
+     * @param convertView recycled view
+     * @param parent parent view group
+     *
+     * @return view for the given tag
+     */
     private View createView(int position, View convertView, ViewGroup parent) {
         // inflate the layout for each tag
         if (convertView == null) {

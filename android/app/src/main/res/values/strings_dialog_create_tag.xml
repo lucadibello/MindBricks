@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- UI elements -->
+    <string name="dialog_create_tag_title">Create a tag</string>
+    <string name="dialog_create_tag_submit_option_title">Add tag</string>
+    <string name="dialog_create_tag_name_field_title">Tag name</string>
+    <string name="dialog_create_tag_color_field_title">Pick a color</string>
+
+    <!-- Validation (UI) -->
+    <string name="dialog_create_tag_color_required_message">You need to pick a color to create a tag.</string>
+    <string name="dialog_create_tag_name_required_message">Give your tag a name.</string>
+    <string name="dialog_create_tag_name_validation_error">Use letters/numbers with simple punctuation for tag names.</string>
+
+    <!-- Validation (TagManager) -->
+    <string name="tag_creation_error_name_too_long">Tag name must be %d characters or less.</string>
+</resources>

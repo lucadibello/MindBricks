@@ -1,31 +1,56 @@
 package ch.inf.usi.mindbricks.util;
 
 import android.Manifest;
-import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-    import android.content.Context;
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Build;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
 import ch.inf.usi.mindbricks.R;
 
+/**
+ * Helper class for managing notifications.
+ *
+ * @author Luca Beltrami
+ */
 public class NotificationHelper {
 
+    /**
+     * Channel ID for notifications.
+     */
     private static final String CHANNEL_ID = "pomodoro_channel";
+
+    /**
+     * Notification channel name.
+     */
     private static final String CHANNEL_NAME = "Pomodoro Timer";
+
+    /**
+     * Description for the notification channel.
+     */
     private static final String CHANNEL_DESC = "Notification for study and break sessions";
 
     private final Context context;
 
-    public NotificationHelper(Application application) {
-        this.context = application.getApplicationContext();
+    /**
+     * Constructor for NotificationHelper.
+     *
+     * @param ctx the application context
+     */
+    public NotificationHelper(Context ctx) {
+        this.context = ctx;
         createNotificationChannel();
     }
 
-    // help source: https://stackoverflow.com/questions/45015803/android-o-notification-channels-and-notificationcompat?
+    /**
+     * Creates a notification channel for displaying notifications.
+     * <p>
+     * Help source: <a href="https://stackoverflow.com/questions/45015803/android-o-notification-channels-and-notificationcompat">stackoverflow.com</a>
+     */
     private void createNotificationChannel() {
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
@@ -42,6 +67,14 @@ public class NotificationHelper {
         }
     }
 
+    /**
+     * Shows a notification with the provided title, message, and notification ID.
+     * If the app does not have the POST_NOTIFICATIONS permission, this method will not show the notification.
+     *
+     * @param title          the title of the notification
+     * @param message        the message content of the notification
+     * @param notificationId the unique ID for the notification
+     */
     public void showNotification(String title, String message, int notificationId) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return;

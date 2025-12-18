@@ -18,14 +18,8 @@
         tools:layout="@layout/fragment_shop" />
 
     <fragment
-        android:id="@+id/navigation_profile"
-        android:name="ch.inf.usi.mindbricks.ui.nav.profile.ProfileFragment"
-        android:label="@string/title_profile"
-        tools:layout="@layout/fragment_profile" />
-
-    <fragment
         android:id="@+id/navigation_analytics"
         android:name="ch.inf.usi.mindbricks.ui.nav.analytics.AnalyticsFragment"
-        android:label="Analytics"
+        android:label="@string/title_analytics"
         tools:layout="@layout/fragment_analytics" />
 </navigation>

@@ -11,10 +11,6 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-
-    </style>
-
     <!-- Dialog Style for Calendar Permission -->
     <style name="Theme.MindBricks.Dialog" parent="Theme.Material3.DayNight.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>

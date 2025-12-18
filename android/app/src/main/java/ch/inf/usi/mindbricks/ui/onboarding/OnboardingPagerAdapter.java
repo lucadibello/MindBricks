@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingDoneFragment;
 import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingIntroFragment;
 import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingNotificationsFragment;
 import ch.inf.usi.mindbricks.ui.onboarding.page.sensors.OnboardingSensorsFragment;
@@ -25,7 +24,7 @@ public class OnboardingPagerAdapter extends FragmentStateAdapter {
             case 1 -> new OnboardingUserFragment();
             case 2 -> new OnboardingSensorsFragment();
             case 3 -> new OnboardingNotificationsFragment();
-            default -> new OnboardingDoneFragment();
+            default -> throw new IllegalArgumentException("Invalid position: " + position);
         };
     }
 

@@ -10,7 +10,7 @@
         android:id="@+id/layoutTagName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/onboarding_tags_dialog_name_label"
+        android:hint="@string/dialog_create_tag_name_field_title"
         app:boxBackgroundMode="outline"
         app:counterEnabled="true"
         app:counterMaxLength="@integer/tag_name_max_length">
@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/onboarding_tags_dialog_color_label" />
+        android:text="@string/dialog_create_tag_color_field_title" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipTagColors"

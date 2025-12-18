@@ -27,17 +27,17 @@ public final class TagValidator {
     public static ValidationResult validateTitle(String title, Context ctx) {
         String normalized = title == null ? "" : title.trim();
         if (TextUtils.isEmpty(normalized)) {
-            return ValidationResult.error(ctx.getString(R.string.onboarding_error_tag_name_required));
+            return ValidationResult.error(ctx.getString(R.string.dialog_create_tag_name_required_message));
         }
 
         // Get max length from shared resource
         int maxTagLength = ctx.getResources().getInteger(R.integer.tag_name_max_length);
         if (normalized.length() > maxTagLength) {
-            return ValidationResult.error(ctx.getString(R.string.validation_error_tag_name_too_long, maxTagLength));
+            return ValidationResult.error(ctx.getString(R.string.tag_creation_error_name_too_long, maxTagLength));
         }
 
         if (!TITLE_PATTERN.matcher(normalized).matches()) {
-            return ValidationResult.error(ctx.getString(R.string.validation_error_tag_name_format));
+            return ValidationResult.error(ctx.getString(R.string.dialog_create_tag_name_validation_error));
         }
         return ValidationResult.ok();
     }

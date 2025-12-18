@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_session">Start Study Session</string>
+    <string name="start_timer_digits">"00:00:00"</string>
+</resources>

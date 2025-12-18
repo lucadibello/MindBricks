@@ -16,14 +16,14 @@
             style="@style/TextAppearance.Material3.TitleMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/onboarding_study_plan_schedule_label"
+            android:text="@string/settings_plan_title"
             android:layout_marginBottom="4dp" />
 
         <com.google.android.material.textview.MaterialTextView
             style="@style/TextAppearance.Material3.BodyMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/onboarding_study_plan_schedule_helper"
+            android:text="@string/settings_plan_subtitle"
             android:textColor="?android:attr/textColorSecondary"
             android:layout_marginBottom="24dp" />
 

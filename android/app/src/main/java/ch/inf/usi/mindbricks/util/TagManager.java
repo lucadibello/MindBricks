@@ -80,7 +80,7 @@ public class TagManager {
 
         // if no tags -> show empty state message
         if (tags.isEmpty()) {
-            tagEmptyState.setText(fragment.getString(R.string.onboarding_tags_empty_state));
+            tagEmptyState.setText(fragment.getString(R.string.profile_tags_empty_message));
             tagEmptyState.setVisibility(View.VISIBLE);
             return;
         }
@@ -139,14 +139,14 @@ public class TagManager {
 
         // create dialog with custom view
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(fragment.requireContext())
-                .setTitle(R.string.onboarding_tags_dialog_title)
+                .setTitle(R.string.dialog_create_tag_title)
                 .setView(dialogView)
                 .setNegativeButton(android.R.string.cancel, (d, which) -> {
                     if (onCancelListener != null) {
                         onCancelListener.run();
                     }
                 })
-                .setPositiveButton(R.string.onboarding_tags_dialog_add, null);
+                .setPositiveButton(R.string.dialog_create_tag_submit_option_title, null);
 
         // show dialog and listen for positive button click
         AlertDialog dialog = builder.create();
@@ -164,7 +164,7 @@ public class TagManager {
                     // get the selected color
                     int checkedChipId = colorGroup.getCheckedChipId();
                     if (checkedChipId == View.NO_ID) {
-                        Snackbar.make(fragment.requireView(), R.string.onboarding_error_tag_color_required, Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(fragment.requireView(), R.string.dialog_create_tag_color_required_message, Snackbar.LENGTH_SHORT).show();
                         return;
                     }
                     Chip selected = colorGroup.findViewById(checkedChipId);
@@ -229,14 +229,14 @@ public class TagManager {
 
         // create dialog with custom view
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(fragment.requireContext())
-                .setTitle(R.string.onboarding_tags_dialog_title)
+                .setTitle(R.string.dialog_create_tag_title)
                 .setView(dialogView)
                 .setNegativeButton(android.R.string.cancel, (d, which) -> {
                     if (onCancelListener != null) {
                         onCancelListener.run();
                     }
                 })
-                .setPositiveButton(R.string.onboarding_tags_dialog_add, null);
+                .setPositiveButton(R.string.dialog_create_tag_submit_option_title, null);
 
         // show dialog and listen for positive button click
         AlertDialog dialog = builder.create();
@@ -254,7 +254,7 @@ public class TagManager {
                     // get the selected color
                     int checkedChipId = colorGroup.getCheckedChipId();
                     if (checkedChipId == View.NO_ID) {
-                        Snackbar.make(fragment.requireView(), R.string.onboarding_error_tag_color_required, Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(fragment.requireView(), R.string.dialog_create_tag_color_required_message, Snackbar.LENGTH_SHORT).show();
                         return;
                     }
                     Chip selected = colorGroup.findViewById(checkedChipId);

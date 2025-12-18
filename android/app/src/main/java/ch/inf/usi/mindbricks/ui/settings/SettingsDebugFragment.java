@@ -17,31 +17,48 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import ch.inf.usi.mindbricks.R;
-import ch.inf.usi.mindbricks.ui.nav.home.questionnare.DetailedQuestionsDialogFragment;
 import ch.inf.usi.mindbricks.ui.nav.home.questionnare.EmotionSelectDialogFragment;
+import ch.inf.usi.mindbricks.ui.nav.home.questionnare.ProductivityQuestionsDialogFragment;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.database.TestDataGenerator;
+import ch.inf.usi.mindbricks.util.questionnaire.ProductivityQuestionnaireResult;
 
 /**
  * Debug settings fragment for development and testing purposes.
- * Provides UI controls for generating test data and managing the database.
+ *
+ * @author Marta Šafářová
+ * <p>
+ * Refactored by:
+ * @author Luca Di Bello
  */
 public class SettingsDebugFragment extends Fragment {
 
+    private static final int COINS_AMOUNT = 1000;
     private ProfileViewModel profileViewModel;
 
+    /**
+     * Button for generating basic test data.
+     */
     private MaterialButton btnGenerateBasic;
+
+    /**
+     * Button for generating large test data.
+     */
     private MaterialButton btnGenerateLarge;
-    private MaterialButton btnGenerateEdgeCases;
+
+    /**
+     * Button for testing the questionnaire dialog flow.
+     */
     private MaterialButton btnTestQuestionnaire;
-    private MaterialButton btnGenerateLibrary;
-    private MaterialButton btnGenerateCafe;
-    private MaterialButton btnGenerateDarkRoom;
-    private MaterialButton btnGenerateOutdoor;
-    private MaterialButton btnGenerateHome;
-    private MaterialButton btnGenerateCommute;
-    private MaterialButton btnVerifyDatabase;
+
+    /**
+     * Button for clearing the database.
+     */
     private MaterialButton btnClearDatabase;
+
+    /**
+     * Button for adding coins to the balance.
+     */
     private MaterialButton btnAddCoins;
 
     @Nullable
@@ -50,22 +67,14 @@ public class SettingsDebugFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings_debug, container, false);
-        
+
         // Initialize ViewModel
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 
         // Initialize buttons
         btnGenerateBasic = view.findViewById(R.id.btn_generate_basic);
         btnGenerateLarge = view.findViewById(R.id.btn_generate_large);
-        btnGenerateEdgeCases = view.findViewById(R.id.btn_generate_edge_cases);
         btnTestQuestionnaire = view.findViewById(R.id.btn_test_questionnaire);
-        btnGenerateLibrary = view.findViewById(R.id.btn_generate_library);
-        btnGenerateCafe = view.findViewById(R.id.btn_generate_cafe);
-        btnGenerateDarkRoom = view.findViewById(R.id.btn_generate_dark_room);
-        btnGenerateOutdoor = view.findViewById(R.id.btn_generate_outdoor);
-        btnGenerateHome = view.findViewById(R.id.btn_generate_home);
-        btnGenerateCommute = view.findViewById(R.id.btn_generate_commute);
-        btnVerifyDatabase = view.findViewById(R.id.btn_verify_database);
         btnClearDatabase = view.findViewById(R.id.btn_clear_database);
         btnAddCoins = view.findViewById(R.id.btn_add_coins);
 
@@ -74,16 +83,18 @@ public class SettingsDebugFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Sets up click listeners for all buttons.
+     */
     private void setupClickListeners() {
-        // Add 1000 coins
+        // Add coins to balance
         btnAddCoins.setOnClickListener(v -> {
-            profileViewModel.addCoins(1000);
-            showToast("Added 1000 coins!");
-            showCompletionToast("Balance updated!");
+            profileViewModel.addCoins(COINS_AMOUNT);
+            showToast(getString(R.string.settings_tab_debug_balance_result_message, COINS_AMOUNT));
         });
 
-        // Test Questionnaire
-        btnTestQuestionnaire.setOnClickListener(v -> showEmotionDialog());
+        // Test questionnaire dialogs
+        btnTestQuestionnaire.setOnClickListener(v -> showQuestionnairesTest());
 
         // Generate basic test data (50 sessions)
         btnGenerateBasic.setOnClickListener(v -> {
@@ -106,84 +117,16 @@ public class SettingsDebugFragment extends Fragment {
                     .show();
         });
 
-        // Generate edge case sessions
-        btnGenerateEdgeCases.setOnClickListener(v -> {
-            showToast("Generating edge case sessions...");
-            TestDataGenerator.addEdgeCaseSessions(requireContext());
-            showCompletionToast("Edge cases generated!");
-        });
-
-        // Generate library environment sessions
-        btnGenerateLibrary.setOnClickListener(v -> {
-            showToast("Generating library sessions...");
-            TestDataGenerator.addEnvironmentTestSessions(
-                    requireContext(),
-                    TestDataGenerator.EnvironmentCondition.QUIET_LIBRARY
-            );
-            showCompletionToast("Library sessions generated!");
-        });
-
-        // Generate cafe environment sessions
-        btnGenerateCafe.setOnClickListener(v -> {
-            showToast("Generating cafe sessions...");
-            TestDataGenerator.addEnvironmentTestSessions(
-                    requireContext(),
-                    TestDataGenerator.EnvironmentCondition.BUSY_CAFE
-            );
-            showCompletionToast("Cafe sessions generated!");
-        });
-
-        // Generate dark room sessions
-        btnGenerateDarkRoom.setOnClickListener(v -> {
-            showToast("Generating dark room sessions...");
-            TestDataGenerator.addEnvironmentTestSessions(
-                    requireContext(),
-                    TestDataGenerator.EnvironmentCondition.DARK_ROOM
-            );
-            showCompletionToast("Dark room sessions generated!");
-        });
-
-        // Generate outdoor park sessions
-        btnGenerateOutdoor.setOnClickListener(v -> {
-            showToast("Generating outdoor sessions...");
-            TestDataGenerator.addEnvironmentTestSessions(
-                    requireContext(),
-                    TestDataGenerator.EnvironmentCondition.OUTDOOR_PARK
-            );
-            showCompletionToast("Outdoor sessions generated!");
-        });
-
-        // Generate home evening sessions
-        btnGenerateHome.setOnClickListener(v -> {
-            showToast("Generating home sessions...");
-            TestDataGenerator.addEnvironmentTestSessions(
-                    requireContext(),
-                    TestDataGenerator.EnvironmentCondition.HOME_EVENING
-            );
-            showCompletionToast("Home sessions generated!");
-        });
-
-        // Generate commute sessions
-        btnGenerateCommute.setOnClickListener(v -> {
-            showToast("Generating commute sessions...");
-            TestDataGenerator.addEnvironmentTestSessions(
-                    requireContext(),
-                    TestDataGenerator.EnvironmentCondition.COMMUTE
-            );
-            showCompletionToast("Commute sessions generated!");
-        });
-
-        // Verify database
-        btnVerifyDatabase.setOnClickListener(v -> {
-            showToast("Verifying database... Check Logcat with tag 'TestDataGenerator'");
-            TestDataGenerator.verifyDatabase(requireContext());
-        });
-
         // Clear database with confirmation
         btnClearDatabase.setOnClickListener(v -> {
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Clear Database")
-                    .setMessage("Are you sure you want to delete ALL sessions?\n\nThis includes:\n• All study sessions\n• All sensor logs\n• All questionnaire responses\n\nThis cannot be undone!")
+                    .setMessage("Are you sure you want to delete ALL sessions?\n\n" +
+                            "This includes:\n" +
+                            "• All study sessions\n" +
+                            "• All sensor logs\n" +
+                            "• All questionnaire responses\n\n" +
+                            "This cannot be undone!")
                     .setPositiveButton("Delete All", (dialog, which) -> {
                         TestDataGenerator.clearAllSessions(requireContext());
                         showToast("All sessions cleared");
@@ -193,38 +136,48 @@ public class SettingsDebugFragment extends Fragment {
         });
     }
 
-    private void showEmotionDialog() {
-        EmotionSelectDialogFragment dialog = new EmotionSelectDialogFragment();
-        dialog.setListener((emotionIndex, wantsDetailedQuestions) -> {
-            if (wantsDetailedQuestions) showDetailedQuestionnaire(emotionIndex);
-            else showToast("Quick questionnaire completed! (Emotion: " + emotionIndex + ")");
+    /**
+     * Shows the questionnaire dialog flow for testing.
+     */
+    private void showQuestionnairesTest() {
+        EmotionSelectDialogFragment emotionDialog = new EmotionSelectDialogFragment();
+        emotionDialog.setOnEmotionSelectedListener((emotionRating) -> {
+            ProductivityQuestionsDialogFragment productivityQuestionnaire = ProductivityQuestionsDialogFragment.create();
+
+            productivityQuestionnaire.setListener(new ProductivityQuestionsDialogFragment.OnQuestionnaireActionListener() {
+                @Override
+                public void onQuestionnaireComplete(ProductivityQuestionnaireResult result) {
+                    showToast("Detailed questionnaire completed!");
+                }
+
+                @Override
+                public void onQuestionnaireSkipped() {
+                    showToast("Quick questionnaire saved.");
+                }
+            });
+
+            productivityQuestionnaire.show(getChildFragmentManager(), "detailed_questionnaire");
         });
-        dialog.show(getChildFragmentManager(), "emotion_dialog");
+
+        emotionDialog.show(getChildFragmentManager(), "emotion_dialog");
     }
 
-    private void showDetailedQuestionnaire(int emotionIndex) {
-        DetailedQuestionsDialogFragment dialog = DetailedQuestionsDialogFragment.newInstance(emotionIndex);
-        dialog.setListener(new DetailedQuestionsDialogFragment.OnQuestionnaireCompleteListener() {
-            @Override
-            public void onQuestionnaireComplete(int emotion, int enthusiasm, int energy,
-                                                int engagement, int satisfaction, int anticipation) {
-                showToast("Detailed questionnaire completed! (Score calculated)");
-            }
-
-            @Override
-            public void onQuestionnaireSkipped(int emotionIndex) {
-                showToast("Detailed questionnaire skipped. Quick response saved.");
-            }
-        });
-        dialog.show(getChildFragmentManager(), "detailed_questionnaire");
-    }
-
+    /**
+     * Shows a short toast message.
+     *
+     * @param message the message to display
+     */
     private void showToast(String message) {
         if (getContext() != null) {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Shows a delayed completion toast message with a checkmark.
+     *
+     * @param message the message to display
+     */
     private void showCompletionToast(String message) {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (getContext() != null) {

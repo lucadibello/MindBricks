@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Onboarding pager controls -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start">Start</string>
+
+    <!-- Intro step -->
+    <string name="onboarding_intro_title">Welcome to <b>MindBricks</b></string>
+    <string name="onboarding_intro_subtitle">Build focus through timed study sessions</string>
+    <string name="onboarding_intro_card_body">
+    Build your empire, one study session at a time. Keep your focus sharp to grow your city and avoid delays!
+    </string>
+    <string name="onboarding_intro_logo_content_description">Application logo</string>
+
+    <!-- Profile step -->
+    <string name="onboarding_profile_title">Let\'s personalize your coaching</string>
+    <string name="onboarding_profile_subtitle">Add a friendly face and a few focus goals so we can cheer you on.</string>
+
+    <!-- Sensors step -->
+    <string name="onboarding_sensors_title">Sense your environment</string>
+    <string name="onboarding_sensors_subtitle">MindBricks learns based on ambient noise and light environment during study sessions.</string>
+    <string name="onboarding_sensors_learn_more_button_title">Learn More</string>
+    <string name="onboarding_sensors_pickup_fallback_in_use">fallback in use</string>
+
+    <string name="onboarding_sensors_microphone_title">Microphone check-ins</string>
+    <string name="onboarding_sensors_microphone_body">We only listen for noise levels during your sessions to understand in what environment you are.</string>
+    <string name="onboarding_sensors_microphone_rationale_title">Allow microphone in background</string>
+    <string name="onboarding_sensors_microphone_rationale">Allow microphone access so we can track noise during sessions, even when the screen is off. If you selected “Allow only while using”, switch to “Allow” in system settings.</string>
+
+    <string name="onboarding_sensors_light_title">Luminance insights</string>
+    <string name="onboarding_sensors_light_body">Ambient light data helps us understand if you are more productive in the dark, or in the bright.</string>
+    <string name="onboarding_sensors_light_unavailable">Light sensor unavailable on this device</string>
+
+    <string name="onboarding_sensors_pickup_info_title">Which sensors are used?</string>
+    <string name="onboarding_sensors_pickup_info_body">We use the significant motion sensor to detect when you lift or move the phone during focus sessions. If your phone doesn’t have this sensor, we’ll use the accelerometer as a fallback.</string>
+    <string name="onboarding_sensors_pickup_title">Phone pick-up detection</string>
+    <string name="onboarding_sensors_pickup_body">We use the significant motion sensor to detect when you lift or move the phone during focus sessions.</string>
+    <string name="onboarding_sensors_pickup_unavailable">Pick-up detection unavailable on this device</string>
+
+    <!-- Notification step -->
+    <string name="onboarding_notifications_rationale_title">Allow notifications</string>
+    <string name="onboarding_notifications_rationale_body">Enable notifications so we can remind you to start, pause, and celebrate focus sessions.</string>
+    <string name="onboarding_notifications_allow_button">Allow notifications</string>
+    <string name="onboarding_notifications_settings_title">Turn on notifications in Settings</string>
+    <string name="onboarding_notifications_settings_body">Notifications are off. Enable them in system Settings to get reminders.</string>
+    <string name="onboarding_notifications_open_settings">Open settings</string>
+    <string name="onboarding_notifications_title">Stay on track</string>
+    <string name="onboarding_notifications_body">Enable reminders so MindBricks can nudge you to start, pause, and celebrate after each focus session.</string>
+    <string name="onboarding_enable_notifications">Allow notifications</string>
+    <string name="onboarding_notifications_secondary">You can change this preference later in Settings.</string>
+
+    <!-- Validation messages -->
+    <string name="onboarding_validation_error">Please fill in the required fields.</string>
+    <string name="onboarding_profile_validation_error_name_required">Add your name so we can personalize your coaching.</string>
+</resources>

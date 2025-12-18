@@ -15,6 +15,10 @@ mpandroidchart = "v3.1.0"
 glide = "5.0.5"
 lifecycleViewmodel = "2.10.0"
 gson = "2.10.1"
+work = "2.11.0"
+fragment = "1.8.1"
+recyclerview = "1.3.1"
+swiperefreshlayout = "1.0.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -38,6 +42,18 @@ glide-runtime = { module = "com.github.bumptech.glide:glide", version.ref = "gli
 glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide"}
 lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+# work manager
+work-runtime = { group = "androidx.work", name = "work-runtime", version.ref = "work" }
+
+# fragment
+fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment" }
+
+# recyclerview
+recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+
+# swipe refresh
+swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

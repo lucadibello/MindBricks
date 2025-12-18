@@ -35,7 +35,7 @@
                         android:id="@+id/imageProfile"
                         android:layout_width="120dp"
                         android:layout_height="120dp"
-                        android:contentDescription="@string/onboarding_profile_upload_photo"
+                        android:contentDescription="@string/profile_add_picture_button"
                         android:src="@mipmap/ic_launcher_round"
                         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                         app:strokeColor="?attr/colorPrimary"
@@ -46,7 +46,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
-                        android:contentDescription="@string/onboarding_profile_upload_photo"
+                        android:contentDescription="@string/profile_add_picture_button"
                         app:backgroundTint="?attr/colorSurfaceDim"
                         app:fabCustomSize="36dp"
                         app:maxImageSize="20dp"
@@ -59,13 +59,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="@string/onboarding_profile_upload_photo" />
+                    android:text="@string/profile_add_picture_button" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="@string/onboarding_profile_photo_helper"
+                    android:text="@string/profile_add_picture_notice_message"
                     android:textAlignment="center" />
 
             </LinearLayout>
@@ -75,7 +75,7 @@
             android:id="@+id/layoutName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/onboarding_profile_name_label"
+            android:hint="@string/profile_name_field_title"
             app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -92,7 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/onboarding_profile_goal_label" />
+            android:text="@string/profile_tags_title" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textTagsEmptyState"
@@ -100,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/onboarding_tags_empty_state" />
+            android:text="@string/profile_tags_empty_message" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupTags"
@@ -116,7 +116,7 @@
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/onboarding_tags_add_button"
+            android:text="@string/profile_tags_add_button_title"
             android:layout_marginTop="8dp"
             app:strokeWidth="1dp" />
 

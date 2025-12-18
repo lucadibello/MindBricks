@@ -41,31 +41,31 @@ public interface SessionQuestionnaireDao {
     @Query("SELECT * FROM session_questionnaires ORDER BY timeStamp DESC")
     LiveData<List<SessionQuestionnaire>> getAllQuestionnaires();
 
-    @Query("SELECT * FROM session_questionnaires WHERE answeredDetailedQuestions = 1")
+    @Query("SELECT * FROM session_questionnaires WHERE hasProductivityQuestions = 1")
     LiveData<List<SessionQuestionnaire>> getDetailedQuestionnaires();
 
-    @Query("SELECT * FROM session_questionnaires WHERE answeredDetailedQuestions = 1 ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM session_questionnaires WHERE hasProductivityQuestions = 1 ORDER BY timeStamp DESC")
     LiveData<List<SessionQuestionnaire>> getDetailedQuestionnairesOrdered();
 
-    @Query("SELECT AVG(enthusiasmRating) FROM session_questionnaires WHERE answeredDetailedQuestions = 1")
+    @Query("SELECT AVG(enthusiasmRating) FROM session_questionnaires WHERE hasProductivityQuestions = 1")
     LiveData<Float> getAverageEnthusiasm();
 
-    @Query("SELECT AVG(energyRating) FROM session_questionnaires WHERE answeredDetailedQuestions = 1")
+    @Query("SELECT AVG(energyRating) FROM session_questionnaires WHERE hasProductivityQuestions = 1")
     LiveData<Float> getAverageEnergy();
 
-    @Query("SELECT AVG(engagementRating) FROM session_questionnaires WHERE answeredDetailedQuestions = 1")
+    @Query("SELECT AVG(engagementRating) FROM session_questionnaires WHERE hasProductivityQuestions = 1")
     LiveData<Float> getAverageEngagement();
 
-    @Query("SELECT AVG(satisfactionRating) FROM session_questionnaires WHERE answeredDetailedQuestions = 1")
+    @Query("SELECT AVG(satisfactionRating) FROM session_questionnaires WHERE hasProductivityQuestions = 1")
     LiveData<Float> getAverageSatisfaction();
 
-    @Query("SELECT AVG(anticipationRating) FROM session_questionnaires WHERE answeredDetailedQuestions = 1")
+    @Query("SELECT AVG(anticipationRating) FROM session_questionnaires WHERE hasProductivityQuestions = 1")
     LiveData<Float> getAverageAnticipation();
 
     @Query("SELECT COUNT(*) FROM session_questionnaires")
     LiveData<Integer> getTotalQuestionnaireCount();
 
-    @Query("SELECT COUNT(*) FROM session_questionnaires WHERE answeredDetailedQuestions = 1")
+    @Query("SELECT COUNT(*) FROM session_questionnaires WHERE hasProductivityQuestions = 1")
     LiveData<Integer> getDetailedQuestionnaireCount();
 
     @Query("DELETE FROM session_questionnaires")
