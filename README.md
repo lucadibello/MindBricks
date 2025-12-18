@@ -17,6 +17,7 @@ Here is the full list of the refactors I (@lucadibello) managed to do during in 
 - [x] Splitting string resources into multiple files based on their usage (e.g., `strings_home.xml`, `strings_settings.xml`, etc).
 - [x] Removed the substring "AI" from all resource files (misleading, we are not using any AI in the app. Just structured data and simple algorithms). Leftover from the initial idea of the app
 - [x] Remove unused layout resources.
+- [x] Refactored `HomeViewModel` to remove duplicated code and remove passing the same parameters multiple times to different methods and updated `HomeFragment` accordingly.
 
 - [] Adding `@author` tags to all classes to make it clear who did what
 - [] Added Javadocs to all classes, methods, fields, etc.

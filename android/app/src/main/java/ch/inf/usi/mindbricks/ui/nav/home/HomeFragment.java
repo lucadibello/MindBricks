@@ -26,7 +26,6 @@ import androidx.transition.TransitionManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
@@ -123,19 +122,18 @@ public class HomeFragment extends HomeFragmentHelper {
         homeViewModel.activityRecreated();
 
         startSessionButton.setOnClickListener(v -> {
-            if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {
+            if (homeViewModel.currentPhase.getValue() != HomeViewModel.Phase.IDLE) {
                 confirmEndSessionDialog();
             } else {
-                HomeViewModel.NextPhase nextPhase = homeViewModel.nextPhase.getValue();
                 int sessionCounter = homeViewModel.getSessionCounter();
+                HomeViewModel.Phase nextPhase = homeViewModel.nextPhase.getValue();
 
                 // If we're continuing an existing cycle (after a break), just continue
                 if (sessionCounter > 0) {
                     startNextPhase();
                 }
                 // If we're starting a break, continue to the next phase
-                else if (nextPhase == HomeViewModel.NextPhase.SHORT_BREAK ||
-                        nextPhase == HomeViewModel.NextPhase.LONG_BREAK) {
+                else if (nextPhase == HomeViewModel.Phase.SHORT_BREAK || nextPhase == HomeViewModel.Phase.LONG_BREAK) {
                     startNextPhase();
                 }
                 // Otherwise, start new cycle
@@ -167,7 +165,7 @@ public class HomeFragment extends HomeFragmentHelper {
         super.onResume();
 
         // If idle, refresh timer display in case settings changed
-        if (homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
+        if (homeViewModel.currentPhase.getValue() == HomeViewModel.Phase.IDLE) {
             // NOTE: on first load, timerTextView is still null
             if (timerTextView != null) updateTimerText(timerTextView, TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
         }
@@ -179,9 +177,9 @@ public class HomeFragment extends HomeFragmentHelper {
     }
 
     private void setupObservers() {
-        homeViewModel.currentState.observe(getViewLifecycleOwner(), state -> {
-            boolean isRunning = state != HomeViewModel.PomodoroState.IDLE;
-            boolean isStudying = state == HomeViewModel.PomodoroState.STUDY;
+        homeViewModel.currentPhase.observe(getViewLifecycleOwner(), state -> {
+            boolean isRunning = state != HomeViewModel.Phase.IDLE;
+            boolean isStudying = state == HomeViewModel.Phase.FOCUS;
 
             // Update the button text and appearance based on state
             updateButtonForState(state, homeViewModel.nextPhase.getValue());
@@ -204,8 +202,8 @@ public class HomeFragment extends HomeFragmentHelper {
 
         // Observe the next phase to update button and dots when it changes
         homeViewModel.nextPhase.observe(getViewLifecycleOwner(), nextPhase -> {
-            if (homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
-                updateButtonForState(homeViewModel.currentState.getValue(), nextPhase);
+            if (homeViewModel.currentPhase.getValue() == HomeViewModel.Phase.IDLE) {
+                updateButtonForState(homeViewModel.currentPhase.getValue(), nextPhase);
                 updateSessionDots();
             }
         });
@@ -220,7 +218,7 @@ public class HomeFragment extends HomeFragmentHelper {
 
         homeViewModel.currentTime.observe(getViewLifecycleOwner(), millis -> {
             // if idle -> show text
-            if (homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
+            if (homeViewModel.currentPhase.getValue() == HomeViewModel.Phase.IDLE) {
                 updateTimerText(timerTextView, TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
             }
             // if running -> show remaining millis
@@ -260,6 +258,8 @@ public class HomeFragment extends HomeFragmentHelper {
         int longPauseDuration = prefs.getTimerLongPauseDuration();
 
         // Continue to the next phase
+        Tag selectedTag = (Tag) tagSpinner.getSelectedItem();
+        assert selectedTag != null;
         homeViewModel.continueToNextPhase(studyDuration, shortPauseDuration, longPauseDuration);
     }
 
@@ -270,7 +270,7 @@ public class HomeFragment extends HomeFragmentHelper {
         TransitionManager.beginDelayedTransition(sessionDotsLayout);
 
         int currentSession = homeViewModel.getSessionCounter();
-        HomeViewModel.PomodoroState currentState = homeViewModel.currentState.getValue();
+        HomeViewModel.Phase currentState = homeViewModel.currentPhase.getValue();
 
         for (ImageView dot : sessionDots) {
             dot.setImageResource(R.drawable.dot_inactive);
@@ -281,7 +281,7 @@ public class HomeFragment extends HomeFragmentHelper {
 
         // Show completed sessions based on current state
         if (currentSession > 0 && currentSession <= sessionDots.size()) {
-            if (currentState == HomeViewModel.PomodoroState.STUDY) {
+            if (currentState == HomeViewModel.Phase.FOCUS) {
                 // During focus: show current session as active (pill shape)
                 ImageView activeDot = sessionDots.get(currentSession - 1);
                 activeDot.setImageResource(R.drawable.dot_active);
@@ -306,9 +306,9 @@ public class HomeFragment extends HomeFragmentHelper {
 
 
     // Updates the button text and style based on current state
-    private void updateButtonForState(HomeViewModel.PomodoroState state, HomeViewModel.NextPhase nextPhase) {
-        if (state == null) state = HomeViewModel.PomodoroState.IDLE;
-        if (nextPhase == null) nextPhase = HomeViewModel.NextPhase.FOCUS;
+    private void updateButtonForState(HomeViewModel.Phase state, HomeViewModel.Phase nextPhase) {
+        if (state == null) state = HomeViewModel.Phase.IDLE;
+        if (nextPhase == null) nextPhase = HomeViewModel.Phase.FOCUS;
 
         switch (state) {
             case IDLE:
@@ -332,7 +332,7 @@ public class HomeFragment extends HomeFragmentHelper {
                 }
                 break;
 
-            case STUDY:
+            case FOCUS:
                 startSessionButton.setText(R.string.timer_action_end_focus);
                 startSessionButton.setBackgroundTintList(
                         getResources().getColorStateList(R.color.md_theme_error, null));
@@ -341,7 +341,7 @@ public class HomeFragment extends HomeFragmentHelper {
                 stateLabel.setVisibility(View.VISIBLE);
                 break;
 
-            case PAUSE:
+            case SHORT_BREAK:
                 startSessionButton.setText(R.string.timer_action_skip_break);
                 startSessionButton.setBackgroundTintList(
                         getResources().getColorStateList(R.color.analytics_accent_green, null));
@@ -349,8 +349,7 @@ public class HomeFragment extends HomeFragmentHelper {
                 stateLabel.setTextColor(getResources().getColor(R.color.analytics_accent_green, null));
                 stateLabel.setVisibility(View.VISIBLE);
                 break;
-
-            case LONG_PAUSE:
+            case LONG_BREAK:
                 startSessionButton.setText(R.string.timer_action_skip_long_break);
                 startSessionButton.setBackgroundTintList(
                         getResources().getColorStateList(R.color.analytics_accent_purple, null));
@@ -363,16 +362,16 @@ public class HomeFragment extends HomeFragmentHelper {
 
     // Shows a confirmation dialog before stopping an active session
     private void confirmEndSessionDialog() {
-        HomeViewModel.PomodoroState currentState = homeViewModel.currentState.getValue();
+        HomeViewModel.Phase currentState = homeViewModel.currentPhase.getValue();
         String title;
         String message;
         String skipButtonText;
 
-        if (currentState == HomeViewModel.PomodoroState.STUDY) {
+        if (currentState == HomeViewModel.Phase.FOCUS) {
             title = getString(R.string.dialog_focus_options_title);
             message = getString(R.string.dialog_focus_options_message);
             skipButtonText = getString(R.string.dialog_action_skip_to_break);
-        } else if (currentState == HomeViewModel.PomodoroState.LONG_PAUSE) {
+        } else if (currentState == HomeViewModel.Phase.LONG_BREAK) {
             title = getString(R.string.dialog_long_break_options_title);
             message = getString(R.string.dialog_long_break_options_message);
             skipButtonText = getString(R.string.dialog_action_end_break);
@@ -393,7 +392,7 @@ public class HomeFragment extends HomeFragmentHelper {
 
         // Only show "End Entire Cycle" option if not in long pause
         // NOTE: after the long pause, we have already finished the cycle. Useless
-        if (currentState != HomeViewModel.PomodoroState.LONG_PAUSE) {
+        if (currentState != HomeViewModel.Phase.LONG_BREAK) {
             builder.setNeutralButton(R.string.dialog_action_end_cycle, (dialog, which) -> {
                 homeViewModel.stopTimerAndReset();
                 Toast.makeText(getContext(), R.string.toast_cycle_stopped, Toast.LENGTH_SHORT).show();
