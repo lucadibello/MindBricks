@@ -14,7 +14,7 @@
     <string name="permission_calendar_device_description">Allow MindBricks to access your device calendar to create a smarter study schedule.</string>
     <string name="permission_calendar_benefit_schedule">See your calendar events in your daily schedule</string>
     <string name="permission_calendar_benefit_conflicts">Avoid scheduling study sessions during meetings</string>
-    <string name="permission_calendar_benefit_smart">Get smarter AI recommendations based on your availability</string>
+    <string name="permission_calendar_benefit_smart">Get smarter recommendations based on your availability</string>
     <string name="permission_calendar_privacy">Your calendar data stays on your device and is never shared.</string>
     <string name="permission_calendar_allow">Allow Access</string>
     <string name="permission_calendar_decline">Not Now</string>
