@@ -2,6 +2,8 @@ package ch.inf.usi.mindbricks.model.visual;
 
 /**
  * Represents a single achievement ring (Apple Activity style)
+ *
+ * @author Marta Šafářová
  */
 public class GoalRing {
     private String title;
