@@ -2,12 +2,12 @@ package ch.inf.usi.mindbricks.ui.charts;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
@@ -24,28 +24,63 @@ import ch.inf.usi.mindbricks.model.visual.HeatmapCell;
  */
 public class QualityHeatmapChartView extends View {
 
-    private Paint cellPaint;
-    private Paint borderPaint;
-    private Paint textPaint;
-    private Paint titlePaint;
 
+    /**
+     * Paint for heatmap cells.
+     */
+    private Paint cellPaint;
+
+    /**
+     * Paint for cell borders.
+     */
+    private Paint borderPaint;
+
+    /**
+     * Paint for text labels.
+     */
+    private Paint textPaint;
+
+    /**
+     * List of heatmap cells to display.
+     */
     private List<HeatmapCell> cells;
 
-    private float cellSize = 40f;
-    private float cellSpacing = 4f;
-    private float padding = 80f;
-    private float topPadding = 100f;
+    /**
+     * Cell dimensions and spacing.
+     */
+    private final float cellSize = 40f;
 
-    // Theme colors
-    private int colorGrid;
-    private int colorTextPrimary;
-    private int colorTextSecondary;
+    /**
+     * Spacing between cells.
+     */
+    private final float cellSpacing = 4f;
 
+    /**
+     * Padding around the heatmap.
+     */
+    private final float padding = 80f;
+
+    /**
+     * Top padding for hour labels.
+     */
+    private final float topPadding = 100f;
+
+    /**
+     * Default constructor.
+     *
+     * @param context The context
+     */
     public QualityHeatmapChartView(Context context) {
         super(context);
         init();
     }
 
+    /**
+     * Constructor with attributes.
+     *
+     * @param context The context
+     * @param attrs   The attribute set
+     */
     public QualityHeatmapChartView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
@@ -69,11 +104,15 @@ public class QualityHeatmapChartView extends View {
         setMeasuredDimension(requiredWidth, requiredHeight);
     }
 
+    /**
+     * Initialize paints and colors.
+     */
     private void init() {
         Context context = getContext();
-        colorGrid = ContextCompat.getColor(context, R.color.analytics_grid_line_major);
-        colorTextPrimary = ContextCompat.getColor(context, R.color.analytics_text_primary);
-        colorTextSecondary = ContextCompat.getColor(context, R.color.analytics_text_secondary);
+        // Theme colors
+        int colorGrid = ContextCompat.getColor(context, R.color.analytics_grid_line_major);
+        int colorTextPrimary = ContextCompat.getColor(context, R.color.analytics_text_primary);
+        int colorTextSecondary = ContextCompat.getColor(context, R.color.analytics_text_secondary);
 
         cellPaint = new Paint();
         cellPaint.setStyle(Paint.Style.FILL);
@@ -90,20 +129,25 @@ public class QualityHeatmapChartView extends View {
         textPaint.setTextSize(28f);
         textPaint.setAntiAlias(true);
 
-        titlePaint = new Paint();
+        Paint titlePaint = new Paint();
         titlePaint.setColor(colorTextPrimary);
         titlePaint.setTextSize(48f);
         titlePaint.setAntiAlias(true);
         titlePaint.setFakeBoldText(true);
     }
 
+    /**
+     * Set the data for the heatmap.
+     *
+     * @param cells List of HeatmapCell data
+     */
     public void setData(List<HeatmapCell> cells) {
         this.cells = cells;
         invalidate();
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
 
         if (cells == null || cells.isEmpty()) {
@@ -116,6 +160,11 @@ public class QualityHeatmapChartView extends View {
         drawHeatmap(canvas);
     }
 
+    /**
+     * Draw the hour labels on the left side of the heatmap.
+     *
+     * @param canvas The canvas to draw on
+     */
     private void drawHourLabels(Canvas canvas) {
         textPaint.setTextAlign(Paint.Align.RIGHT);
 
@@ -126,6 +175,11 @@ public class QualityHeatmapChartView extends View {
         }
     }
 
+    /**
+     * Draw the day labels at the top of the heatmap.
+     *
+     * @param canvas The canvas to draw on
+     */
     private void drawDayLabels(Canvas canvas) {
         textPaint.setTextAlign(Paint.Align.CENTER);
 
@@ -147,33 +201,72 @@ public class QualityHeatmapChartView extends View {
         }
     }
 
+    /**
+     * Draw the heatmap cells on the canvas.
+     *
+     * @param canvas The canvas to draw on
+     */
     private void drawHeatmap(Canvas canvas) {
-        for (HeatmapCell cell : cells) {
-            int dayIndex = cell.getDayOfMonth() - getMinDay();
-            int hourIndex = cell.getHourOfDay();
+        int minDay = getMinDay();
+        int maxDay = getMaxDay();
 
-            float x = padding + (dayIndex * (cellSize + cellSpacing));
-            float y = topPadding + (hourIndex * (cellSize + cellSpacing));
+        // Draw all hours (0-23) for each day in range
+        for (int day = minDay; day <= maxDay; day++) {
+            for (int hour = 0; hour < 24; hour++) {
+                // Find cell data for this day/hour combination
+                HeatmapCell cellData = findCell(day, hour);
 
-            int color;
-            if (cell.getSessionCount() == 0) {
-                cellPaint.setAlpha(10);
-                borderPaint.setAlpha(10);
-                color = ContextCompat.getColor(getContext(), R.color.analytics_grid_line_major);
-            } else {
-                color = getColorForQuality(cell.getAvgQuality());
+                int dayIndex = day - minDay;
+
+                float x = padding + (dayIndex * (cellSize + cellSpacing));
+                float y = topPadding + (hour * (cellSize + cellSpacing));
+
+                int color;
+                // If no data or no sessions, draw empty cell
+                if (cellData == null || cellData.getSessionCount() == 0) {
+                    cellPaint.setAlpha(10);
+                    borderPaint.setAlpha(10);
+                    color = ContextCompat.getColor(getContext(), R.color.analytics_grid_line_major);
+                } else {
+                    cellPaint.setAlpha(255);
+                    borderPaint.setAlpha(255);
+                    color = getColorForQuality(cellData.getAvgQuality());
+                }
+
+                cellPaint.setColor(color);
+
+                // Draw cell
+                RectF rect = new RectF(x, y, x + cellSize, y + cellSize);
+                canvas.drawRoundRect(rect, 8f, 8f, cellPaint);
+                canvas.drawRoundRect(rect, 8f, 8f, borderPaint);
             }
-
-            cellPaint.setColor(color);
-
-
-            // Draw cell
-            RectF rect = new RectF(x, y, x + cellSize, y + cellSize);
-            canvas.drawRoundRect(rect, 8f, 8f, cellPaint);
-            canvas.drawRoundRect(rect, 8f, 8f, borderPaint);
         }
     }
 
+    /**
+     * Find cell data for a specific day and hour combination.
+     *
+     * @param dayOfMonth The day to search for
+     * @param hourOfDay The hour to search for
+     * @return The matching HeatmapCell or null if not found
+     */
+    private HeatmapCell findCell(int dayOfMonth, int hourOfDay) {
+        if (cells == null) return null;
+
+        for (HeatmapCell cell : cells) {
+            if (cell.getDayOfMonth() == dayOfMonth && cell.getHourOfDay() == hourOfDay) {
+                return cell;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get color based on quality score.
+     *
+     * @param quality The quality score (0-100)
+     * @return The corresponding color
+     */
     private int getColorForQuality(float quality) {
         Context context = getContext();
 
@@ -194,6 +287,11 @@ public class QualityHeatmapChartView extends View {
         }
     }
 
+    /**
+     * Get the minimum day from the cells.
+     *
+     * @return The minimum day of month
+     */
     private int getMinDay() {
         if (cells == null || cells.isEmpty()) return 1;
 
@@ -206,6 +304,11 @@ public class QualityHeatmapChartView extends View {
         return min;
     }
 
+    /**
+     * Get the maximum day from the cells.
+     *
+     * @return The maximum day of month
+     */
     private int getMaxDay() {
         if (cells == null || cells.isEmpty()) return 1;
 
@@ -218,6 +321,11 @@ public class QualityHeatmapChartView extends View {
         return max;
     }
 
+    /**
+     * Draw empty state message when no data is available.
+     *
+     * @param canvas Canvas to draw on
+     */
     private void drawEmptyState(Canvas canvas) {
         Paint emptyPaint = new Paint(textPaint);
         emptyPaint.setColor(ContextCompat.getColor(getContext(), R.color.empty_state_text));
