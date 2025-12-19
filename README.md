@@ -1,9 +1,9 @@
 ## Project notes for MindBricks
 
-### Refactor (from 16.12.25 to 17.12.25)
+### Refactor (from 16.12.25 to 19.12.25)
 
 As cited during the last lesson, it's possible to make some changes in the code before the submission of the project (scheduled for the 17th of December, 2025).
-Since our app is really big, some features are poorly implemented (not optimized, not flexible, etc). The goal of this refactor is to improve the code quality and the user experience, while also solving some bugs along the way.
+The codebase of the app is quite big, and some features were poorly implemented (not optimized, not flexible, etc). The goal of this refactor is to improve the code quality and the user experience, while also solving some bugs along the way.
 
 Here is the full list of the refactors I (@lucadibello) managed to do during in this span of time:
 
@@ -32,4 +32,4 @@ Here is the full list of the refactors I (@lucadibello) managed to do during in 
 
 > During this time span, I did not add any new feature to the app, just refactored existing code to improve its quality and maintainability, as well as removing some bugs/inconsistencies/messy code.
 
-> I used CoPilot to help me write javadoc comments (I always review them to ensure they are correct and make sense).
+> I used Copilot to help me write javadoc comments (I always review them to ensure they are correct and make sense).
