@@ -27,7 +27,6 @@
         app:layout_constraintEnd_toEndOf="@id/textSensorsTitle" />
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/sensorCardsScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"

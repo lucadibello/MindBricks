@@ -54,7 +54,6 @@
 
     <!-- Type Colors (muted alternatives) -->
 
-
     <!-- Sequential Color Scale -> for heatmaps, gradients -->
     <color name="chart_scale_0">#F5F3F7</color>
     <color name="chart_scale_2">#D4C5EC</color>
@@ -68,18 +67,4 @@
     <color name="goal_ring_focus">#52C197</color>
     <color name="goal_ring_quality">#5B8DEE</color>
     <color name="goal_ring_background">#E6E1E5</color>
-
-
-    <!-- calendar -->
-
-    <!-- PAM Score Colors -->
-    <color name="pam_high">#66BB6A</color>
-    <color name="pam_medium">#A5D6A7</color>
-    <color name="pam_medium_low">#9D83CE</color>
-    <color name="pam_low">#6B4FBB</color>
-
-
-    <!-- confidence overlay -->
-
-
 </resources>

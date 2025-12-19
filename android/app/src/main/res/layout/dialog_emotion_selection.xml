@@ -12,7 +12,6 @@
 
         <!-- Subtitle/Instructions -->
         <TextView
-            android:id="@+id/emotion_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Select the emotion that best describes your experience:"
@@ -35,7 +34,6 @@
 
         <!-- Helper text -->
         <TextView
-            android:id="@+id/emotion_helper_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tap an emotion to continue"

@@ -20,7 +20,6 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/questionnaire_title"
             style="@style/TextAppearance.Material3.HeadlineMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,7 +28,6 @@
             android:letterSpacing="0" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/questionnaire_subtitle"
             style="@style/TextAppearance.Material3.BodyMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,7 +49,6 @@
 
     <!-- Scrollable Questions Area -->
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/questions_scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
