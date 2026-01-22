@@ -316,40 +316,41 @@ MindBricks handles sensitive behavioral data (study habits, environmental condit
 
 MindBricks follows **Clean Architecture** principles with **MVVM (Model-View-ViewModel)** pattern:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Presentation Layer                   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │  Activities  │  │  Fragments   │  │ Custom Views │  │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  │
-│         │                 │                  │          │
-│         └────────────┬────┴──────────────────┘          │
-│                      ▼                                   │
-│               ┌──────────────┐                          │
-│               │  ViewModels  │                          │
-│               └──────┬───────┘                          │
-└──────────────────────┼──────────────────────────────────┘
-                       │
-┌──────────────────────┼──────────────────────────────────┐
-│                Domain Layer                              │
-│               ┌──────▼───────┐                          │
-│               │ Repositories │                          │
-│               └──────┬───────┘                          │
-│                      │                                   │
-│               ┌──────▼───────┐                          │
-│               │  Use Cases   │                          │
-│               └──────────────┘                          │
-└──────────────────────┼──────────────────────────────────┘
-                       │
-┌──────────────────────┼──────────────────────────────────┐
-│                  Data Layer                              │
-│  ┌──────────────┐   │   ┌──────────────┐               │
-│  │ Room Database│◄──┴──►│   Sensors    │               │
-│  └──────────────┘       └──────────────┘               │
-│  ┌──────────────┐       ┌──────────────┐               │
-│  │ SharedPrefs  │       │   Calendar   │               │
-│  └──────────────┘       └──────────────┘               │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph Presentation_Layer [Presentation Layer]
+        direction TB
+        Activities
+        Fragments
+        Custom_Views [Custom Views]
+        ViewModels
+        
+        Activities --> ViewModels
+        Fragments --> ViewModels
+        Custom_Views --> ViewModels
+    end
+
+    subgraph Domain_Layer [Domain Layer]
+        direction TB
+        Repositories
+        Use_Cases [Use Cases]
+        
+        ViewModels --> Repositories
+        Repositories --> Use_Cases
+    end
+
+    subgraph Data_Layer [Data Layer]
+        direction TB
+        Room_Database [Room Database]
+        Sensors
+        SharedPrefs
+        Calendar
+        
+        Use_Cases --> Room_Database
+        Use_Cases --> Sensors
+        Use_Cases --> SharedPrefs
+        Use_Cases --> Calendar
+    end
 ```
 
 ### Design Patterns Used
