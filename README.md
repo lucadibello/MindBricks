@@ -46,7 +46,20 @@ Built as a university project, MindBricks demonstrates advanced Android developm
 
 ## ✨ Features
 
-### 🎯 Core Features
+### 🌟 Key Features at a Glance
+
+| Feature | Description |
+| :--- | :--- |
+| 🍅 **Smart Timer** | Flexible **Pomodoro timer** with custom work/break intervals and subject tagging. |
+| 📡 **Focus Sensing** | Real-time monitoring of **noise, light, and motion** to ensure optimal study conditions. |
+| 📊 **Deep Analytics** | Visual insights with **7+ chart types**, heatmaps, and weekly focus trends. |
+| 🏙️ **Gamification** | Build a **virtual city** with coins earned from productive study sessions. |
+| 🤖 **AI Planner** | Smart **daily schedule recommendations** based on your habits and calendar. |
+
+<details>
+<summary><strong>Click to expand detailed feature breakdown</strong></summary>
+
+### 🔍 Detailed Feature Breakdown
 
 #### **Smart Study Timer**
 - **Pomodoro Technique Integration**: Configurable work/break intervals with customizable durations
@@ -150,6 +163,8 @@ Built as a university project, MindBricks demonstrates advanced Android developm
 - **User Profile Creation**: Set up name and avatar during onboarding
 - **Sensor Testing**: Verify sensor availability and functionality
 - **Skip Option**: Fast-track for experienced users
+
+</details>
 
 ### 🔒 Privacy & Permissions
 
