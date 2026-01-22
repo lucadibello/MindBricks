@@ -37,7 +37,7 @@
 
 ## 🎯 Overview
 
-**MindBricks** is a comprehensive Android study tracking application designed to help students and professionals optimize their learning sessions through intelligent analytics, personalized recommendations, and gamification. The app combines traditional Pomodoro techniques with modern sensor-based focus tracking, detailed analytics, and an engaging city-building game to motivate consistent study habits.
+**MindBricks** is a comprehensive Android study tracking application designed to help students and professionals optimize their learning sessions through intelligent analytics, personalized recommendations, and gamification. The app combines traditional Pomodoro techniques with modern sensor-based focus tracking and utilizes **post-session mood and perceived productivity questionnaires** to understand user productivity. This data, alongside contextual information fetched from **on-device sensors**, is analyzed to generate a **personalized study timeline** that adapts to individual habits, aiming to maximize perceived productivity and motivate consistent study habits.
 
 ---
 
