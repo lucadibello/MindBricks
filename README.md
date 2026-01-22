@@ -322,7 +322,7 @@ graph TD
         direction TB
         Activities
         Fragments
-        Custom_Views [Custom Views]
+        Custom_Views[Custom Views]
         ViewModels
         
         Activities --> ViewModels
@@ -333,7 +333,7 @@ graph TD
     subgraph Domain_Layer [Domain Layer]
         direction TB
         Repositories
-        Use_Cases [Use Cases]
+        Use_Cases[Use Cases]
         
         ViewModels --> Repositories
         Repositories --> Use_Cases
@@ -341,7 +341,7 @@ graph TD
 
     subgraph Data_Layer [Data Layer]
         direction TB
-        Room_Database [Room Database]
+        Room_Database[Room Database]
         Sensors
         SharedPrefs
         Calendar
